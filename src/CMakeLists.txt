@@ -19,6 +19,9 @@ set(PROJECT_SOURCES
         gui/mainwindow.cpp
         gui/overview/overview_widget.h
         gui/overview/overview_widget.cpp
+
+        frontend/overview/overview_controller.h
+        frontend/overview/overview_controller.cpp
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
