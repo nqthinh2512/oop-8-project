@@ -1,7 +1,7 @@
 # 📊 Personal Finance Dashboard
 
-Tổng quan về cấu trúc của cái file này, mng nhớ đọc kĩ để hiểu cấu trúc và cái workflow nha
-một vài hướng dẫn thêm tui có ghi vào docs: https://docs.google.com/document/d/1gSN3vh6dryw86OCvHgywqSVO04O7QHV6IxaESyr7VgY/edit?tab=t.zhbbnu9d614n
+* Tổng quan về cấu trúc của cái file này, mng nhớ đọc kĩ để hiểu cấu trúc và cái workflow nha
+* một vài hướng dẫn thêm tui có ghi vào docs: https://docs.google.com/document/d/1gSN3vh6dryw86OCvHgywqSVO04O7QHV6IxaESyr7VgY/edit?tab=t.zhbbnu9d614n
 ---
 
 * **Tầng GUI (Giao diện):** Chỉ lo việc hiển thị (Vẽ bảng, nút bấm, ô nhập dữ liệu). Không chứa thuật toán hay logic tính toán.
@@ -38,4 +38,4 @@ một vài hướng dẫn thêm tui có ghi vào docs: https://docs.google.com/d
         │     └── 📄 budget.h        # Cấu trúc dữ liệu hạn mức ngân sách
         │
         └── 📁 storage/              # Quản lý Đọc/Ghi dữ liệu
-              └── 📄 database_manager.h/.cpp # Quản lý mảng dữ liệu động (RAM) và File I/O (CSV)
+              └── 📄 database_manager.h/.cpp # Đây sẽ là nơi xử lý dữ liệu và File I/O (CSV)
