@@ -1,6 +1,5 @@
 # 📊 Personal Finance Dashboard
 
-Tổng quan về cấu trúc của cái file này, mng nhớ đọc kĩ để hiểu cấu trúc và cái workflow nha
 ---
 
 * **Tầng GUI (Giao diện):** Chỉ lo việc hiển thị (Vẽ bảng, nút bấm, ô nhập dữ liệu). Không chứa thuật toán hay logic tính toán.
