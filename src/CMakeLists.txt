@@ -17,17 +17,56 @@ set(PROJECT_SOURCES
 
         gui/mainwindow.h
         gui/mainwindow.cpp
-        gui/overview/overview_widget.h
-        gui/overview/overview_widget.cpp
 
         frontend/overview/overview_controller.h
         frontend/overview/overview_controller.cpp
+
+        frontend/bills/bills_controller.h
+        frontend/bills/bills_controller.cpp
+
+        frontend/budgets/budgets_controller.h
+        frontend/budgets/budgets_controller.cpp
+
+        frontend/categories/categories_controller.h
+        frontend/categories/categories_controller.cpp
+
+        frontend/reports/reports_controller.h
+        frontend/reports/reports_controller.cpp
+
+        frontend/transactions/transactions_controller.h
+        frontend/transactions/transactions_controller.cpp
+
+        gui/overview/overview_widget.h
+        gui/overview/overview_widget.cpp
+
+        gui/transactions/transactions_widget.h
+        gui/transactions/transactions_widget.cpp
+
+        gui/bills/bills_widget.h
+        gui/bills/bills_widget.cpp
+
+        gui/categories/categories_widget.h
+        gui/categories/categories_widget.cpp
+
+        gui/budgets/budgets_widget.h
+        gui/budgets/budgets_widget.cpp
+
+        gui/reports/reports_widget.h
+        gui/reports/reports_widget.cpp
+
+        backend/models/transaction.h
+        backend/models/bill.h
+        backend/models/category.h
+        backend/models/budget.h
+        backend/storage/database_manager.h
+        backend/storage/database_manager.cpp
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
     qt_add_executable(src
         MANUAL_FINALIZATION
         ${PROJECT_SOURCES}
+        frontend/overview/overview_controller.cpp frontend/overview/overview_controller.h
     )
 # Define target properties for Android with Qt 6 as:
 #    set_property(TARGET src APPEND PROPERTY QT_ANDROID_PACKAGE_SOURCE_DIR
