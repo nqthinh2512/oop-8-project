@@ -58,12 +58,6 @@ set(PROJECT_SOURCES
         backend/models/bill.h
         backend/models/category.h
         backend/models/budget.h
-
-        backend/models/transaction.cpp
-        backend/models/bill.cpp
-        backend/models/category.cpp
-        backend/models/budget.cpp
-
         backend/storage/database_manager.h
         backend/storage/database_manager.cpp
 )
