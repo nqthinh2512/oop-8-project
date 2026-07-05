@@ -36,4 +36,4 @@
         │     └── 📄 budget.h        # Cấu trúc dữ liệu hạn mức ngân sách
         │
         └── 📁 storage/              # Quản lý Đọc/Ghi dữ liệu
-              └── 📄 database_manager.h/.cpp # Quản lý mảng dữ liệu động (RAM) và File I/O (CSV)
+              └── 📄 database_manager.h/.cpp # Đây sẽ là nơi xử lý dữ liệu và File I/O (CSV)
