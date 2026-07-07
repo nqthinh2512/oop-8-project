@@ -5,6 +5,8 @@
 #include <QStackedWidget>
 #include <QPushButton>
 #include <QVBoxLayout>
+#include <QResizeEvent>
+#include <QButtonGroup>
 
 // Khai báo trước các lớp Giao diện
 class OverviewWidget;
@@ -22,6 +24,7 @@ public:
     ~MainWindow();
 
 private:
+
     // Bộ quản lý lật trang
     QStackedWidget *stackedWidget;
 

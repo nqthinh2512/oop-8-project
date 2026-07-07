@@ -1,26 +1,50 @@
+// database_manager.h
 #ifndef DATABASE_MANAGER_H
 #define DATABASE_MANAGER_H
 
-#include <vector>
-#include "../models/transaction.h"
-#include "../models/bill.h"
-#include "../models/category.h"
-#include "../models/budget.h"
+#include <QObject>
+#include <QVector>
+#include <QString>
+#include "../models/category.h" // File định nghĩa lớp Category của bạn
 
-class DatabaseManager {
+class DatabaseManager : public QObject {
+    Q_OBJECT
+
+private:
+    // Kho lưu trữ danh mục duy nhất trong RAM
+    QVector<Category> m_categories;
+
+    // Hàm tiện ích nội bộ để tự tăng ID cho danh mục mới
+    int generateNextCategoryId() const;
+
+    // Singleton constructor & destructor
+    explicit DatabaseManager(QObject *parent = nullptr);
+    ~DatabaseManager() = default;
+
 public:
-    DatabaseManager();
-    ~DatabaseManager();
+    // Hàm lấy instance duy nhất để sử dụng toàn hệ thống
+    static DatabaseManager& instance() {
+        static DatabaseManager instance;
+        return instance;
+    }
 
-    // Các kho chứa dữ liệu tạm thời trong RAM của ứng dụng
-    std::vector<Transaction> transactions;
-    std::vector<Bill> bills;
-    std::vector<Category> categories;
-    std::vector<Budget> budgets;
+    // Ngăn chặn sao chép dữ liệu database
+    DatabaseManager(const DatabaseManager&) = delete;
+    DatabaseManager& operator=(const DatabaseManager&) = delete;
 
-    // Các hàm sườn (chưa viết logic) để sau này đọc/ghi file CSV
-    bool loadDataFromStorage();
-    bool saveDataToStorage();
+    // ==========================================================
+    // 🎯 CÁC HÀM XỬ LÝ DANH MỤC THUẦN TÚY
+    // ==========================================================
+
+    // Đọc và Ghi file CSV
+    void loadCategoriesFromCSV();
+    void saveCategoriesToCSV() const;
+
+    // API lấy danh sách danh mục cấp cho giao diện UI hiển thị
+    const QVector<Category>& getAllCategories() const { return m_categories; }
+
+    // Hàm thêm danh mục tùy chỉnh từ Giao diện (UI truyền: Tên, và Root ID từ 1 đến 5)
+    void addUserCustomCategory(const QString& name, int parentId);
 };
 
 #endif // DATABASE_MANAGER_H
