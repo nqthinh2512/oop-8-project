@@ -6,12 +6,23 @@
 class Category {
 private:
     int id;
-    QString name;           // Tên danh mục (Ăn uống, Học phí...)
-    QString iconPath;       // Đường dẫn tới ảnh icon (nếu có)
+    int parentId;
+    QString name;        // Tên danh mục (Ăn uống, Học phí...)
 public:
     Category();
-    Category(int n_id, const QString& n_name, const QString& n_path = "");
-    //đừng viết trực tiếp logic cho các hàm ở đây, đi qua .cpp để viết đi.
+
+    //hàm cho backend
+    Category(int n_id, int n_parentid, const QString& n_name);
+    //hàm cho frontend
+    Category(int n_parentid, const QString& n_name);
+    //ngoại trừ hàm getter và setter thì các hàm khác không được viết logic của nó trực tiếp ở đây, đi qua .cpp để viết đi.
+
+    //getter
+    int getId() const {return id;}
+    int getParentId() const {return parentId;}
+    QString getName() const {return name;}
+
+    //setter, để tránh lỗi đè cùng ID, đừng viết hàm setId ở đây.
 };
 
 #endif // CATEGORY_H

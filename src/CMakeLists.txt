@@ -73,6 +73,8 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         MANUAL_FINALIZATION
         ${PROJECT_SOURCES}
         frontend/overview/overview_controller.cpp frontend/overview/overview_controller.h
+        backend/models/saving.h backend/models/saving.cpp
+        build/Desktop_Qt_6_11_1_MinGW_64_bit_Debug/categories.csv
     )
 # Define target properties for Android with Qt 6 as:
 #    set_property(TARGET src APPEND PROPERTY QT_ANDROID_PACKAGE_SOURCE_DIR

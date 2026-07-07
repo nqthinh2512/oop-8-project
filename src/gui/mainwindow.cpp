@@ -1,6 +1,4 @@
 #include "mainwindow.h"
-#include <QHBoxLayout>
-#include <QFrame>
 
 // Include tất cả các trang con vào khung xương chính
 #include "overview/overview_widget.h"
@@ -10,8 +8,10 @@
 #include "budgets/budgets_widget.h"
 #include "reports/reports_widget.h"
 
+
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     resize(1000, 700);
+    showMaximized();
     setWindowTitle("Personal Finance Dashboard - Nhóm 8 Template");
 
     // 1. Tạo Widget trung tâm tổng và Layout ngang chính (Trái: Menu, Phải: Nội dung)
@@ -28,20 +28,31 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     QVBoxLayout *sidebarLayout = new QVBoxLayout(sidebar);
     sidebarLayout->setContentsMargins(10, 30, 10, 30);
     sidebarLayout->setSpacing(10);
+    QButtonGroup *sidebarGroup = new QButtonGroup(this);
+    sidebarGroup->setExclusive(true);
 
     // Khởi tạo 6 nút bấm menu điều hướng
     btnOverview = new QPushButton("📊 Tổng quan", sidebar);
     btnTransactions = new QPushButton("📝 Lịch sử giao dịch", sidebar);
     btnBills = new QPushButton("🧾 Quản lý hóa đơn", sidebar);
     btnCategories = new QPushButton("📁 Danh mục", sidebar);
-    btnBudgets = new QPushButton("💰 Tiết kiệm & Ngân sách", sidebar);
+    btnBudgets = new QPushButton("💰 Tiết kiệm / Ngân sách", sidebar);
     btnReports = new QPushButton("📈 Báo cáo / Phân tích", sidebar);
+
+    //Button group action
+    btnOverview->setCheckable(true); sidebarGroup->addButton(btnOverview);
+    btnTransactions->setCheckable(true); sidebarGroup->addButton(btnTransactions);
+    btnBills->setCheckable(true); sidebarGroup->addButton(btnBills);
+    btnCategories->setCheckable(true); sidebarGroup->addButton(btnCategories);
+    btnBudgets->setCheckable(true); sidebarGroup->addButton(btnBudgets);
+    btnReports->setCheckable(true); sidebarGroup->addButton(btnReports);
 
     // Nút Style định dạng CSS thuần cho mượt mà chuyên nghiệp
     QString buttonStyle = "QPushButton { color: #ecf0f1; background-color: transparent; text-align: left; "
                           "padding: 12px; border-radius: 5px; font-size: 14px; font-weight: bold; }"
                           "QPushButton:hover { background-color: #34495e; }"
-                          "QPushButton:pressed { background-color: #1abc9c; }";
+                          "QPushButton:pressed { background-color: #1abc9c; }"
+                          "QPushButton:checked {color: #FFFFFF; background-color: #2A82DA; font-weight: bold; border-left: 4px solid #00E5FF}";
 
     btnOverview->setStyleSheet(buttonStyle);
     btnTransactions->setStyleSheet(buttonStyle);
@@ -83,6 +94,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     mainLayout->addWidget(stackedWidget, 1);
 
     // 4. KẾT NỐI CÁC NÚT BẤM VỚI SỰ KIỆN LẬT TRANG (Signals & Slots)
+    btnOverview->setChecked(true); // mặc định overview là checked
     connect(btnOverview, &QPushButton::clicked, [=]() { stackedWidget->setCurrentIndex(0); });
     connect(btnTransactions, &QPushButton::clicked, [=]() { stackedWidget->setCurrentIndex(1); });
     connect(btnBills, &QPushButton::clicked, [=]() { stackedWidget->setCurrentIndex(2); });
