@@ -21,14 +21,16 @@ class DatabaseManager : public QObject {
     Q_OBJECT
 
 private:
+
+
+    explicit DatabaseManager(QObject *parent = nullptr);
+    ~DatabaseManager() = default;
+
     //===========================CATEGORY SECTION=============================
 
     QVector<Category> m_categories;
 
     int generateNextCategoryId() const;
-
-    explicit DatabaseManager(QObject *parent = nullptr);
-    ~DatabaseManager() = default;
 
     //=============================BILL SECTION==================================
 
