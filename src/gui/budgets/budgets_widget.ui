@@ -6,15 +6,9 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1700</width>
-    <height>860</height>
+    <width>1200</width>
+    <height>675</height>
    </rect>
-  </property>
-  <property name="minimumSize">
-   <size>
-    <width>780</width>
-    <height>480</height>
-   </size>
   </property>
   <property name="windowTitle">
    <string>Form</string>
@@ -23,7 +17,7 @@
    <item>
     <widget class="QLabel" name="label">
      <property name="text">
-      <string>Trang 5: Tiết Kiệm & Ngân Sách (Trống)</string>
+      <string>Trang 5: Tiết Kiệm  Ngân Sách (Trống)</string>
      </property>
      <property name="alignment">
       <set>Qt::AlignCenter</set>
