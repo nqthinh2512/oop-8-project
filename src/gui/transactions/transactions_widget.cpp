@@ -1,10 +1,13 @@
 #include "transactions_widget.h"
-#include <QLabel>
-#include <QVBoxLayout>
-TransactionsWidget::TransactionsWidget(QWidget *parent) : QWidget(parent) {
-    QVBoxLayout *layout = new QVBoxLayout(this);
-    QLabel *label = new QLabel("Trang 2: Lịch Sử Giao Dịch (Trống)", this);
-    label->setAlignment(Qt::AlignCenter);
-    layout->addWidget(label);
+#include "ui_transactions_widget.h"
+
+TransactionsWidget::TransactionsWidget(QWidget *parent)
+    : QWidget(parent),
+    ui(new Ui::TransactionsWidget)
+{
+    ui->setupUi(this);
 }
-TransactionsWidget::~TransactionsWidget() {}
+
+TransactionsWidget::~TransactionsWidget() {
+    delete ui;
+}
