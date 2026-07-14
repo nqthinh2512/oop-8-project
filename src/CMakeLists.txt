@@ -81,6 +81,11 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         backend/storage/database_manager_transaction.cpp
         gui/categories/categories_widget.ui
         gui/mainwindow.ui
+        gui/bills/bills_widget.ui
+        gui/budgets/budgets_widget.ui
+        gui/overview/overview_widget.ui
+        gui/reports/reports_widget.ui
+        gui/transactions/transactions_widget.ui
 
     )
 # Define target properties for Android with Qt 6 as:
