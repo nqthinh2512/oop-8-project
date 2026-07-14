@@ -79,6 +79,9 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         backend/storage/database_manager_budget.cpp
         backend/storage/database_manager_saving.cpp
         backend/storage/database_manager_transaction.cpp
+        gui/categories/categories_widget.ui
+        gui/mainwindow.ui
+
     )
 # Define target properties for Android with Qt 6 as:
 #    set_property(TARGET src APPEND PROPERTY QT_ANDROID_PACKAGE_SOURCE_DIR
