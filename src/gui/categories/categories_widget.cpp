@@ -1,10 +1,11 @@
 #include "categories_widget.h"
-#include <QLabel>
-#include <QVBoxLayout>
-CategoriesWidget::CategoriesWidget(QWidget *parent) : QWidget(parent) {
-    QVBoxLayout *layout = new QVBoxLayout(this);
-    QLabel *label = new QLabel("Trang 4: Quản Lý Danh Mục (Trống)", this);
-    label->setAlignment(Qt::AlignCenter);
-    layout->addWidget(label);
+#include "ui_categories_widget.h"
+
+
+CategoriesWidget::CategoriesWidget(QWidget *parent) : QWidget(parent), ui(new Ui::CategoriesWidget) {
+    ui->setupUi(this);
+    ui->txtCategoryName->setPlaceholderText("e.g., Groceries, Rent, Salary...");
 }
-CategoriesWidget::~CategoriesWidget() {}
+CategoriesWidget::~CategoriesWidget() {
+    delete ui;
+}

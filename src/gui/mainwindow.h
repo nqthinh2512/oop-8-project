@@ -2,19 +2,20 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
-#include <QStackedWidget>
-#include <QPushButton>
-#include <QVBoxLayout>
-#include <QResizeEvent>
 #include <QButtonGroup>
 
-// Khai báo trước các lớp Giao diện
+// Forward declarations of your page widget classes
 class OverviewWidget;
 class TransactionsWidget;
 class BillsWidget;
 class CategoriesWidget;
 class BudgetsWidget;
 class ReportsWidget;
+
+// Standard Qt namespace container for generated UI blueprints
+namespace Ui {
+class MainWindow;
+}
 
 class MainWindow : public QMainWindow {
     Q_OBJECT
@@ -24,28 +25,19 @@ public:
     ~MainWindow();
 
 private:
+    // The bridge pointer holding access to your visual designer canvas elements
+    Ui::MainWindow *ui;
 
-    // Bộ quản lý lật trang
-    QStackedWidget *stackedWidget;
+    // A group container to manage exclusive navigation menu selections
+    QButtonGroup *sidebarGroup;
 
-    // Các con trỏ lưu trữ 6 trang giao diện chính
+    // Sub-page pointer tracking instances inside the page swapper framework
     OverviewWidget *overviewPage;
     TransactionsWidget *transactionsPage;
     BillsWidget *billsPage;
     CategoriesWidget *categoriesPage;
     BudgetsWidget *budgetsPage;
     ReportsWidget *reportsPage;
-
-    // Các nút bấm trên thanh Sidebar điều hướng
-    QPushButton *btnOverview;
-    QPushButton *btnTransactions;
-    QPushButton *btnBills;
-    QPushButton *btnCategories;
-    QPushButton *btnBudgets;
-    QPushButton *btnReports;
-
-    // Hàm phụ trợ tạo giao diện điều hướng
-    void setupNavigation();
 };
 
 #endif // MAINWINDOW_H

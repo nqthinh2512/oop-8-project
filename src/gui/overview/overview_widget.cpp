@@ -1,10 +1,13 @@
 #include "overview_widget.h"
-#include <QLabel>
-#include <QVBoxLayout>
-OverviewWidget::OverviewWidget(QWidget *parent) : QWidget(parent) {
-    QVBoxLayout *layout = new QVBoxLayout(this);
-    QLabel *label = new QLabel("Trang 1: Tổng Quan (Trống)", this);
-    label->setAlignment(Qt::AlignCenter);
-    layout->addWidget(label);
+#include "ui_overview_widget.h"
+
+OverviewWidget::OverviewWidget(QWidget *parent)
+    : QWidget(parent),
+    ui(new Ui::OverviewWidget)
+{
+    ui->setupUi(this);
 }
-OverviewWidget::~OverviewWidget() {}
+
+OverviewWidget::~OverviewWidget() {
+    delete ui;
+}
