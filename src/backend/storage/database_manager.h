@@ -49,10 +49,7 @@ private:
 
 
     //==========================TRANSACTION SECTION=================================
-
-
-
-
+    QVector<Transaction*> m_transactions;
 
 public:
 
@@ -95,6 +92,26 @@ public:
 
 
     //==========================TRANSACTION SECTION=================================
+    // CÁC HÀM XỬ LÝ GIAO DỊCH (CRUD - OOP)
+    
+    // Sinh ID mới cho Giao dịch
+    int generateNextTransactionId() const;
+    
+    // Đọc và Ghi file CSV cho giao dịch
+    void loadTransactionsFromCSV();
+    void saveTransactionsToCSV() const;
+    
+    // API Read: Lấy danh sách giao dịch
+    const QVector<Transaction*>& getAllTransactions() const { return m_transactions; }
+    
+    // API Create: Thêm giao dịch (Truyền con trỏ đa hình vào)
+    void addTransaction(Transaction* newTransaction);
+    
+    // API Update: Cập nhật giao dịch bằng ID
+    bool updateTransaction(int id, double amount, const QDateTime& dateTime, int categoryId, const QString& note, const QString& transactionType, const QString& paymentMethod);
+    
+    // API Delete: Xóa giao dịch bằng ID
+    bool deleteTransaction(int id);
 };
 
 #endif // DATABASE_MANAGER_H
