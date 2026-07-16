@@ -24,7 +24,7 @@ private:
 
 
     explicit DatabaseManager(QObject *parent = nullptr);
-    ~DatabaseManager(); // Ghi đè để quản lý bộ nhớ (xóa con trỏ)
+    ~DatabaseManager() = default;
 
     //===========================CATEGORY SECTION=============================
 
@@ -47,10 +47,9 @@ private:
 
 
 
+
     //==========================TRANSACTION SECTION=================================
-    // Kho lưu trữ giao dịch (dùng con trỏ để hỗ trợ Đa hình - Polymorphism)
-    // Ghi chú cho giáo viên: Sử dụng mảng con trỏ lớp cơ sở để chứa cả Income và Expense.
-    QVector<Transaction*> m_transactions;
+
 
 
 
@@ -96,28 +95,6 @@ public:
 
 
     //==========================TRANSACTION SECTION=================================
-    // ==========================================================
-    // 🎯 CÁC HÀM XỬ LÝ GIAO DỊCH (CRUD - OOP)
-    // ==========================================================
-    
-    // Sinh ID mới cho Giao dịch (Public để Controller có thể gọi khi new đối tượng)
-    int generateNextTransactionId() const;
-    
-    // Đọc và Ghi file CSV cho giao dịch
-    void loadTransactionsFromCSV();
-    void saveTransactionsToCSV() const;
-    
-    // API Read: Lấy danh sách giao dịch
-    const QVector<Transaction*>& getAllTransactions() const { return m_transactions; }
-    
-    // API Create: Thêm giao dịch (Truyền con trỏ đa hình vào)
-    void addTransaction(Transaction* newTransaction);
-    
-    // API Update: Cập nhật giao dịch bằng ID
-    bool updateTransaction(int id, double amount, const QDateTime& dateTime, int categoryId, const QString& description, const QString& account);
-    
-    // API Delete: Xóa giao dịch bằng ID
-    bool deleteTransaction(int id);
 };
 
 #endif // DATABASE_MANAGER_H
