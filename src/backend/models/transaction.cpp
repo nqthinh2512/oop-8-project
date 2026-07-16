@@ -5,19 +5,17 @@ Transaction::Transaction():
     amount(0),
     categoryId(0),
     dateTime(QDateTime::currentDateTime()),
-    description(""),
-    account("") {}
+    note("") {}
 
-Transaction::Transaction(int n_id, double n_amount, const QDateTime& n_date, const QString& n_desc, int n_categoryid, const QString& n_account):
+Transaction::Transaction(int n_id, double n_amount, const QDateTime& n_date, const QString& n_note, int n_categoryid):
     id(n_id),
     amount(n_amount),
     categoryId(n_categoryid),
     dateTime(n_date),
-    description(n_desc),
-    account(n_account) {}
+    note(n_note) {}
 
-Income::Income(int n_id, double n_amount, const QDateTime& n_date, const QString& n_desc, int n_categoryid, const QString& n_account):
-    Transaction(n_id, n_amount, n_date, n_desc, n_categoryid, n_account) {}
+Income::Income(int n_id, double n_amount, const QDateTime& n_date, const QString& n_note, int n_categoryid):
+    Transaction(n_id,n_amount,n_date,n_note,n_categoryid) {}
 
-Expense::Expense(int n_id, double n_amount, const QDateTime& n_date, const QString& n_desc, int n_categoryid, const QString& n_account):
-    Transaction(n_id, n_amount, n_date, n_desc, n_categoryid, n_account) {}
+Expense::Expense(int n_id, double n_amount, const QDateTime& n_date, const QString& n_note, int n_categoryid):
+    Transaction(n_id,n_amount,n_date,n_note,n_categoryid) {}
