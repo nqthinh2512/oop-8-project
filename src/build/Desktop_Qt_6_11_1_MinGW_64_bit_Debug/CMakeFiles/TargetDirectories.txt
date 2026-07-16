@@ -1,0 +1,9 @@
+D:/HCMUS/HK3-NAMNHAT/OOP/projectQT/oop-8-project/src/build/Desktop_Qt_6_11_1_MinGW_64_bit_Debug/CMakeFiles/src.dir
+D:/HCMUS/HK3-NAMNHAT/OOP/projectQT/oop-8-project/src/build/Desktop_Qt_6_11_1_MinGW_64_bit_Debug/CMakeFiles/edit_cache.dir
+D:/HCMUS/HK3-NAMNHAT/OOP/projectQT/oop-8-project/src/build/Desktop_Qt_6_11_1_MinGW_64_bit_Debug/CMakeFiles/rebuild_cache.dir
+D:/HCMUS/HK3-NAMNHAT/OOP/projectQT/oop-8-project/src/build/Desktop_Qt_6_11_1_MinGW_64_bit_Debug/CMakeFiles/list_install_components.dir
+D:/HCMUS/HK3-NAMNHAT/OOP/projectQT/oop-8-project/src/build/Desktop_Qt_6_11_1_MinGW_64_bit_Debug/CMakeFiles/install.dir
+D:/HCMUS/HK3-NAMNHAT/OOP/projectQT/oop-8-project/src/build/Desktop_Qt_6_11_1_MinGW_64_bit_Debug/CMakeFiles/install/local.dir
+D:/HCMUS/HK3-NAMNHAT/OOP/projectQT/oop-8-project/src/build/Desktop_Qt_6_11_1_MinGW_64_bit_Debug/CMakeFiles/install/strip.dir
+D:/HCMUS/HK3-NAMNHAT/OOP/projectQT/oop-8-project/src/build/Desktop_Qt_6_11_1_MinGW_64_bit_Debug/CMakeFiles/src_autogen_timestamp_deps.dir
+D:/HCMUS/HK3-NAMNHAT/OOP/projectQT/oop-8-project/src/build/Desktop_Qt_6_11_1_MinGW_64_bit_Debug/CMakeFiles/src_autogen.dir

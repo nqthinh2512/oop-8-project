@@ -42,6 +42,9 @@ set(PROJECT_SOURCES
         gui/transactions/transactions_widget.h
         gui/transactions/transactions_widget.cpp
 
+        gui/transactions/add_transaction_dialog.h
+        gui/transactions/add_transaction_dialog.cpp
+
         gui/bills/bills_widget.h
         gui/bills/bills_widget.cpp
 
