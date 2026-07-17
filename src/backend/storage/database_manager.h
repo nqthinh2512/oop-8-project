@@ -32,6 +32,7 @@ private:
 
     int generateNextCategoryId() const;
 
+
     //=============================BILL SECTION==================================
 
 
@@ -77,6 +78,9 @@ public:
 
     // Hàm thêm danh mục tùy chỉnh từ Giao diện (UI truyền: Tên, và Root ID từ 1 đến 5)
     void addUserCustomCategory(const QString& name, int parentId);
+
+    void updateCategoryParent(int id, int newParentId);
+    void removeCategory(int id);
 
     //=============================BILL SECTION==================================
 

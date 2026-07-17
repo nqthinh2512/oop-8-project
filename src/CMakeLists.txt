@@ -89,6 +89,9 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         gui/categories/add_category_dialog.ui
         gui/categories/add_category_dialog.h
         gui/categories/add_category_dialog.cpp
+        gui/categories/category_remove_button.h
+        gui/categories/category_remove_button.cpp
+
 
 
     )

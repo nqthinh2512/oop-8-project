@@ -23,6 +23,7 @@ public:
     QString getName() const {return name;}
 
     //setter, để tránh lỗi đè cùng ID, đừng viết hàm setId ở đây.
+    void setParentId(int newParentId) { parentId = newParentId; }
 
     static QString parentCategoryName(int parentId);
 

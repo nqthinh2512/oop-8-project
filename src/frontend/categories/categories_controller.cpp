@@ -1,17 +1,37 @@
 #include "categories_controller.h"
 #include "../../gui/categories/categories_widget.h"
 #include "../../backend/storage/database_manager.h"
+#include <QTimer>
+#include <QMessageBox>
+
 
 CategoriesController::CategoriesController(CategoriesWidget *widget, QObject *parent)
     : QObject(parent), m_widget(widget) {
     refreshCategoryList();
     connect(m_widget, &CategoriesWidget::addCategoryRequested,
             this, &CategoriesController::onAddCategoryRequested);
+    connect(m_widget, &CategoriesWidget::filterChanged,
+            this, &CategoriesController::onFilterChanged);
+    connect(m_widget, &CategoriesWidget::categoryParentChanged,
+            this, &CategoriesController::onCategoryParentChanged);
+    connect(m_widget, &CategoriesWidget::removeCategoryRequested,
+            this, &CategoriesController::onRemoveCategoryRequested);
 }
 
 void CategoriesController::refreshCategoryList() {
     const QVector<Category>& categories = DatabaseManager::instance().getAllCategories();
-    m_widget->displayCategories(categories);
+    if (m_currentFilter==0){
+        m_widget->displayCategories(categories);
+        return;
+    }
+
+    QVector<Category> filtered;
+    for (const Category& cat: categories){
+        if (cat.getParentId()==m_currentFilter){
+            filtered.append(cat);
+        }
+    }
+    m_widget->displayCategories(filtered);
 }
 
 void CategoriesController::onAddCategoryRequested(const QString &name, int parentId) {
@@ -22,4 +42,33 @@ void CategoriesController::onAddCategoryRequested(const QString &name, int paren
 
     DatabaseManager::instance().addUserCustomCategory(name, parentId);
     refreshCategoryList();
+}
+
+void CategoriesController::onFilterChanged(int parentId){
+    m_currentFilter = parentId;
+    refreshCategoryList();
+}
+
+void CategoriesController::onCategoryParentChanged(int id,int newParentId){
+    DatabaseManager::instance().updateCategoryParent(id, newParentId);
+
+    QTimer::singleShot(0, this, [this]() {
+        refreshCategoryList();
+    });
+
+}
+
+void CategoriesController::onRemoveCategoryRequested(int id, const QString& name) {
+    QString msg = "Are you sure you want to delete " + name + " category";
+    QMessageBox::StandardButton reply = QMessageBox::question(
+        m_widget,
+        "Confirm Deletion",
+        msg,
+        QMessageBox::Yes | QMessageBox::No
+        );
+
+    if (reply == QMessageBox::Yes) {
+        DatabaseManager::instance().removeCategory(id);
+        refreshCategoryList();
+    }
 }

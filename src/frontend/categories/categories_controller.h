@@ -12,9 +12,13 @@ public:
 
 private slots:
     void onAddCategoryRequested(const QString &name, int parentId);
+    void onFilterChanged(int parentId);
+    void onCategoryParentChanged(int id, int newParentId);
+    void onRemoveCategoryRequested(int id,const QString& name);
 
 private:
     CategoriesWidget *m_widget;
+    int m_currentFilter = 0;
     void refreshCategoryList();
 };
 

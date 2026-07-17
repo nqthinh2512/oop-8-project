@@ -18,9 +18,13 @@ public:
 
 signals:
     void addCategoryRequested(const QString &name, int parentId);
+    void filterChanged(int parentId);
+    void categoryParentChanged(int id, int newParentId);
+    void removeCategoryRequested(int id, const QString& name);
 
 private slots:
     void onAddButtonClicked();
+    void onFilterChanged(int index);
 
 private:
     Ui::CategoriesWidget *ui;
