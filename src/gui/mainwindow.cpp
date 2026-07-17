@@ -9,6 +9,8 @@
 #include "budgets/budgets_widget.h"
 #include "reports/reports_widget.h"
 
+#include "../frontend/categories/categories_controller.h"
+
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent),
     ui(new Ui::MainWindow) // Allocates the visual engine tracking pointer
@@ -47,7 +49,7 @@ MainWindow::MainWindow(QWidget *parent)
     overviewPage = new OverviewWidget(this);
     transactionsPage = new TransactionsWidget(this);
     billsPage = new BillsWidget(this);
-    categoriesPage = new CategoriesWidget(this);
+    categoriesPage = new CategoriesWidget(this); new CategoriesController(categoriesPage, this);
     budgetsPage = new BudgetsWidget(this);
     reportsPage = new ReportsWidget(this);
 
