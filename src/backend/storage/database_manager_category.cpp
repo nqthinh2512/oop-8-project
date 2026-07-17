@@ -90,3 +90,23 @@ void DatabaseManager::addUserCustomCategory(const QString& name, int parentId) {
     saveCategoriesToCSV();
     qDebug() << "Đã tạo danh mục mới thành công! Tên:" << name << "| ID:" << newId << "| Thuộc nhóm gốc:" << parentId;
 }
+
+void DatabaseManager::updateCategoryParent(int id, int newParentId) {
+    for (Category& cat : m_categories) {
+        if (cat.getId() == id) {
+            cat.setParentId(newParentId);
+            break;
+        }
+    }
+    saveCategoriesToCSV();
+}
+
+void DatabaseManager::removeCategory(int id) {
+    for (int i = 0; i < m_categories.size(); ++i) {
+        if (m_categories[i].getId() == id) {
+            m_categories.removeAt(i);
+            break;
+        }
+    }
+    saveCategoriesToCSV();
+}

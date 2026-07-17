@@ -86,6 +86,13 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         gui/overview/overview_widget.ui
         gui/reports/reports_widget.ui
         gui/transactions/transactions_widget.ui
+        gui/categories/add_category_dialog.ui
+        gui/categories/add_category_dialog.h
+        gui/categories/add_category_dialog.cpp
+        gui/categories/category_remove_button.h
+        gui/categories/category_remove_button.cpp
+
+
 
     )
 # Define target properties for Android with Qt 6 as:
