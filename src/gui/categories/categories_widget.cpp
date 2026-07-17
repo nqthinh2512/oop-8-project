@@ -10,6 +10,7 @@ CategoriesWidget::CategoriesWidget(QWidget *parent) : QWidget(parent), ui(new Ui
     ui->setupUi(this);
 
     ui->tableWidget->setColumnCount(4);
+    ui->searchLineEdit->setPlaceholderText("Search by name...");
     ui->tableWidget->setHorizontalHeaderLabels({"ID", "Name", "Parent Category", "Actions"});
     ui->tableWidget->setEditTriggers(QAbstractItemView::NoEditTriggers);
     ui->tableWidget->verticalHeader()->setVisible(false);
@@ -44,6 +45,7 @@ CategoriesWidget::CategoriesWidget(QWidget *parent) : QWidget(parent), ui(new Ui
 
     connect(ui->filterComboBox, &QComboBox::currentIndexChanged, this, &CategoriesWidget::onFilterChanged);
     connect(ui->pushButton, &QPushButton::clicked, this, &CategoriesWidget::onAddButtonClicked);
+    connect(ui->searchLineEdit, &QLineEdit::textChanged, this, &CategoriesWidget::searchTextChanged);
 }
 
 CategoriesWidget::~CategoriesWidget() {
@@ -54,6 +56,8 @@ void CategoriesWidget::onAddButtonClicked() {
     AddCategoryDialog dialog(this);
 
     if (dialog.exec() == QDialog::Accepted) {
+        ui->filterComboBox->setCurrentIndex(0);
+        ui->searchLineEdit->clear();
         emit addCategoryRequested(dialog.getCategoryName(), dialog.getParentId());
     }
 }

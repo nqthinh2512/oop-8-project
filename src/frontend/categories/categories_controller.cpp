@@ -16,22 +16,29 @@ CategoriesController::CategoriesController(CategoriesWidget *widget, QObject *pa
             this, &CategoriesController::onCategoryParentChanged);
     connect(m_widget, &CategoriesWidget::removeCategoryRequested,
             this, &CategoriesController::onRemoveCategoryRequested);
+    connect(m_widget, &CategoriesWidget::searchTextChanged,
+            this, &CategoriesController::onSearchTextChanged);
 }
 
 void CategoriesController::refreshCategoryList() {
     const QVector<Category>& categories = DatabaseManager::instance().getAllCategories();
-    if (m_currentFilter==0){
-        m_widget->displayCategories(categories);
-        return;
-    }
 
-    QVector<Category> filtered;
-    for (const Category& cat: categories){
-        if (cat.getParentId()==m_currentFilter){
-            filtered.append(cat);
+    QVector<Category> results;
+    for (const Category& cat : categories){
+        bool matchesFilter = (m_currentFilter == 0) || (cat.getParentId() == m_currentFilter);
+        bool matchesSearch = cat.getName().contains(m_currentSearchText, Qt::CaseInsensitive);
+
+        if (matchesFilter && matchesSearch){
+            results.append(cat);
         }
     }
-    m_widget->displayCategories(filtered);
+
+    m_widget->displayCategories(results);
+}
+
+void CategoriesController::onSearchTextChanged(const QString &text) {
+    m_currentSearchText = text;
+    refreshCategoryList();
 }
 
 void CategoriesController::onAddCategoryRequested(const QString &name, int parentId) {

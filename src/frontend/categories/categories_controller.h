@@ -15,10 +15,12 @@ private slots:
     void onFilterChanged(int parentId);
     void onCategoryParentChanged(int id, int newParentId);
     void onRemoveCategoryRequested(int id,const QString& name);
+    void onSearchTextChanged(const QString& text);
 
 private:
     CategoriesWidget *m_widget;
     int m_currentFilter = 0;
+    QString m_currentSearchText;
     void refreshCategoryList();
 };
 
