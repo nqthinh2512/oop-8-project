@@ -1,44 +1,59 @@
-#pragma once
+#ifndef BUDGETS_CONTROLLER_H
+#define BUDGETS_CONTROLLER_H
+
 #include <QObject>
 #include <QList>
+#include <QString>
 #include <QDate>
-#include "../../backend/models/budget.h"
-#include "../../backend/storage/database_manager.h"
+#include "../../backend/models/budget.h"          // Budget, Priority, BudgetStatus
+#include "../../backend/storage/database_manager.h" // DatabaseManager
 
-// Controller xử lý logic cho TAB NGÂN SÁCH.
-// Không được viết layout/widget ở đây - chỉ logic (đúng nguyên tắc tách tầng của project).
 class BudgetsController : public QObject
 {
     Q_OBJECT
 public:
     explicit BudgetsController(DatabaseManager* dbManager, QObject* parent = nullptr);
 
-    // Trả về danh sách ngân sách ĐÃ áp bộ lọc hiện tại -> GUI chỉ việc render
+    // Lấy toàn bộ ngân sách từ DatabaseManager (chưa lọc)
+    QList<Budget> loadAll() const;
+
+    // Lấy danh sách ngân sách đã áp dụng bộ lọc hiện tại (danh mục + khoảng thời gian)
     QList<Budget> getFilteredBudgets() const;
 
-    // ---- CRUD ----
+    // Tạo mới một ngân sách, trả về true nếu thành công
     bool createBudget(const QString& name, Priority priority, int categoryId,
                       double limit, const QDate& startDate, const QDate& endDate);
+
+    // Sửa một ngân sách đã có (giữ nguyên số tiền đã chi), trả về true nếu thành công
     bool editBudget(int budgetId, const QString& name, Priority priority, int categoryId,
                     double limit, const QDate& startDate, const QDate& endDate);
+
+    // Xóa một ngân sách theo id, trả về true nếu thành công
     bool removeBudget(int budgetId);
 
-    // ---- Filter ----
-    void setCategoryFilter(int categoryId);   // truyền -1 = không lọc, lấy tất cả danh mục
+    // Thiết lập bộ lọc theo danh mục (-1 = không lọc)
+    void setCategoryFilter(int categoryId);
+
+    // Thiết lập bộ lọc theo khoảng thời gian
     void setDateRangeFilter(const QDate& from, const QDate& to);
+
+    // Xóa hết bộ lọc hiện tại
     void clearFilters();
 
-    // ---- Helper cho GUI ----
-    static QString statusToColorHex(BudgetStatus status); // map trạng thái -> mã màu hiển thị
+    // Chuyển trạng thái ngân sách (Safe/Warning/Danger/Over) sang mã màu hex để GUI tô màu
+    static QString statusToColorHex(BudgetStatus status);
 
 signals:
-    void budgetsChanged(); // GUI kết nối (connect) signal này để tự reload danh sách khi có thay đổi
+    // Phát ra mỗi khi dữ liệu ngân sách hoặc bộ lọc thay đổi, để GUI biết mà load lại danh sách
+    void budgetsChanged();
 
 private:
-    DatabaseManager* db;        // controller không sở hữu, được MainWindow truyền vào (dependency injection)
-    int filterCategoryId = -1;  // -1 nghĩa là "tất cả danh mục"
-    QDate filterFrom;
-    QDate filterTo;
+    DatabaseManager* db;
 
-    QList<Budget> loadAll() const; // đọc toàn bộ ngân sách từ database_manager
+    // Trạng thái bộ lọc hiện tại
+    int filterCategoryId = -1;   // -1 nghĩa là không lọc theo danh mục
+    QDate filterFrom;            // không hợp lệ (isValid() == false) nghĩa là không giới hạn từ ngày nào
+    QDate filterTo;              // không hợp lệ (isValid() == false) nghĩa là không giới hạn đến ngày nào
 };
+
+#endif // BUDGETS_CONTROLLER_H

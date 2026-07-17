@@ -34,9 +34,6 @@ public:
     Budget(int n_id, const QString& n_name, Priority n_priority, int n_categoryId,
            double n_limit, const QDate& n_startDate, const QDate& n_endDate, double n_spent = 0.0);
 
-    // ngoại trừ getter/setter, các hàm khác viết logic ở budget.cpp
-
-    // getter
     int getId() const { return id; }
     QString getName() const { return name; }
     Priority getPriority() const { return priority; }
@@ -46,7 +43,6 @@ public:
     QDate getStartDate() const { return startDate; }
     QDate getEndDate() const { return endDate; }
 
-    // setter (không có setId, tránh đè trùng id)
     void setName(const QString& n_name);
     void setPriority(Priority n_priority);
     void setCategoryId(int n_categoryId);

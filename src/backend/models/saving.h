@@ -15,15 +15,14 @@ public:
     // 5 sẽ là số chỉ định cho danh mục cha này
     Saving();
     Saving(int n_id, const QString& n_name, const QDate& n_dueDate, double n_target, double n_current=0.0, int n_categoryid=0);
-    //ngoại trừ hàm getter và setter thì các hàm khác không được viết logic của nó trực tiếp ở đây, đi qua .cpp để viết đi.
-    //getter
+
     int getId() const {return id;}
     int getCategoryId() const {return categoryId;}
     QString getName() const {return name;}
     double getTarget() const {return targetAmount;}
     double getCurrent() const{return currentAmount;}
     QDate getDueDate() const {return dueDate;}
-    //setter, để tránh lỗi đè cùng ID, đừng viết hàm setId.
+
     void setCategoryId(int n_categoryId);
     void setName(const QString& n_name);
     void setTarget(double n_target);
