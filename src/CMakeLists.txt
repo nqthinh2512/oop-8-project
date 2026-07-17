@@ -41,6 +41,9 @@ set(PROJECT_SOURCES
 
         gui/transactions/transactions_widget.h
         gui/transactions/transactions_widget.cpp
+        
+        gui/transactions/transaction_dialog.h
+        gui/transactions/transaction_dialog.cpp
 
         gui/bills/bills_widget.h
         gui/bills/bills_widget.cpp
@@ -86,6 +89,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         gui/overview/overview_widget.ui
         gui/reports/reports_widget.ui
         gui/transactions/transactions_widget.ui
+        gui/transactions/transaction_dialog.ui
 
     )
 # Define target properties for Android with Qt 6 as:

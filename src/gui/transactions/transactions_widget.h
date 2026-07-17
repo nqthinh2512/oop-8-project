@@ -16,6 +16,9 @@ public:
 
 private:
     Ui::TransactionsWidget *ui;
+    
+    // Hàm tải dữ liệu vào bảng
+    void loadTransactionsToTable();
 };
 
 #endif

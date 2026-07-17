@@ -1,0 +1,314 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>TransactionDialog</class>
+ <widget class="QDialog" name="TransactionDialog">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>450</width>
+    <height>475</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Add Transaction</string>
+  </property>
+  <layout class="QVBoxLayout" name="windowLayout">
+   <property name="leftMargin">
+    <number>0</number>
+   </property>
+   <property name="topMargin">
+    <number>0</number>
+   </property>
+   <property name="rightMargin">
+    <number>0</number>
+   </property>
+   <property name="bottomMargin">
+    <number>0</number>
+   </property>
+   <item>
+    <widget class="QFrame" name="mainFrame">
+     <property name="styleSheet">
+      <string>
+#mainFrame {
+    background-color: #fcfcfc;
+    border-radius: 16px;
+    border: 1px solid #e0e0e0;
+}
+QLabel {
+    font-size: 14px;
+    color: #333333;
+    font-weight: bold;
+    background-color: transparent;
+}
+QLineEdit, QComboBox, QDateEdit {
+    padding: 8px 12px;
+    border: 1px solid #dcdcdc;
+    border-radius: 8px;
+    background-color: white;
+    color: #333333;
+    font-size: 14px;
+    min-height: 24px;
+}
+QComboBox QAbstractItemView {
+    background-color: white;
+    color: #333333;
+    selection-background-color: #e8f0fe;
+    selection-color: #1a73e8;
+    border-radius: 4px;
+}
+QCalendarWidget QWidget {
+    color: #333333;
+    background-color: white;
+}
+QCalendarWidget QToolButton {
+    color: #333333;
+}
+/* Style cho loại giao dịch như nút bấm */
+QRadioButton::indicator {
+    width: 0px;
+    height: 0px;
+    background: none;
+    border: none;
+}
+QRadioButton {
+    font-size: 13px;
+    font-weight: bold;
+    color: #555555;
+    background-color: #f0f0f0;
+    padding: 6px 16px;
+    border-radius: 8px;
+    min-width: 70px;
+    max-width: 90px;
+}
+QRadioButton:checked {
+    background-color: #2ecc71;
+    color: white;
+}
+QPushButton {
+    color: #333333;
+    padding: 8px 20px;
+    border-radius: 8px;
+    background-color: #e0e0e0;
+    font-weight: bold;
+}
+QPushButton:hover {
+    background-color: #d0d0d0;
+}
+      </string>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout">
+      <property name="spacing">
+       <number>15</number>
+      </property>
+      <property name="leftMargin">
+       <number>25</number>
+      </property>
+      <property name="topMargin">
+       <number>25</number>
+      </property>
+      <property name="rightMargin">
+       <number>25</number>
+      </property>
+      <property name="bottomMargin">
+       <number>25</number>
+      </property>
+      <item>
+       <widget class="QLabel" name="lblDialogTitle">
+        <property name="styleSheet">
+         <string>font-size: 20px; font-weight: bold; color: #111;</string>
+        </property>
+        <property name="text">
+         <string>Add Transaction</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignmentFlag::AlignCenter</set>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <layout class="QFormLayout" name="formLayout">
+        <property name="horizontalSpacing">
+         <number>20</number>
+        </property>
+        <property name="verticalSpacing">
+         <number>15</number>
+        </property>
+        <item row="0" column="0">
+         <widget class="QLabel" name="labelType">
+          <property name="text">
+           <string>Type:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0">
+         <widget class="QLabel" name="labelAmount">
+          <property name="text">
+           <string>Amount (USD):</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="1">
+         <widget class="QLineEdit" name="editAmount">
+          <property name="placeholderText">
+           <string>Enter amount</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="0">
+         <widget class="QLabel" name="labelCategory">
+          <property name="text">
+           <string>Category:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="1">
+         <widget class="QComboBox" name="comboCategory"/>
+        </item>
+        <item row="3" column="0">
+         <widget class="QLabel" name="labelMethod">
+          <property name="text">
+           <string>Method:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="1">
+         <widget class="QComboBox" name="comboMethod">
+          <item>
+           <property name="text">
+            <string>Cash</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Bank Transfer</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>E-Wallet</string>
+           </property>
+          </item>
+         </widget>
+        </item>
+        <item row="4" column="0">
+         <widget class="QLabel" name="labelNote">
+          <property name="text">
+           <string>Note:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="4" column="1">
+         <widget class="QLineEdit" name="editNote">
+          <property name="placeholderText">
+           <string>Description (optional)</string>
+          </property>
+         </widget>
+        </item>
+        <item row="5" column="0">
+         <widget class="QLabel" name="labelDate">
+          <property name="text">
+           <string>Date:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="5" column="1">
+         <widget class="QDateEdit" name="dateEdit">
+          <property name="calendarPopup">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="1">
+         <layout class="QHBoxLayout" name="typeLayout">
+          <property name="spacing">
+           <number>10</number>
+          </property>
+          <item>
+           <widget class="QRadioButton" name="radExpense">
+            <property name="text">
+             <string>Expense</string>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QRadioButton" name="radIncome">
+            <property name="text">
+             <string>Income</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <spacer name="verticalSpacer">
+        <property name="orientation">
+         <enum>Qt::Orientation::Vertical</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>20</width>
+          <height>40</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item>
+       <widget class="QDialogButtonBox" name="buttonBox">
+        <property name="orientation">
+         <enum>Qt::Orientation::Horizontal</enum>
+        </property>
+        <property name="standardButtons">
+         <set>QDialogButtonBox::StandardButton::Cancel|QDialogButtonBox::StandardButton::Save</set>
+        </property>
+        <property name="centerButtons">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>buttonBox</sender>
+   <signal>accepted()</signal>
+   <receiver>TransactionDialog</receiver>
+   <slot>accept()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>248</x>
+     <y>254</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>157</x>
+     <y>274</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>buttonBox</sender>
+   <signal>rejected()</signal>
+   <receiver>TransactionDialog</receiver>
+   <slot>reject()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>316</x>
+     <y>260</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>286</x>
+     <y>274</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+</ui>
