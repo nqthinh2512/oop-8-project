@@ -169,3 +169,6 @@ CMakeLists.txt.user*
 /src/build/
 
 build/
+
+# csv files
+!/build/**/*.csv

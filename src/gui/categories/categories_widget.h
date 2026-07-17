@@ -21,6 +21,8 @@ signals:
     void filterChanged(int parentId);
     void categoryParentChanged(int id, int newParentId);
     void removeCategoryRequested(int id, const QString& name);
+    void searchTextChanged(const QString &text);
+
 
 private slots:
     void onAddButtonClicked();
