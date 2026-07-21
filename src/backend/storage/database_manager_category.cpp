@@ -4,11 +4,6 @@
 #include <QTextStream>
 #include <QDebug>
 
-DatabaseManager::DatabaseManager(QObject *parent) : QObject(parent) {
-    // Tự động tải dữ liệu từ file khi khởi động ứng dụng
-    loadCategoriesFromCSV();
-}
-
 // Hàm tìm ID lớn nhất hiện tại trong mảng để tự động cộng 1 cho phần tử tiếp theo
 int DatabaseManager::generateNextCategoryId() const {
     int maxId = 0;
