@@ -23,6 +23,7 @@ class DatabaseManager : public QObject {
 private:
 
     explicit DatabaseManager(QObject *parent = nullptr): QObject(parent){
+        loadBillsFromCSV();
         loadCategoriesFromCSV();
         loadBudgetsFromCSV();
         loadSavingsFromCSV();
@@ -38,7 +39,8 @@ private:
 
     //=============================BILL SECTION==================================
 
-
+    QVector<Bill> m_bills;
+    int generateNextBillId() const;
 
 
     //=============================BUDGET SECTION==================================
@@ -89,7 +91,19 @@ public:
     //=============================BILL SECTION==================================
 
 
-
+    // Đọc và Ghi file CSV
+    void loadBillsFromCSV();
+    void saveBillsToCSV();
+    // API lấy danh sách các hóa đơn cho giao diện UI hiển thị
+    const QVector<Bill>& getAllBill() const { return m_bills; }
+    // Thêm hóa đơn mới từ UI (id được tự sinh)
+    void addBill(const QString& name, double amount, const QDate& dueDate);
+    // Sửa thông tin hóa đơn đã có
+    bool updateBill(int billId, const QString& name, double amount, const QDate& dueDate);
+    // Xóa hóa đơn theo id
+    bool deleteBill(int billId);
+    // Trả tiền hóa đơn
+    void payBill(int billId);
 
     //=============================BUDGET SECTION==================================
     // Đọc và Ghi file CSV
