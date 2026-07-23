@@ -91,8 +91,8 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         gui/categories/add_category_dialog.cpp
         gui/categories/category_remove_button.h
         gui/categories/category_remove_button.cpp
-        build/Desktop_Qt_6_11_1_MinGW_64_bit_Debug/budgets.csv
-        build/Desktop_Qt_6_11_1_MinGW_64_bit_Debug/savings.csv
+        # build/Desktop_Qt_6_11_1_MinGW_64_bit_Debug/budgets.csv
+        # build/Desktop_Qt_6_11_1_MinGW_64_bit_Debug/savings.csv
 
 
 
