@@ -1,143 +1,84 @@
 cmake_minimum_required(VERSION 3.16)
 
-project(src VERSION 0.1 LANGUAGES CXX)
-
-set(CMAKE_AUTOUIC ON)
-set(CMAKE_AUTOMOC ON)
-set(CMAKE_AUTORCC ON)
+project(FinanceDashboard VERSION 1.0 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets)
-find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets)
+find_package(Qt6 REQUIRED COMPONENTS Quick)
 
-set(PROJECT_SOURCES
-        main.cpp
+qt_standard_project_setup(REQUIRES 6.10)
 
-        gui/mainwindow.h
-        gui/mainwindow.cpp
+# 1. Insert C++ backend and frontend here
+qt_add_executable(appFinanceDashboard
+    main.cpp
+    
+    # Backend Storage
+    backend/storage/database_manager.h
+    backend/storage/database_manager_bill.cpp
+    backend/storage/database_manager_budget.cpp
+    backend/storage/database_manager_category.cpp
+    backend/storage/database_manager_saving.cpp
+    backend/storage/database_manager_transaction.cpp
 
-        frontend/overview/overview_controller.h
-        frontend/overview/overview_controller.cpp
+    # Backend Model
+    backend/models/category.h
+    backend/models/category.cpp
 
-        frontend/bills/bills_controller.h
-        frontend/bills/bills_controller.cpp
+    backend/models/budget.h
+    backend/models/budget.cpp
 
-        frontend/budgets/budgets_controller.h
-        frontend/budgets/budgets_controller.cpp
+    backend/models/bill.h
+    backend/models/bill.cpp
 
-        frontend/categories/categories_controller.h
-        frontend/categories/categories_controller.cpp
+    backend/models/saving.h
+    backend/models/saving.cpp
 
-        frontend/reports/reports_controller.h
-        frontend/reports/reports_controller.cpp
+    backend/models/transaction.h
+    backend/models/transaction.cpp
+    
+    # Frontend Controllers
+    frontend/overview_controller.h
+    frontend/overview_controller.cpp
 
-        frontend/transactions/transactions_controller.h
-        frontend/transactions/transactions_controller.cpp
+    frontend/categories_controller.h
+    frontend/categories_controller.cpp
 
-        gui/overview/overview_widget.h
-        gui/overview/overview_widget.cpp
+    frontend/budgets_controller.h
+    frontend/budgets_controller.cpp
 
-        gui/transactions/transactions_widget.h
-        gui/transactions/transactions_widget.cpp
+    frontend/bills_controller.h
+    frontend/bills_controller.cpp
 
-        gui/bills/bills_widget.h
-        gui/bills/bills_widget.cpp
+    frontend/reports_controller.h
+    frontend/reports_controller.cpp
 
-        gui/categories/categories_widget.h
-        gui/categories/categories_widget.cpp
+    frontend/transactions_controller.h
+    frontend/transactions_controller.cpp
 
-        gui/budgets/budgets_widget.h
-        gui/budgets/budgets_widget.cpp
+    frontend/savings_controller.h
+    frontend/savings_controller.cpp
 
-        gui/reports/reports_widget.h
-        gui/reports/reports_widget.cpp
-
-        backend/models/transaction.h
-        backend/models/bill.h
-        backend/models/category.h
-        backend/models/budget.h
-
-        backend/models/transaction.cpp
-        backend/models/bill.cpp
-        backend/models/category.cpp
-        backend/models/budget.cpp
-
-        backend/storage/database_manager.h
-        backend/storage/database_manager_category.cpp
 )
 
-if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
-    qt_add_executable(src
-        MANUAL_FINALIZATION
-        ${PROJECT_SOURCES}
-        frontend/overview/overview_controller.cpp frontend/overview/overview_controller.h
-        backend/models/saving.h backend/models/saving.cpp
-        build/Desktop_Qt_6_11_1_MinGW_64_bit_Debug/categories.csv
-        backend/storage/database_manager_bill.cpp
-        backend/storage/database_manager_budget.cpp
-        backend/storage/database_manager_saving.cpp
-        backend/storage/database_manager_transaction.cpp
-        gui/categories/categories_widget.ui
-        gui/mainwindow.ui
-        gui/bills/bills_widget.ui
-        gui/budgets/budgets_widget.ui
-        gui/overview/overview_widget.ui
-        gui/reports/reports_widget.ui
-        gui/transactions/transactions_widget.ui
-        gui/categories/add_category_dialog.ui
-        gui/categories/add_category_dialog.h
-        gui/categories/add_category_dialog.cpp
-        gui/categories/category_remove_button.h
-        gui/categories/category_remove_button.cpp
-        build/Desktop_Qt_6_11_1_MinGW_64_bit_Debug/budgets.csv
-        build/Desktop_Qt_6_11_1_MinGW_64_bit_Debug/savings.csv
+# 2. INSERT QML FILES HERE
+qt_add_qml_module(appFinanceDashboard
+    URI src
+    VERSION 1.0
+    QML_FILES
+        qml/Main.qml
 
+    	# Pages:
+    	qml/pages/dummy_page.qml
 
-
-    )
-# Define target properties for Android with Qt 6 as:
-#    set_property(TARGET src APPEND PROPERTY QT_ANDROID_PACKAGE_SOURCE_DIR
-#                 ${CMAKE_CURRENT_SOURCE_DIR}/android)
-# For more information, see https://doc.qt.io/qt-6/qt-add-executable.html#target-creation
-else()
-    if(ANDROID)
-        add_library(src SHARED
-            ${PROJECT_SOURCES}
-        )
-# Define properties for Android with Qt 5 after find_package() calls as:
-#    set(ANDROID_PACKAGE_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/android")
-    else()
-        add_executable(src
-            ${PROJECT_SOURCES}
-        )
-    endif()
-endif()
-
-target_link_libraries(src PRIVATE Qt${QT_VERSION_MAJOR}::Widgets)
-
-# Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.
-# If you are developing for iOS or macOS you should consider setting an
-# explicit, fixed bundle identifier manually though.
-if(${QT_VERSION} VERSION_LESS 6.1.0)
-  set(BUNDLE_ID_OPTION MACOSX_BUNDLE_GUI_IDENTIFIER com.example.src)
-endif()
-set_target_properties(src PROPERTIES
-    ${BUNDLE_ID_OPTION}
-    MACOSX_BUNDLE_BUNDLE_VERSION ${PROJECT_VERSION}
-    MACOSX_BUNDLE_SHORT_VERSION_STRING ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}
-    MACOSX_BUNDLE TRUE
-    WIN32_EXECUTABLE TRUE
+    	# Components:
+    	qml/components/dummy_component.qml
 )
 
-include(GNUInstallDirs)
-install(TARGETS src
+target_link_libraries(appFinanceDashboard PRIVATE Qt6::Quick)
+
+install(TARGETS appFinanceDashboard
     BUNDLE DESTINATION .
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
 )
-
-if(QT_VERSION_MAJOR EQUAL 6)
-    qt_finalize_executable(src)
-endif()
