@@ -73,6 +73,16 @@ qt_add_qml_module(appFinanceDashboard
 
     	# Components:
     	qml/components/dummy_component.qml
+
+        # Data:
+        RESOURCES data/bills.csv data/budgets.csv data/categories.csv data/savings.csv data/transactions.csv
+)
+
+add_custom_command(TARGET appFinanceDashboard POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+        "${CMAKE_CURRENT_SOURCE_DIR}/data"
+        "$<TARGET_FILE_DIR:appFinanceDashboard>/data"
+    COMMENT "Copying data folder to output directory..."
 )
 
 target_link_libraries(appFinanceDashboard PRIVATE Qt6::Quick)

@@ -19,7 +19,8 @@ int DatabaseManager::generateNextCategoryId() const {
 void DatabaseManager::loadCategoriesFromCSV() {
     m_categories.clear();
 
-    QFile file("categories.csv");
+    QString fullPath = QCoreApplication::applicationDirPath() + "/data/categories.csv";
+    QFile file(fullPath);
 
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
         qWarning() << "Không thể mở file categories.csv! Khởi tạo danh sách rỗng.";
@@ -49,12 +50,13 @@ void DatabaseManager::loadCategoriesFromCSV() {
         }
     }
     file.close();
-    qDebug() << "Đã tải" << m_categories.size() << "danh mục từ file CSV vào RAM.";
+    qDebug() << "Đã tải" << m_categories.size() << "danh mục từ categories.CSV vào RAM.";
 }
 
 // 🎯 GHI FILE CSV: Xuất dữ liệu gọn gàng với 3 cột
 void DatabaseManager::saveCategoriesToCSV() const {
-    QFile file("categories.csv");
+    QString fullPath = QCoreApplication::applicationDirPath() + "/data/categories.csv";
+    QFile file(fullPath);
     if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
         qWarning() << "Không thể ghi dữ liệu vào file categories.csv!";
         return;

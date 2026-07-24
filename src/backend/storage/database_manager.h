@@ -11,6 +11,7 @@
 #include <QObject>
 #include <QVector>
 #include <QString>
+#include <QCoreApplication>
 #include "../models/category.h"
 #include "../models/bill.h"
 #include "../models/budget.h"
@@ -21,13 +22,6 @@ class DatabaseManager : public QObject {
     Q_OBJECT
 
 private:
-
-    explicit DatabaseManager(QObject *parent = nullptr): QObject(parent){
-        loadCategoriesFromCSV();
-        loadBudgetsFromCSV();
-        loadSavingsFromCSV();
-    }
-    ~DatabaseManager() = default;
 
     //===========================CATEGORY SECTION=============================
 
@@ -60,6 +54,9 @@ private:
 
 
 public:
+
+    explicit DatabaseManager(QObject *parent = nullptr): QObject(parent){}
+    ~DatabaseManager() = default;
 
     // Hàm lấy instance duy nhất để sử dụng toàn hệ thống
     static DatabaseManager& instance() {
