@@ -1,24 +1,48 @@
-// src/qml/Main.qml
-import QtQuick 2.15
-import QtQuick.Window 2.15
-import QtQuick.Controls 2.15
+import QtQuick
+import QtQuick.Window
+import QtQuick.Layouts
+import QtQuick.Controls
+
+import "components/sidebar"
+import "pages"
 
 Window {
-    width: 600
-    height: 400
+    id: mainWindow
+    width: 1920
+    height: 1080
     visible: true
-    title: "Finance Dashboard - QML Test"
+    title: "Finance Dashboard App"
 
-    Rectangle {
+    visibility: Window.Maximized
+
+    RowLayout {
         anchors.fill: parent
-        color: "#1e1e2d"
+        spacing: 0
 
-        Text {
-            anchors.centerIn: parent
-            text: "QML is Working!"
-            color: "#ffffff"
-            font.pixelSize: 24
-            font.bold: true
+        // 1. SIDEBAR NAVIGATION MENU
+        Sidebar_menu_1 {
+            id: sidebarMenu
+            Layout.fillHeight: true
+            Layout.preferredWidth: 330
+        }
+
+        // 2. PAGE CONTAINER (Switches page based on sidebar selection)
+        StackLayout {
+            id: pageStack
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+
+            currentIndex: sidebarMenu.selectedIndex
+
+            // --- 8 MAIN PAGES ---
+            OverviewPage { }      // Index 0
+            TransactionsPage { }  // Index 1
+            BillsPage { }         // Index 2
+            BudgetsPage { }       // Index 3
+            SavingsPage { }       // Index 4
+            CategoriesPage { }    // Index 5
+            ReportsPage { }       // Index 6
+            SettingsPage { }      // Index 7
         }
     }
 }
