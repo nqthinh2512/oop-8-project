@@ -1,101 +1,138 @@
 import QtQuick
+import ".."
 
-Rectangle {
-    id: deleteDialog
 
-    height: 217
-    width: 500
+Item {
+    id: root
+    anchors.fill: parent
+    visible: false
+    z: 999
 
-    color: "#ffffff"
-    radius: 15
+    signal accepted()
+    signal rejected()
 
-    Image {
-        id: title
+    function open() { visible = true }
+    function close() { visible = false }
 
-        source: Qt.resolvedUrl("../../assets/title_15.png")
+    // Dimmed background overlay
+    Rectangle {
+        anchors.fill: parent
+        color: "#66000000"
 
-        Text {
-            id: title_1
-
-            x: 20
-            y: 9
-
-            height: 32
-            width: 461
-
-            color: "#191919"
-            font.family: "Intel One Mono"
-            font.pixelSize: 24
-            font.weight: Font.DemiBold
-            horizontalAlignment: Text.AlignLeft
-            lineHeight: 32
-            lineHeightMode: Text.FixedHeight
-            text: "Deleting"
-            textFormat: Text.PlainText
-            verticalAlignment: Text.AlignTop
-            wrapMode: Text.Wrap
+        MouseArea {
+            anchors.fill: parent
+            onClicked: root.close()
         }
     }
+
+    // Centered Dialog Card
     Rectangle {
-        id: label
+        id: deleteDialog
+        anchors.centerIn: parent
 
-        y: 75
-
-        height: 64
+        height: 217
         width: 500
 
-        color: "transparent"
+        color: "#ffffff"
+        radius: 15
+        clip: true
 
-        Text {
-            id: label_1
+        // Header Title
+        Image {
+            id: title
+            source: Qt.resolvedUrl("../../assets/title_15.png")
 
-            x: 20
+            Text {
+                id: title_1
+                x: 20
+                y: 9
+                height: 32
+                width: 461
+                color: "#191919"
+                font.family: "Intel One Mono"
+                font.pixelSize: 24
+                font.weight: Font.DemiBold
+                horizontalAlignment: Text.AlignLeft
+                lineHeight: 32
+                lineHeightMode: Text.FixedHeight
+                text: "Deleting"
+                textFormat: Text.PlainText
+                verticalAlignment: Text.AlignTop
+                wrapMode: Text.Wrap
+            }
+        }
 
+        // Confirmation Message
+        Rectangle {
+            id: label
+            y: 75
             height: 64
-            width: 461
+            width: 500
+            color: "transparent"
 
-            color: "#878787"
-            font.family: "Intel One Mono"
-            font.pixelSize: 18
-            font.weight: Font.DemiBold
-            horizontalAlignment: Text.AlignLeft
-            lineHeight: 32
-            lineHeightMode: Text.FixedHeight
-            text: "Are you really sure you want to delete this ?"
-            textFormat: Text.PlainText
-            verticalAlignment: Text.AlignTop
-            wrapMode: Text.Wrap
+            Text {
+                id: label_1
+                x: 20
+                height: 64
+                width: 461
+                color: "#878787"
+                font.family: "Intel One Mono"
+                font.pixelSize: 18
+                font.weight: Font.DemiBold
+                horizontalAlignment: Text.AlignLeft
+                lineHeight: 32
+                lineHeightMode: Text.FixedHeight
+                text: "Are you really sure you want to delete this ?"
+                textFormat: Text.PlainText
+                verticalAlignment: Text.AlignTop
+                wrapMode: Text.Wrap
+            }
         }
-    }
-    Image {
-        id: choice
 
-        y: 164
+        // Action Buttons
+        Image {
+            id: choice
+            y: 164
+            source: Qt.resolvedUrl("../../assets/choice_6.png")
 
-        source: Qt.resolvedUrl("../../assets/choice_6.png")
+            UniversalButton_1 {
+                id: cancelButton
+                x: 307
+                y: 9
+                height: 35
+                width: 75
+                buttonText: "Cancel"
+                _state: UniversalButton_1.State_1.State_1_default
 
-        UniversalButton_1 {
-            id: cancelButton
+                MouseArea {
+                    anchors.fill: parent
+                    cursorShape: Qt.PointingHandCursor
+                    onClicked: {
+                        root.rejected()
+                        root.close()
+                    }
+                }
+            }
 
-            x: 307
-            y: 9
+            UniversalButton_1 {
+                id: saveButton
+                x: 407
+                y: 9
+                height: 35
+                width: 73
+                buttonText: "Delete"
+                _state: UniversalButton_1.State_1.State_1_selected
+                color: "#f85154"
 
-            height: 35
-            width: 75
-
-            _state: UniversalButton_1.State_1.State_1_default
-        }
-        UniversalButton_1 {
-            id: saveButton
-
-            x: 407
-            y: 9
-
-            height: 35
-            width: 73
-
-            _state: UniversalButton_1.State_1.State_1_selected
-            color: "#f85154"
+                MouseArea {
+                    anchors.fill: parent
+                    cursorShape: Qt.PointingHandCursor
+                    onClicked: {
+                        root.accepted()
+                        root.close()
+                    }
+                }
+            }
         }
     }
 }

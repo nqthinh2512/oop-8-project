@@ -1,193 +1,297 @@
 import QtQuick
-import QtQuick.Shapes
+import QtQuick.Controls
 
 Rectangle {
     id: date_Input_Field
 
     height: 42
-    width: 312
+    width: 460
 
     color: "#e9e9e9"
     radius: 8
 
-    Rectangle {
-        id: dmy
+    property string selectedDate: ""
+    signal dateSelected(string dateStr)
 
-        x: 20
-        y: 6
+    // Helper to format date numbers to 2 digits
+    function pad(n) { return n < 10 ? "0" + n : "" + n }
 
-        height: 30
-        width: 143
+    // Set date programmatically or from calendar picker
+    function setDate(d, m, y) {
+        dayInput.text = pad(d)
+        monthInput.text = pad(m)
+        yearInput.text = y.toString()
+        selectedDate = dayInput.text + "/" + monthInput.text + "/" + yearInput.text
+        dateSelected(selectedDate)
+    }
 
-        color: "transparent"
+    // --- Interactive Date Input Segmented Fields (DD / MM / YYYY) ---
+    Row {
+        id: dateRow
+        x: 15
+        anchors.verticalCenter: parent.verticalCenter
+        spacing: 6
 
-        Rectangle {
-            id: day
-
-            height: 30
-            width: 23
-
-            color: "transparent"
-            radius: 8
+        // Day (DD) Segment
+        TextInput {
+            id: dayInput
+            width: 28
+            height: 24
+            verticalAlignment: Text.AlignVCenter
+            horizontalAlignment: Text.AlignHCenter
+            color: "#1e1e1e"
+            font.family: "Roboto"
+            font.pixelSize: 16
+            font.weight: Font.Medium
+            maximumLength: 2
+            inputMethodHints: Qt.ImhDigitsOnly
+            selectByMouse: true
 
             Text {
-                id: textField
-
-                y: 7
-
-                height: 16
-                width: 24
-
-                color: "#1e1e1e"
-                font.family: "Inter"
-                font.pixelSize: 16
-                font.weight: Font.Normal
-                horizontalAlignment: Text.AlignLeft
-                lineHeight: 16
-                lineHeightMode: Text.FixedHeight
                 text: "DD"
-                textFormat: Text.PlainText
-                verticalAlignment: Text.AlignTop
+                color: "#8049454f"
+                font: parent.font
+                visible: !parent.text && !parent.activeFocus
+                anchors.fill: parent
+                horizontalAlignment: Text.AlignHCenter
+                verticalAlignment: Text.AlignVCenter
+            }
+
+            onTextChanged: {
+                if (text.length === 2) monthInput.forceActiveFocus()
             }
         }
+
         Text {
-            id: element
-
-            x: 31
-            y: 5
-
-            height: 20
-            width: 9
-
-            color: "#1e1e1e"
-            font.family: "Inter"
-            font.pixelSize: 20
-            font.weight: Font.Normal
-            horizontalAlignment: Text.AlignLeft
-            lineHeight: 20
-            lineHeightMode: Text.FixedHeight
             text: "/"
-            textFormat: Text.PlainText
-            verticalAlignment: Text.AlignTop
+            color: "#878787"
+            font.family: "Roboto"
+            font.pixelSize: 16
+            anchors.verticalCenter: parent.verticalCenter
         }
-        Rectangle {
-            id: month
 
-            x: 47
-
-            height: 30
-            width: 29
-
-            color: "transparent"
-            radius: 8
+        // Month (MM) Segment
+        TextInput {
+            id: monthInput
+            width: 28
+            height: 24
+            verticalAlignment: Text.AlignVCenter
+            horizontalAlignment: Text.AlignHCenter
+            color: "#1e1e1e"
+            font.family: "Roboto"
+            font.pixelSize: 16
+            font.weight: Font.Medium
+            maximumLength: 2
+            inputMethodHints: Qt.ImhDigitsOnly
+            selectByMouse: true
 
             Text {
-                id: textField_1
-
-                y: 7
-
-                height: 16
-                width: 30
-
-                color: "#1e1e1e"
-                font.family: "Inter"
-                font.pixelSize: 16
-                font.weight: Font.Normal
-                horizontalAlignment: Text.AlignLeft
-                lineHeight: 16
-                lineHeightMode: Text.FixedHeight
                 text: "MM"
-                textFormat: Text.PlainText
-                verticalAlignment: Text.AlignTop
+                color: "#8049454f"
+                font: parent.font
+                visible: !parent.text && !parent.activeFocus
+                anchors.fill: parent
+                horizontalAlignment: Text.AlignHCenter
+                verticalAlignment: Text.AlignVCenter
+            }
+
+            onTextChanged: {
+                if (text.length === 2) yearInput.forceActiveFocus()
             }
         }
+
         Text {
-            id: element_1
-
-            x: 84
-            y: 5
-
-            height: 20
-            width: 9
-
-            color: "#1e1e1e"
-            font.family: "Inter"
-            font.pixelSize: 20
-            font.weight: Font.Normal
-            horizontalAlignment: Text.AlignLeft
-            lineHeight: 20
-            lineHeightMode: Text.FixedHeight
             text: "/"
-            textFormat: Text.PlainText
-            verticalAlignment: Text.AlignTop
+            color: "#878787"
+            font.family: "Roboto"
+            font.pixelSize: 16
+            anchors.verticalCenter: parent.verticalCenter
         }
-        Rectangle {
-            id: year
 
-            x: 100
-
-            height: 30
-            width: 43
-
-            color: "transparent"
-            radius: 8
+        // Year (YYYY) Segment
+        TextInput {
+            id: yearInput
+            width: 50
+            height: 24
+            verticalAlignment: Text.AlignVCenter
+            horizontalAlignment: Text.AlignHCenter
+            color: "#1e1e1e"
+            font.family: "Roboto"
+            font.pixelSize: 16
+            font.weight: Font.Medium
+            maximumLength: 4
+            inputMethodHints: Qt.ImhDigitsOnly
+            selectByMouse: true
 
             Text {
-                id: textField_2
-
-                y: 7
-
-                height: 16
-                width: 44
-
-                color: "#1e1e1e"
-                font.family: "Inter"
-                font.pixelSize: 16
-                font.weight: Font.Normal
-                horizontalAlignment: Text.AlignLeft
-                lineHeight: 16
-                lineHeightMode: Text.FixedHeight
                 text: "YYYY"
-                textFormat: Text.PlainText
-                verticalAlignment: Text.AlignTop
+                color: "#8049454f"
+                font: parent.font
+                visible: !parent.text && !parent.activeFocus
+                anchors.fill: parent
+                horizontalAlignment: Text.AlignHCenter
+                verticalAlignment: Text.AlignVCenter
             }
         }
     }
-    Rectangle {
-        id: datePicker
 
-        x: 274
-        y: 12
+    // --- Rightmost Calendar Picker Button 📅 ---
+    Item {
+        id: calendarBtn
+        anchors.right: parent.right
+        anchors.rightMargin: 12
+        anchors.verticalCenter: parent.verticalCenter
+        width: 24
+        height: 24
 
-        height: 18
-        width: 18
+        Text {
+            text: "📅"
+            font.pixelSize: 18
+            anchors.centerIn: parent
+        }
 
-        clip: true
-        color: "transparent"
+        MouseArea {
+            anchors.fill: parent
+            cursorShape: Qt.PointingHandCursor
+            onClicked: datePickerPopup.open()
+        }
+    }
 
-        Shape {
-            id: icon
+    // --- Popup Calendar Picker Window ---
+    Popup {
+        id: datePickerPopup
+        x: date_Input_Field.width - width
+        y: date_Input_Field.height + 4
+        width: 260
+        height: 270
+        padding: 10
+        modal: true
+        focus: true
 
-            x: 2.25
-            y: 1.50
+        background: Rectangle {
+            color: "#ffffff"
+            radius: 12
+            border.color: "#cbd5e1"
+            border.width: 1
+        }
 
-            height: 15
-            width: 13.50
+        Column {
+            anchors.fill: parent
+            spacing: 8
 
-            ShapePath {
-                id: icon_ShapePath0
+            // Header: Month & Year Navigation
+            Row {
+                width: parent.width
+                spacing: 4
 
-                fillColor: "#00000000"
-                fillRule: ShapePath.WindingFill
-                strokeColor: "#1e1e1e"
-                strokeWidth: 1.60
+                Text {
+                    width: 170
+                    text: currentMonthName + " " + currentYear
+                    font.family: "Inter"
+                    font.pixelSize: 14
+                    font.weight: Font.Bold
+                    color: "#1e293b"
+                    verticalAlignment: Text.AlignVCenter
+                }
 
-                PathSvg {
-                    id: icon_ShapePath0_PathSvg0
+                Rectangle {
+                    width: 28; height: 28; radius: 6; color: "#f1f5f9"
+                    Text { text: "◀"; anchors.centerIn: parent; font.pixelSize: 10; color: "#475569" }
+                    MouseArea {
+                        anchors.fill: parent
+                        cursorShape: Qt.PointingHandCursor
+                        onClicked: prevMonth()
+                    }
+                }
 
-                    path: "M 11.999999713897706 1.500000116825106 L 1.4999999642372133 1.500000116825106 C 0.6715728342533113 1.500000116825106 0 2.171573019394341 0 3.000000233650212 L 0 13.500001373291068 C 0 14.32842896305624 0.6715728342533113 15.000000953674316 1.4999999642372133 15.000000953674316 L 11.999999713897706 15.000000953674316 C 12.82842721939087 15.000000953674316 13.5 14.32842896305624 13.5 13.500001373291068 L 13.5 3.000000233650212 C 13.5 2.171573019394341 12.82842721939087 1.500000116825106 11.999999713897706 1.500000116825106 Z"
+                Rectangle {
+                    width: 28; height: 28; radius: 6; color: "#f1f5f9"
+                    Text { text: "▶"; anchors.centerIn: parent; font.pixelSize: 10; color: "#475569" }
+                    MouseArea {
+                        anchors.fill: parent
+                        cursorShape: Qt.PointingHandCursor
+                        onClicked: nextMonth()
+                    }
                 }
             }
+
+            // Days of Week Header Row
+            Grid {
+                columns: 7
+                spacing: 4
+                Repeater {
+                    model: ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"]
+                    Text {
+                        width: 30; height: 20
+                        text: modelData
+                        font.pixelSize: 11
+                        font.weight: Font.Bold
+                        color: "#94a3b8"
+                        horizontalAlignment: Text.AlignHCenter
+                        verticalAlignment: Text.AlignVCenter
+                    }
+                }
+            }
+
+            // Interactive Days Grid (1..31)
+            Grid {
+                columns: 7
+                spacing: 4
+
+                Repeater {
+                    model: daysInMonth
+
+                    Rectangle {
+                        width: 30; height: 30; radius: 15
+                        color: (index + 1 === currentDay) ? "#3b82f6" : (dayMouse.containsMouse ? "#eff6ff" : "transparent")
+
+                        Text {
+                            text: (index + 1).toString()
+                            anchors.centerIn: parent
+                            font.pixelSize: 12
+                            font.weight: (index + 1 === currentDay) ? Font.Bold : Font.Normal
+                            color: (index + 1 === currentDay) ? "#ffffff" : "#334155"
+                        }
+
+                        MouseArea {
+                            id: dayMouse
+                            anchors.fill: parent
+                            hoverEnabled: true
+                            cursorShape: Qt.PointingHandCursor
+                            onClicked: {
+                                setDate(index + 1, currentMonthIndex + 1, currentYear)
+                                datePickerPopup.close()
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    // --- Internal Date Picker State Logic ---
+    property var monthNames: ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
+    property int currentMonthIndex: new Date().getMonth()
+    property int currentYear: new Date().getFullYear()
+    property int currentDay: new Date().getDate()
+    property string currentMonthName: monthNames[currentMonthIndex]
+    property int daysInMonth: new Date(currentYear, currentMonthIndex + 1, 0).getDate()
+
+    function prevMonth() {
+        if (currentMonthIndex === 0) {
+            currentMonthIndex = 11
+            currentYear--
+        } else {
+            currentMonthIndex--
+        }
+    }
+
+    function nextMonth() {
+        if (currentMonthIndex === 11) {
+            currentMonthIndex = 0
+            currentYear++
+        } else {
+            currentMonthIndex++
         }
     }
 }

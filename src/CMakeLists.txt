@@ -102,6 +102,7 @@ qt_add_qml_module(appFinanceDashboard
         qml/components/dialogs/TransactionDialog.qml
         qml/components/dialogs/DeleteDialog.qml
         qml/components/dialogs/DeleteCategoryDialog.qml
+        qml/components/dialogs/DialogTestOverlay.qml
 
         # Reusable UI Widgets & Cards:
         qml/components/GaugeMeter.qml

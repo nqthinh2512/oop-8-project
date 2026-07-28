@@ -1,132 +1,81 @@
 import QtQuick
+import ".."
 
-Rectangle {
-    id: savingDialog
 
-    height: 493
-    width: 500
+Item {
+    id: root
+    anchors.fill: parent
+    visible: false
+    z: 999
 
-    color: "#ffffff"
-    radius: 15
+    signal accepted()
+    signal rejected()
 
-    Image {
-        id: title
+    function open() { visible = true }
+    function close() { visible = false }
 
-        source: Qt.resolvedUrl("../../assets/title_11.png")
+    // Dimmed background overlay
+    Rectangle {
+        anchors.fill: parent
+        color: "#66000000"
 
-        Text {
-            id: title_1
-
-            x: 20
-            y: 9
-
-            height: 32
-            width: 461
-
-            color: "#191919"
-            font.capitalization: Font.Capitalize
-            font.family: "Intel One Mono"
-            font.pixelSize: 24
-            font.weight: Font.DemiBold
-            horizontalAlignment: Text.AlignLeft
-            lineHeight: 32
-            lineHeightMode: Text.FixedHeight
-            text: "Add Saving"
-            textFormat: Text.PlainText
-            verticalAlignment: Text.AlignTop
-            wrapMode: Text.Wrap
+        MouseArea {
+            anchors.fill: parent
+            onClicked: root.close()
         }
     }
+
+    // Centered Dialog Card
     Rectangle {
-        id: titleInput
+        id: savingDialog
+        anchors.centerIn: parent
 
-        y: 75
-
-        height: 74
+        height: 493
         width: 500
 
-        color: "transparent"
+        color: "#ffffff"
+        radius: 15
+        clip: true
 
-        Text {
-            id: saving_Title
-
-            x: 20
-
-            height: 32
-            width: 461
-
-            color: "#878787"
-            font.family: "Intel One Mono"
-            font.pixelSize: 20
-            font.weight: Font.DemiBold
-            horizontalAlignment: Text.AlignLeft
-            lineHeight: 32
-            lineHeightMode: Text.FixedHeight
-            text: "Saving Title"
-            textFormat: Text.PlainText
-            verticalAlignment: Text.AlignTop
-            wrapMode: Text.Wrap
-        }
-        Rectangle {
-            id: inputBox
-
-            x: 20
-            y: 32
-
-            height: 42
-            width: 460
-
-            color: "#e9e9e9"
-            radius: 10
+        // 1. Header Title
+        Image {
+            id: title
+            source: Qt.resolvedUrl("../../assets/title_11.png")
 
             Text {
-                id: textField
-
+                id: title_1
                 x: 20
                 y: 9
-
-                height: 24
-                width: 68
-
-                color: "#8049454f"
-                font.family: "Roboto"
-                font.pixelSize: 16
-                font.weight: Font.Normal
+                height: 32
+                width: 461
+                color: "#191919"
+                font.capitalization: Font.Capitalize
+                font.family: "Intel One Mono"
+                font.pixelSize: 24
+                font.weight: Font.DemiBold
                 horizontalAlignment: Text.AlignLeft
-                lineHeight: 24
+                lineHeight: 32
                 lineHeightMode: Text.FixedHeight
-                text: "input text"
+                text: "Add Saving"
                 textFormat: Text.PlainText
-                verticalAlignment: Text.AlignVCenter
+                verticalAlignment: Text.AlignTop
+                wrapMode: Text.Wrap
             }
         }
-    }
-    Rectangle {
-        id: rowContainer
 
-        y: 174
-
-        height: 142
-        width: 500
-
-        color: "transparent"
-
+        // 2. Saving Title Field
         Rectangle {
-            id: dropdown
-
-            x: 20
-
-            height: 66
-            width: 225
-
+            id: titleInput
+            y: 75
+            height: 74
+            width: 500
             color: "transparent"
 
             Text {
-                id: priority
-
+                id: saving_Title
+                x: 20
                 height: 32
-                width: 226
-
+                width: 461
                 color: "#878787"
                 font.family: "Intel One Mono"
                 font.pixelSize: 20
@@ -134,142 +83,258 @@ Rectangle {
                 horizontalAlignment: Text.AlignLeft
                 lineHeight: 32
                 lineHeightMode: Text.FixedHeight
-                text: "Priority"
+                text: "Saving Title"
                 textFormat: Text.PlainText
                 verticalAlignment: Text.AlignTop
                 wrapMode: Text.Wrap
             }
-            Dropdown_1 {
-                id: dropdown_1
 
-                y: 32
-
-                height: 34
-                width: 225
-
-                _state: Dropdown_1.State_1.State_1_default
-                clip: true
-            }
-        }
-        Rectangle {
-            id: dropdown_2
-
-            x: 255
-
-            height: 66
-            width: 225
-
-            color: "transparent"
-
-            Text {
-                id: categories
-
-                height: 32
-                width: 226
-
-                color: "#878787"
-                font.family: "Intel One Mono"
-                font.pixelSize: 20
-                font.weight: Font.DemiBold
-                horizontalAlignment: Text.AlignLeft
-                lineHeight: 32
-                lineHeightMode: Text.FixedHeight
-                text: "Categories"
-                textFormat: Text.PlainText
-                verticalAlignment: Text.AlignTop
-                wrapMode: Text.Wrap
-            }
-            Dropdown_1 {
-                id: dropdown_3
-
-                y: 32
-
-                height: 34
-                width: 225
-
-                _state: Dropdown_1.State_1.State_1_default
-                clip: true
-            }
-        }
-        Rectangle {
-            id: dropdown_4
-
-            x: 20
-            y: 76
-
-            height: 66
-            width: 225
-
-            color: "transparent"
-
-            Text {
-                id: amount_Funded
-
-                height: 32
-                width: 226
-
-                color: "#878787"
-                font.family: "Intel One Mono"
-                font.pixelSize: 20
-                font.weight: Font.DemiBold
-                horizontalAlignment: Text.AlignLeft
-                lineHeight: 32
-                lineHeightMode: Text.FixedHeight
-                text: "Amount Funded"
-                textFormat: Text.PlainText
-                verticalAlignment: Text.AlignTop
-                wrapMode: Text.Wrap
-            }
             Rectangle {
-                id: inputBox_1
-
+                id: inputBox
+                x: 20
                 y: 32
-
-                height: 34
-                width: 225
-
+                height: 42
+                width: 460
                 color: "#e9e9e9"
                 radius: 10
 
-                Text {
-                    id: supporting_text
-
-                    x: 20
-                    y: 5
-
-                    height: 24
-                    width: 68
-
-                    color: "#8049454f"
+                TextInput {
+                    id: textField
+                    anchors.fill: parent
+                    anchors.leftMargin: 15
+                    anchors.rightMargin: 15
+                    verticalAlignment: Text.AlignVCenter
+                    color: "#191919"
                     font.family: "Roboto"
                     font.pixelSize: 16
                     font.weight: Font.Normal
-                    horizontalAlignment: Text.AlignLeft
-                    lineHeight: 24
-                    lineHeightMode: Text.FixedHeight
-                    text: "input text"
-                    textFormat: Text.PlainText
-                    verticalAlignment: Text.AlignVCenter
+                    clip: true
+                    selectByMouse: true
+
+                    Text {
+                        text: "input text"
+                        color: "#8049454f"
+                        font: parent.font
+                        visible: !parent.text && !parent.activeFocus
+                        anchors.fill: parent
+                        verticalAlignment: Text.AlignVCenter
+                    }
                 }
             }
         }
+
+        // 3. Priority, Categories, Amount Funded & Save Goal Grid Row
         Rectangle {
-            id: dropdown_5
+            id: rowContainer
+            y: 174
+            height: 142
+            width: 500
+            color: "transparent"
 
-            x: 255
-            y: 76
+            // Priority Dropdown
+            Rectangle {
+                id: dropdown
+                x: 20
+                height: 66
+                width: 225
+                color: "transparent"
 
-            height: 66
-            width: 225
+                Text {
+                    id: priority
+                    height: 32
+                    width: 226
+                    color: "#878787"
+                    font.family: "Intel One Mono"
+                    font.pixelSize: 20
+                    font.weight: Font.DemiBold
+                    horizontalAlignment: Text.AlignLeft
+                    lineHeight: 32
+                    lineHeightMode: Text.FixedHeight
+                    text: "Priority"
+                    textFormat: Text.PlainText
+                    verticalAlignment: Text.AlignTop
+                    wrapMode: Text.Wrap
+                }
 
+                Dropdown_1 {
+                    id: dropdown_1
+                    y: 32
+                    height: 34
+                    width: 225
+                    _state: Dropdown_1.State_1.State_1_default
+                    clip: true
+                }
+            }
+
+            // Categories Dropdown
+            Rectangle {
+                id: dropdown_2
+                x: 255
+                height: 66
+                width: 225
+                color: "transparent"
+
+                Text {
+                    id: categories
+                    height: 32
+                    width: 226
+                    color: "#878787"
+                    font.family: "Intel One Mono"
+                    font.pixelSize: 20
+                    font.weight: Font.DemiBold
+                    horizontalAlignment: Text.AlignLeft
+                    lineHeight: 32
+                    lineHeightMode: Text.FixedHeight
+                    text: "Categories"
+                    textFormat: Text.PlainText
+                    verticalAlignment: Text.AlignTop
+                    wrapMode: Text.Wrap
+                }
+
+                Dropdown_1 {
+                    id: dropdown_3
+                    y: 32
+                    height: 34
+                    width: 225
+                    _state: Dropdown_1.State_1.State_1_default
+                    clip: true
+                }
+            }
+
+            // Amount Funded Input
+            Rectangle {
+                id: dropdown_4
+                x: 20
+                y: 76
+                height: 66
+                width: 225
+                color: "transparent"
+
+                Text {
+                    id: amount_Funded
+                    height: 32
+                    width: 226
+                    color: "#878787"
+                    font.family: "Intel One Mono"
+                    font.pixelSize: 20
+                    font.weight: Font.DemiBold
+                    horizontalAlignment: Text.AlignLeft
+                    lineHeight: 32
+                    lineHeightMode: Text.FixedHeight
+                    text: "Amount Funded"
+                    textFormat: Text.PlainText
+                    verticalAlignment: Text.AlignTop
+                    wrapMode: Text.Wrap
+                }
+
+                Rectangle {
+                    id: inputBox_1
+                    y: 32
+                    height: 34
+                    width: 225
+                    color: "#e9e9e9"
+                    radius: 10
+
+                    TextInput {
+                        id: supporting_text
+                        anchors.fill: parent
+                        anchors.leftMargin: 15
+                        anchors.rightMargin: 15
+                        verticalAlignment: Text.AlignVCenter
+                        color: "#191919"
+                        font.family: "Roboto"
+                        font.pixelSize: 16
+                        font.weight: Font.Normal
+                        clip: true
+                        selectByMouse: true
+                        inputMethodHints: Qt.ImhFormattedNumbersOnly
+
+                        Text {
+                            text: "input text"
+                            color: "#8049454f"
+                            font: parent.font
+                            visible: !parent.text && !parent.activeFocus
+                            anchors.fill: parent
+                            verticalAlignment: Text.AlignVCenter
+                        }
+                    }
+                }
+            }
+
+            // Save Goal Input
+            Rectangle {
+                id: dropdown_5
+                x: 255
+                y: 76
+                height: 66
+                width: 225
+                color: "transparent"
+
+                Text {
+                    id: save_Goal
+                    height: 32
+                    width: 226
+                    color: "#878787"
+                    font.family: "Intel One Mono"
+                    font.pixelSize: 20
+                    font.weight: Font.DemiBold
+                    horizontalAlignment: Text.AlignLeft
+                    lineHeight: 32
+                    lineHeightMode: Text.FixedHeight
+                    text: "Save Goal"
+                    textFormat: Text.PlainText
+                    verticalAlignment: Text.AlignTop
+                    wrapMode: Text.Wrap
+                }
+
+                Rectangle {
+                    id: inputBox_2
+                    y: 32
+                    height: 34
+                    width: 225
+                    color: "#e9e9e9"
+                    radius: 10
+
+                    TextInput {
+                        id: supporting_text_1
+                        anchors.fill: parent
+                        anchors.leftMargin: 15
+                        anchors.rightMargin: 15
+                        verticalAlignment: Text.AlignVCenter
+                        color: "#191919"
+                        font.family: "Roboto"
+                        font.pixelSize: 16
+                        font.weight: Font.Normal
+                        clip: true
+                        selectByMouse: true
+                        inputMethodHints: Qt.ImhFormattedNumbersOnly
+
+                        Text {
+                            text: "input text"
+                            color: "#8049454f"
+                            font: parent.font
+                            visible: !parent.text && !parent.activeFocus
+                            anchors.fill: parent
+                            verticalAlignment: Text.AlignVCenter
+                        }
+                    }
+                }
+            }
+        }
+
+        // 4. Due Date Field
+        Rectangle {
+            id: dueDate
+            y: 341
+            height: 74
+            width: 500
             color: "transparent"
 
             Text {
-                id: save_Goal
-
+                id: due_Date
+                x: 20
                 height: 32
-                width: 226
-
+                width: 461
                 color: "#878787"
                 font.family: "Intel One Mono"
                 font.pixelSize: 20
@@ -277,113 +342,64 @@ Rectangle {
                 horizontalAlignment: Text.AlignLeft
                 lineHeight: 32
                 lineHeightMode: Text.FixedHeight
-                text: "Save Goal"
+                text: "Due Date"
                 textFormat: Text.PlainText
                 verticalAlignment: Text.AlignTop
                 wrapMode: Text.Wrap
             }
-            Rectangle {
-                id: inputBox_2
 
+            Date_Input_Field_1 {
+                id: date_Input_Field
+                x: 20
                 y: 32
-
-                height: 34
-                width: 225
-
-                color: "#e9e9e9"
-                radius: 10
-
-                Text {
-                    id: supporting_text_1
-
-                    x: 20
-                    y: 5
-
-                    height: 24
-                    width: 68
-
-                    color: "#8049454f"
-                    font.family: "Roboto"
-                    font.pixelSize: 16
-                    font.weight: Font.Normal
-                    horizontalAlignment: Text.AlignLeft
-                    lineHeight: 24
-                    lineHeightMode: Text.FixedHeight
-                    text: "input text"
-                    textFormat: Text.PlainText
-                    verticalAlignment: Text.AlignVCenter
-                }
+                height: 42
+                width: 460
             }
         }
-    }
-    Rectangle {
-        id: dueDate
 
-        y: 341
+        // 5. Footer Action Buttons
+        Image {
+            id: choice
+            y: 440
+            source: Qt.resolvedUrl("../../assets/choice_2.png")
 
-        height: 74
-        width: 500
+            UniversalButton_1 {
+                id: cancelButton
+                x: 305
+                y: 9
+                buttonText: "Cancel"
+                height: 35
+                width: 75
+                _state: UniversalButton_1.State_1.State_1_default
 
-        color: "transparent"
+                MouseArea {
+                    anchors.fill: parent
+                    cursorShape: Qt.PointingHandCursor
+                    onClicked: {
+                        root.rejected()
+                        root.close()
+                    }
+                }
+            }
 
-        Text {
-            id: due_Date
+            UniversalButton_1 {
+                id: saveButton
+                x: 405
+                y: 9
+                buttonText: "Add"
+                height: 35
+                width: 75
+                _state: UniversalButton_1.State_1.State_1_selected
 
-            x: 20
-
-            height: 32
-            width: 461
-
-            color: "#878787"
-            font.family: "Intel One Mono"
-            font.pixelSize: 20
-            font.weight: Font.DemiBold
-            horizontalAlignment: Text.AlignLeft
-            lineHeight: 32
-            lineHeightMode: Text.FixedHeight
-            text: "Due Date"
-            textFormat: Text.PlainText
-            verticalAlignment: Text.AlignTop
-            wrapMode: Text.Wrap
-        }
-        Date_Input_Field_1 {
-            id: date_Input_Field
-
-            x: 20
-            y: 32
-
-            height: 42
-            width: 460
-        }
-    }
-    Image {
-        id: choice
-
-        y: 440
-
-        source: Qt.resolvedUrl("../../assets/choice_2.png")
-
-        UniversalButton_1 {
-            id: cancelButton
-
-            x: 305
-            y: 9
-
-            height: 35
-            width: 75
-
-            _state: UniversalButton_1.State_1.State_1_default
-        }
-        UniversalButton_1 {
-            id: saveButton
-
-            x: 405
-            y: 9
-
-            height: 35
-            width: 75
-
-            _state: UniversalButton_1.State_1.State_1_selected
+                MouseArea {
+                    anchors.fill: parent
+                    cursorShape: Qt.PointingHandCursor
+                    onClicked: {
+                        root.accepted()
+                        root.close()
+                    }
+                }
+            }
         }
     }
 }

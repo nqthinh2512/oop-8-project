@@ -4,8 +4,8 @@ import QtQuick.Layouts
 Item {
     id: sidebar_menu_app_name
 
-    implicitHeight: 60
-    Layout.fillWidth: true
+    implicitHeight: 30
+    implicitWidth: 60
 
     RowLayout {
         anchors.fill: parent
