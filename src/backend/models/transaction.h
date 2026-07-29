@@ -4,7 +4,7 @@
 #include <QString>
 #include <QDateTime>
 
-//chỉ sửa class này thôi nhưng tránh dùng class này, nhìn hai class ở dưới đi.
+// Class Transaction là Abstract Class (Lớp trừu tượng) phục vụ yêu cầu Abstraction & Đa hình (Polymorphism)
 class Transaction {
 private:
     int id;                 // Mã định danh duy nhất
@@ -16,34 +16,40 @@ private:
 public:
     Transaction();
     Transaction(int n_id, double n_amount, const QDateTime& n_date=QDateTime::currentDateTime(), const QString& n_note="", int n_categoryid=0);
-    //ngoại trừ hàm getter và setter thì các hàm khác không được viết logic của nó trực tiếp ở đây, đi qua .cpp để viết đi.
+    virtual ~Transaction() = default;
 
-    //getter
-    int getId() const {return id;}
-    int getCategoryId() const {return categoryId;}
-    QString getNote() const {return note;}
-    double getAmount() const {return amount;}
-    QDateTime getDateTime() const {return dateTime;}
+    // Getters
+    int getId() const { return id; }
+    int getCategoryId() const { return categoryId; }
+    QString getNote() const { return note; }
+    double getAmount() const { return amount; }
+    QDateTime getDateTime() const { return dateTime; }
 
-    //setter, để tránh lỗi đè cùng ID, đừng viết hàm setId.
+    // Pure Virtual Function (Hàm ảo thuần túy) -> Biến Transaction thành Lớp Trừu Tượng (Abstract Class)
+    // Giúp thực hiện Đa Hình (Polymorphism) runtime khi tính tổng Thu nhập (+) / Chi tiêu (-)
+    virtual double getSignedAmount() const = 0;
 };
 
-//Class thu nhập
-class Income : public Transaction{
+// Class Thu nhập (Income) kế thừa từ Transaction
+class Income : public Transaction {
 public:
-    static const int parentCategory = 1; // Danh mục cha, tất cả categoryId của class này là con của danh mục này
-    // 1 sẽ là số chỉ định cho danh mục cha này
+    static const int parentCategory = 1; // 1 chỉ định danh mục Thu nhập
 
     Income(int n_id, double n_amount, const QDateTime& n_date=QDateTime::currentDateTime(), const QString& n_note="", int n_categoryid=0);
+
+    // Ghi đè hàm ảo thuần túy: Thu nhập trả về số dương (+amount)
+    double getSignedAmount() const override;
 };
 
-//class tiền tiêu
-class Expense : public Transaction{
+// Class Tiền tiêu (Expense) kế thừa từ Transaction
+class Expense : public Transaction {
 public:
-    static const int parentCategory = 2; // Danh mục cha, tất cả categoryId của class này là con của danh mục này
-    // 2 sẽ là số chỉ định cho danh mục cha này
+    static const int parentCategory = 2; // 2 chỉ định danh mục Chi tiêu
 
     Expense(int n_id, double n_amount, const QDateTime& n_date=QDateTime::currentDateTime(), const QString& n_note="", int n_categoryid=0);
+
+    // Ghi đè hàm ảo thuần túy: Chi tiêu trả về số âm (-amount)
+    double getSignedAmount() const override;
 };
 
 #endif // TRANSACTION_H

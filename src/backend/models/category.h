@@ -8,25 +8,27 @@ private:
     int id;
     int parentId;
     QString name;        // Tên danh mục (Ăn uống, Học phí...)
+    bool active;         // Trạng thái (Active = true, Inactive = false)
+
 public:
     Category();
 
-    //hàm cho backend
-    Category(int n_id, int n_parentid, const QString& n_name);
-    //hàm cho frontend
-    Category(int n_parentid, const QString& n_name);
-    //ngoại trừ hàm getter và setter thì các hàm khác không được viết logic của nó trực tiếp ở đây, đi qua .cpp để viết đi.
+    // Hàm khởi tạo cho backend (có id, parentId, name, active)
+    Category(int n_id, int n_parentid, const QString& n_name, bool n_active = true);
+    // Hàm khởi tạo cho frontend (parentId, name, active)
+    Category(int n_parentid, const QString& n_name, bool n_active = true);
 
-    //getter
-    int getId() const {return id;}
-    int getParentId() const {return parentId;}
-    QString getName() const {return name;}
+    // Getters
+    int getId() const { return id; }
+    int getParentId() const { return parentId; }
+    QString getName() const { return name; }
+    bool isActive() const { return active; }
 
-    //setter, để tránh lỗi đè cùng ID, đừng viết hàm setId ở đây.
+    // Setters
     void setParentId(int newParentId) { parentId = newParentId; }
+    void setActive(bool newActive) { active = newActive; }
 
     static QString parentCategoryName(int parentId);
-
 };
 
 #endif // CATEGORY_H

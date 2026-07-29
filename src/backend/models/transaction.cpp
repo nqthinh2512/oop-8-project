@@ -15,7 +15,15 @@ Transaction::Transaction(int n_id, double n_amount, const QDateTime& n_date, con
     note(n_note) {}
 
 Income::Income(int n_id, double n_amount, const QDateTime& n_date, const QString& n_note, int n_categoryid):
-    Transaction(n_id,n_amount,n_date,n_note,n_categoryid) {}
+    Transaction(n_id, n_amount, n_date, n_note, n_categoryid) {}
+
+double Income::getSignedAmount() const {
+    return getAmount(); // Thu nhập là tiền dương
+}
 
 Expense::Expense(int n_id, double n_amount, const QDateTime& n_date, const QString& n_note, int n_categoryid):
-    Transaction(n_id,n_amount,n_date,n_note,n_categoryid) {}
+    Transaction(n_id, n_amount, n_date, n_note, n_categoryid) {}
+
+double Expense::getSignedAmount() const {
+    return -getAmount(); // Chi tiêu là tiền âm
+}

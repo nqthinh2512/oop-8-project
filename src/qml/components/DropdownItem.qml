@@ -11,6 +11,7 @@ Rectangle {
     property alias placeholder_1Width: placeholder_1.width
     property alias placeholder_1X: placeholder_1.x
     property alias placeholder_1Y: placeholder_1.y
+    property alias placeholder_1Text: placeholder_1.text
 
     property int _state: DropdownItem.State_1.State_1_Default
 
@@ -24,15 +25,10 @@ Rectangle {
         State {
             name: "state=Default"
             when: dropdownItem._state === DropdownItem.State_1.State_1_Default
-    
+
             PropertyChanges {
                 color: "#ffffff"
                 target: dropdownItem
-            }
-            PropertyChanges {
-                width: 205
-    
-                target: placeholder_1
             }
             PropertyChanges {
                 color: "#222222"
@@ -46,15 +42,10 @@ Rectangle {
         State {
             name: "state=hover"
             when: dropdownItem._state === DropdownItem.State_1.State_1_hover
-    
+
             PropertyChanges {
                 color: "#d9d9d9"
                 target: dropdownItem
-            }
-            PropertyChanges {
-                width: 205
-    
-                target: placeholder_1
             }
             PropertyChanges {
                 color: "#222222"
@@ -68,15 +59,10 @@ Rectangle {
         State {
             name: "state=selected"
             when: dropdownItem._state === DropdownItem.State_1.State_1_selected
-    
+
             PropertyChanges {
                 color: "#ffffff"
                 target: dropdownItem
-            }
-            PropertyChanges {
-                width: 175
-    
-                target: placeholder_1
             }
             PropertyChanges {
                 color: "#0225d4"
@@ -90,19 +76,18 @@ Rectangle {
         State {
             name: "state=hover-selected"
             when: dropdownItem._state === DropdownItem.State_1.State_1_hover_selected
-    
+
             PropertyChanges {
                 color: "#d9d9d9"
                 target: dropdownItem
             }
             PropertyChanges {
-                width: 175
-    
+                color: "#0225d4"
                 target: placeholder_1
             }
             PropertyChanges {
-                color: "#0225d4"
-                target: placeholder_1
+                target: check
+                visible: true
             }
         }
     ]
@@ -110,27 +95,28 @@ Rectangle {
     Text {
         id: placeholder_1
 
-        x: 18.27
-        y: 9.91
-
-        height: 19
-        width: 205
+        x: 14
+        anchors.verticalCenter: parent.verticalCenter
+        width: parent.width - (check.visible ? 44 : 24)
+        height: 20
 
         color: "#222222"
         font.family: "Inter"
-        font.pixelSize: 15
+        font.pixelSize: 14
         font.weight: Font.Normal
         horizontalAlignment: Text.AlignLeft
         text: "Placeholder 1"
         textFormat: Text.PlainText
-        verticalAlignment: Text.AlignTop
-        wrapMode: Text.Wrap
+        verticalAlignment: Text.AlignVCenter
+        elide: Text.ElideRight
     }
+
     Rectangle {
         id: check
 
-        x: 203.20
-        y: 10.27
+        anchors.right: parent.right
+        anchors.rightMargin: 12
+        anchors.verticalCenter: parent.verticalCenter
 
         height: 18.27
         width: 18.27
