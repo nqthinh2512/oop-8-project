@@ -3,23 +3,20 @@
 Category::Category():
     id(0),
     parentId(0),
-    name(""),
-    active(true) {}
+    name("") {}
 
-Category::Category(int n_id, int n_parentid, const QString& n_name, bool n_active):
+Category::Category(int n_id, int n_parentid, const QString& n_name):
     id(n_id),
     parentId(n_parentid),
-    name(n_name),
-    active(n_active) {}
+    name(n_name) {}
 
-Category::Category(int n_parentid, const QString& n_name, bool n_active):
+Category::Category(int n_parentid, const QString& n_name):
     id(0),
     parentId(n_parentid),
-    name(n_name),
-    active(n_active) {}
+    name(n_name) {}
 
-QString Category::parentCategoryName(int parentId) {
-    switch (parentId) {
+QString Category::parentCategoryName(int parentId){
+    switch(parentId){
         case 1: return "Income";
         case 2: return "Expense";
         case 3: return "Bill";

@@ -1,11 +1,10 @@
-// database_manager_category.cpp
+// database_manager.cpp
 #include "database_manager.h"
 #include <QFile>
 #include <QTextStream>
-#include <QDir>
 #include <QDebug>
 
-// Tìm ID lớn nhất hiện tại trong mảng để tự động cộng 1
+// Hàm tìm ID lớn nhất hiện tại trong mảng để tự động cộng 1 cho phần tử tiếp theo
 int DatabaseManager::generateNextCategoryId() const {
     int maxId = 0;
     for (const Category& cat : m_categories) {
@@ -16,124 +15,75 @@ int DatabaseManager::generateNextCategoryId() const {
     return maxId + 1;
 }
 
-// 🎯 ĐỌC FILE CSV: Đọc id, name, parentId, active
+// 🎯 ĐỌC FILE CSV: Chỉ xử lý 3 cột dữ liệu chính
 void DatabaseManager::loadCategoriesFromCSV() {
     m_categories.clear();
 
-    QString dirPath = QCoreApplication::applicationDirPath() + "/data";
-    QDir dir(dirPath);
-    if (!dir.exists()) {
-        dir.mkpath(".");
+    QFile file("categories.csv");
+
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        qWarning() << "Không thể mở file categories.csv! Khởi tạo danh sách rỗng.";
+        return;
     }
 
-    QString fullPath = dirPath + "/categories.csv";
-    QFile file(fullPath);
+    QTextStream in(&file);
 
-    if (file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        QTextStream in(&file);
-        if (!in.atEnd()) {
-            in.readLine(); // Bỏ qua dòng tiêu đề
+    // Bỏ qua dòng tiêu đề cột đầu tiên (id,name,parentId)
+    if (!in.atEnd()) {
+        in.readLine();
+    }
+
+    // Đọc từng dòng dữ liệu cho đến khi hết file
+    while (!in.atEnd()) {
+        QString line = in.readLine().trimmed();
+        if (line.isEmpty()) continue; // Bỏ qua nếu có dòng trống
+
+        QStringList fields = line.split(",");
+        if (fields.size() >= 3) {
+            int id = fields[0].toInt();
+            QString name = fields[1];
+            int parentId = fields[2].toInt();
+
+            // Khôi phục đối tượng Category (Chỉ nhận 3 tham số)
+            m_categories.append(Category(id, parentId, name));
         }
-
-        while (!in.atEnd()) {
-            QString line = in.readLine().trimmed();
-            if (line.isEmpty()) continue;
-
-            QStringList fields = line.split(",");
-            if (fields.size() >= 3) {
-                int id = fields[0].toInt();
-                QString name = fields[1];
-                int parentId = fields[2].toInt();
-                bool active = (fields.size() >= 4) ? (fields[3].toInt() != 0) : true;
-
-                m_categories.append(Category(id, parentId, name, active));
-            }
-        }
-        file.close();
     }
-
-    // 🌟 KHỞI TẠO DANH MỤC MẶC ĐỊNH CHUẨN NẾU FILE RỖNG
-    if (m_categories.isEmpty()) {
-        qDebug() << "Khởi tạo danh mục mặc định ban đầu...";
-        int id = 1;
-        // 1. Income (Parent 1)
-        m_categories.append(Category(id++, 1, "Salary", true));
-        m_categories.append(Category(id++, 1, "Freelance & Side Income", true));
-        m_categories.append(Category(id++, 1, "Investment Returns", true));
-        m_categories.append(Category(id++, 1, "Gifts & Allowances", true));
-
-        // 2. Expense (Parent 2)
-        m_categories.append(Category(id++, 2, "Food & Dining", true));
-        m_categories.append(Category(id++, 2, "Housing & Rent", true));
-        m_categories.append(Category(id++, 2, "Transportation & Fuel", true));
-        m_categories.append(Category(id++, 2, "Utilities & Services", true));
-        m_categories.append(Category(id++, 2, "Entertainment & Leisure", true));
-        m_categories.append(Category(id++, 2, "Healthcare & Medical", true));
-
-        // 3. Bill (Parent 3)
-        m_categories.append(Category(id++, 3, "Electricity Bill", true));
-        m_categories.append(Category(id++, 3, "Water Bill", true));
-        m_categories.append(Category(id++, 3, "Internet & Cable", true));
-        m_categories.append(Category(id++, 3, "Credit Card Bill", true));
-
-        // 4. Budget (Parent 4)
-        m_categories.append(Category(id++, 4, "Monthly Living Budget", true));
-        m_categories.append(Category(id++, 4, "Discretionary Budget", true));
-
-        // 5. Saving (Parent 5)
-        m_categories.append(Category(id++, 5, "Emergency Savings", true));
-        m_categories.append(Category(id++, 5, "Vacation Fund", true));
-
-        saveCategoriesToCSV();
-    }
-
-    qDebug() << "Đã tải" << m_categories.size() << "danh mục từ categories.csv vào RAM.";
+    file.close();
+    qDebug() << "Đã tải" << m_categories.size() << "danh mục từ file CSV vào RAM.";
 }
 
-// 🎯 GHI FILE CSV: Ghi id, name, parentId, active
+// 🎯 GHI FILE CSV: Xuất dữ liệu gọn gàng với 3 cột
 void DatabaseManager::saveCategoriesToCSV() const {
-    QString dirPath = QCoreApplication::applicationDirPath() + "/data";
-    QDir dir(dirPath);
-    if (!dir.exists()) {
-        dir.mkpath(".");
-    }
-
-    QString fullPath = dirPath + "/categories.csv";
-    QFile file(fullPath);
+    QFile file("categories.csv");
     if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
         qWarning() << "Không thể ghi dữ liệu vào file categories.csv!";
         return;
     }
 
     QTextStream out(&file);
-    out << "id,name,parentId,active\n";
+    out << "id,name,parentId\n"; // Tiêu đề cột tối giản
 
+    // Lặp qua mảng và ghi thô xuống file text
     for (const Category& cat : m_categories) {
         out << cat.getId() << ","
             << cat.getName() << ","
-            << cat.getParentId() << ","
-            << (cat.isActive() ? 1 : 0) << "\n";
+            << cat.getParentId() << "\n";
     }
     file.close();
 }
 
-// 🎯 THÊM MỚI DANH MỤC TỪ UI
-void DatabaseManager::addUserCustomCategory(const QString& name, int parentId, bool active) {
+// 🎯 THÊM MỚI DANH MỤC: Do ứng dụng tự tính toán ID và lưu ngay lập tức
+void DatabaseManager::addUserCustomCategory(const QString& name, int parentId) {
     int newId = generateNextCategoryId();
-    Category newCat(newId, parentId, name, active);
-    m_categories.append(newCat);
-    saveCategoriesToCSV();
-}
 
-// 🎯 CHỈNH SỬA DANH MỤC
-void DatabaseManager::updateCategory(int id, const QString& name, int newParentId, bool active) {
-    for (Category& cat : m_categories) {
-        if (cat.getId() == id) {
-            cat = Category(id, newParentId, name, active);
-            break;
-        }
-    }
+    // Tạo đối tượng danh mục mới với 3 thông tin cơ bản
+    Category newCat(newId, parentId, name);
+
+    m_categories.append(newCat);
+
+    // Lưu ngay xuống file để tránh mất dữ liệu khi tắt app đột ngột
     saveCategoriesToCSV();
+    qDebug() << "Đã tạo danh mục mới thành công! Tên:" << name << "| ID:" << newId << "| Thuộc nhóm gốc:" << parentId;
 }
 
 void DatabaseManager::updateCategoryParent(int id, int newParentId) {
@@ -150,29 +100,6 @@ void DatabaseManager::removeCategory(int id) {
     for (int i = 0; i < m_categories.size(); ++i) {
         if (m_categories[i].getId() == id) {
             m_categories.removeAt(i);
-            break;
-        }
-    }
-    saveCategoriesToCSV();
-}
-
-void DatabaseManager::migrateAndRemoveCategory(int sourceCatId, int targetCatId) {
-    // 1. Re-assign linked budgets
-    for (Budget& b : m_budgets) {
-        if (b.getCategoryId() == sourceCatId) {
-            b.setCategoryId(targetCatId);
-        }
-    }
-    saveBudgetsToCSV();
-
-    // 2. Remove category
-    removeCategory(sourceCatId);
-}
-
-void DatabaseManager::deactivateCategory(int id) {
-    for (Category& cat : m_categories) {
-        if (cat.getId() == id) {
-            cat.setActive(false);
             break;
         }
     }
