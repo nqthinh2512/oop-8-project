@@ -1,5 +1,5 @@
 import QtQuick
-import ".."
+import "../"
 
 Item {
     id: root
@@ -7,10 +7,46 @@ Item {
     visible: false
     z: 999
 
-    signal accepted()
+    property bool isEditMode: false
+    property int editingCategoryId: -1
+
+    signal accepted(int id, string title, int parentId, bool active)
     signal rejected()
 
-    function open() { visible = true }
+    property alias categoryTitleText: textField.text
+    property int selectedParentId: pageDropdown.selectedIndex + 1
+    property bool selectedActive: statusDropdown.selectedIndex === 0
+
+    function openAdd() {
+        isEditMode = false
+        editingCategoryId = -1
+        dialogTitleText.text = "Add Category"
+        textField.text = ""
+        pageDropdown.selectedIndex = 0
+        pageDropdown.selectedText = "Income"
+        statusDropdown.selectedIndex = 0
+        statusDropdown.selectedText = "Active"
+        visible = true
+    }
+
+    function openEdit(id, currentTitle, currentParentId, currentActive) {
+        isEditMode = true
+        editingCategoryId = id
+        dialogTitleText.text = "Edit Category"
+        textField.text = currentTitle
+
+        var parentNames = ["Income", "Expense", "Bill", "Budget", "Saving"]
+        var pIdx = (currentParentId >= 1 && currentParentId <= 5) ? (currentParentId - 1) : 0
+        pageDropdown.selectedIndex = pIdx
+        pageDropdown.selectedText = parentNames[pIdx]
+
+        statusDropdown.selectedIndex = currentActive ? 0 : 1
+        statusDropdown.selectedText = currentActive ? "Active" : "Inactive"
+
+        visible = true
+    }
+
+    function open() { openAdd() }
     function close() { visible = false }
 
     // Dimmed background overlay
@@ -34,7 +70,10 @@ Item {
 
         color: "#ffffff"
         radius: 15
-        clip: true
+        clip: false
+
+        // Absorb clicks inside the card so they don't reach the dimmed overlay
+        MouseArea { anchors.fill: parent }
 
         // 1. Title Header
         Image {
@@ -42,7 +81,7 @@ Item {
             source: Qt.resolvedUrl("../../assets/title_12.png")
 
             Text {
-                id: title_1
+                id: dialogTitleText
                 x: 20
                 y: 9
                 height: 32
@@ -130,7 +169,7 @@ Item {
             width: 500
             color: "transparent"
 
-            // Page Dropdown (Bill, Budget, Saving, Transaction)
+            // Page Dropdown (Income, Expense, Bill, Budget, Saving)
             Rectangle {
                 id: dropdown
                 x: 20
@@ -149,19 +188,21 @@ Item {
                     horizontalAlignment: Text.AlignLeft
                     lineHeight: 32
                     lineHeightMode: Text.FixedHeight
-                    text: "Page"
+                    text: "Main Category"
                     textFormat: Text.PlainText
                     verticalAlignment: Text.AlignTop
                     wrapMode: Text.Wrap
                 }
 
                 Dropdown_1 {
-                    id: dropdown_1
+                    id: pageDropdown
                     y: 32
                     height: 34
                     width: 225
-                    _state: Dropdown_1.State_1.State_1_default
-                    clip: true
+                    model: ["Income", "Expense", "Bill", "Budget", "Saving"]
+                    selectedText: "Income"
+                    selectedIndex: 0
+                    z: 10
                 }
             }
 
@@ -191,12 +232,14 @@ Item {
                 }
 
                 Dropdown_1 {
-                    id: dropdown_3
+                    id: statusDropdown
                     y: 32
                     height: 34
                     width: 225
-                    _state: Dropdown_1.State_1.State_1_default
-                    clip: true
+                    model: ["Active", "Inactive"]
+                    selectedText: "Active"
+                    selectedIndex: 0
+                    z: 10
                 }
             }
         }
@@ -239,7 +282,7 @@ Item {
                     anchors.fill: parent
                     cursorShape: Qt.PointingHandCursor
                     onClicked: {
-                        root.accepted()
+                        root.accepted(editingCategoryId, textField.text, pageDropdown.selectedIndex + 1, statusDropdown.selectedIndex === 0)
                         root.close()
                     }
                 }

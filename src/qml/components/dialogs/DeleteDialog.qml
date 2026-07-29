@@ -37,6 +37,9 @@ Item {
         radius: 15
         clip: true
 
+        // Absorb clicks inside the card so they don't reach the dimmed overlay
+        MouseArea { anchors.fill: parent }
+
         // Header Title
         Image {
             id: title

@@ -36,7 +36,9 @@ Item {
         radius: 15
         clip: true
 
-        // 1. Title Header
+        // Absorb clicks inside the card so they don't reach the dimmed overlay
+        MouseArea { anchors.fill: parent }
+
         Image {
             id: title
             source: Qt.resolvedUrl("../../assets/title_13.png")

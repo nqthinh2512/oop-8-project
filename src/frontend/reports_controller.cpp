@@ -1,5 +1,14 @@
 #include "reports_controller.h"
-#include "../backend/storage/database_manager.h"
 
-//gọi hàm ở dưới nếu muốn lấy danh sách các danh mục đã có sẵn
-//const QVector<Category>& initializedCategories = DatabaseManager::instance().getAllCategories();
+ReportsController::ReportsController(QObject *parent)
+    : QObject(parent) {}
+
+QVariantList ReportsController::categorySpendingReport() const {
+    QVariantList list;
+    // Category spending report calculation logic from DatabaseManager
+    return list;
+}
+
+void ReportsController::refresh() {
+    emit reportChanged();
+}

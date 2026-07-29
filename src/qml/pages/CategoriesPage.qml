@@ -1,12 +1,42 @@
 import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls
+import "../components/dialogs"
+import "../components"
 
 Rectangle {
     id: categoriesPage
 
     color: "#f8fafc"
     clip: true
+
+    CategoryDialog {
+        id: categoryDialog
+
+        onAccepted: (id, title, parentId, active) => {
+            if (isEditMode && id !== -1) {
+                categoriesController.updateCategory(id, title, parentId, active)
+            } else {
+                categoriesController.addCategory(title, parentId, active)
+            }
+        }
+    }
+
+    DeleteCategoryDialog {
+        id: deleteCategoryDialog
+
+        onAccepted: (targetId) => {
+            if (deletingCategoryId !== -1) {
+                categoriesController.migrateAndRemoveCategory(deletingCategoryId, targetId)
+            }
+        }
+
+        onDeactivateRequested: () => {
+            if (deletingCategoryId !== -1) {
+                categoriesController.deactivateCategory(deletingCategoryId)
+            }
+        }
+    }
 
     ColumnLayout {
         anchors.fill: parent
@@ -43,7 +73,7 @@ Rectangle {
             Layout.fillHeight: true
             spacing: 0
 
-            // A. Table Toolbar (Search, Filter Tabs, Dropdown, Add Category Button)
+            // A. Sleek Table Toolbar (Search Bar, Category Group Filter Dropdown, Add Button)
             Rectangle {
                 Layout.fillWidth: true
                 implicitHeight: 70
@@ -52,45 +82,35 @@ Rectangle {
                 border.width: 1
                 topLeftRadius: 12
                 topRightRadius: 12
+                z: 10
 
                 RowLayout {
                     anchors.fill: parent
                     anchors.leftMargin: 16
                     anchors.rightMargin: 16
-                    spacing: 14
+                    spacing: 16
 
                     SearchBar_1 {
                         id: searchBar
                         placeholderText: "Search category name"
                         Layout.preferredWidth: 260
-                    }
 
-                    RowLayout {
-                        spacing: 8
-
-                        UniversalButton_1 {
-                            buttonText: "All"
-                            _state: UniversalButton_1.State_1.State_1_selected
-                        }
-                        UniversalButton_1 {
-                            buttonText: "Active"
-                            _state: UniversalButton_1.State_1.State_1_default
-                        }
-                        UniversalButton_1 {
-                            buttonText: "Inactive"
-                            _state: UniversalButton_1.State_1.State_1_default
+                        onTextChanged: {
+                            categoriesController.searchText = searchBar.text
                         }
                     }
 
-                    Rectangle {
-                        Layout.preferredWidth: 1
-                        Layout.preferredHeight: 24
-                        color: "#cbd5e1"
-                    }
-
+                    // Consolidated Category Group Filter Dropdown (Replaces horizontal button clutter)
                     Dropdown_1 {
-                        selectedText: "All Main Categories"
-                        Layout.preferredWidth: 200
+                        id: toolbarDropdown
+                        Layout.preferredWidth: 220
+                        model: ["All Categories", "Income (Parent 1)", "Expense (Parent 2)", "Bill (Parent 3)", "Budget (Parent 4)", "Saving (Parent 5)"]
+                        selectedText: "All Categories"
+                        selectedIndex: 0
+
+                        onSelected: (idx, val) => {
+                            categoriesController.parentFilter = idx
+                        }
                     }
 
                     Item {
@@ -101,12 +121,12 @@ Rectangle {
                         buttonText: "+ Add Category"
                         _state: UniversalButton_1.State_1.State_1_selected
                         Layout.alignment: Qt.AlignRight | Qt.AlignVCenter
-                        onClicked: console.log("Add Category clicked")
+                        onClicked: categoryDialog.openAdd()
                     }
                 }
             }
 
-            // B. Table Column Header Bar (Matching CategoryRow_1 column wrappers)
+            // B. Table Column Header Bar
             Rectangle {
                 Layout.fillWidth: true
                 implicitHeight: 48
@@ -120,7 +140,6 @@ Rectangle {
                     anchors.rightMargin: 20
                     spacing: 0
 
-                    // 1. MAIN CATEGORY
                     Item {
                         Layout.fillWidth: true
                         Layout.preferredWidth: 280
@@ -137,7 +156,6 @@ Rectangle {
                         }
                     }
 
-                    // 2. CATEGORY NAME
                     Item {
                         Layout.fillWidth: true
                         Layout.preferredWidth: 260
@@ -154,7 +172,6 @@ Rectangle {
                         }
                     }
 
-                    // 3. TOTAL MONEY BY CATEGORY
                     Item {
                         Layout.fillWidth: true
                         Layout.preferredWidth: 280
@@ -171,7 +188,6 @@ Rectangle {
                         }
                     }
 
-                    // 4. STATUS
                     Item {
                         Layout.preferredWidth: 160
                         Layout.fillHeight: true
@@ -187,7 +203,6 @@ Rectangle {
                         }
                     }
 
-                    // 5. ACTIONS
                     Item {
                         Layout.preferredWidth: 100
                         Layout.fillHeight: true
@@ -206,7 +221,7 @@ Rectangle {
                 }
             }
 
-            // C. Dynamic Row ListView
+            // C. Dynamic Row ListView connected to categoriesController
             ListView {
                 id: listView
                 Layout.fillWidth: true
@@ -214,23 +229,22 @@ Rectangle {
                 clip: true
                 spacing: 0
 
-                model: ListModel {
-                    ListElement { mCat: "Name"; catName: "Category"; amount: "1,000 VND"; statusVal: CategoryRow_1.Status.Status_inactive }
-                    ListElement { mCat: "Name"; catName: "Category"; amount: "1,000 VND"; statusVal: CategoryRow_1.Status.Status_active }
-                    ListElement { mCat: "Housing"; catName: "Rent & Mortgages"; amount: "15,000,000 VND"; statusVal: CategoryRow_1.Status.Status_active }
-                    ListElement { mCat: "Food"; catName: "Groceries & Dining"; amount: "4,500,000 VND"; statusVal: CategoryRow_1.Status.Status_active }
-                    ListElement { mCat: "Entertainment"; catName: "Movies & Games"; amount: "2,000,000 VND"; statusVal: CategoryRow_1.Status.Status_inactive }
-                }
+                model: categoriesController.categoriesList
 
                 delegate: CategoryRow_1 {
                     width: listView.width
-                    mainCategoryName: model.mCat
-                    categoryName: model.catName
-                    totalAmountText: model.amount
-                    status_1: model.statusVal
+                    mainCategoryName: modelData.parentName
+                    categoryName: modelData.name
+                    totalAmountText: "0 VND"
+                    status_1: modelData.active ? CategoryRow_1.Status.Status_active : CategoryRow_1.Status.Status_inactive
 
-                    onEditClicked: console.log("Edit category: " + model.catName)
-                    onDeleteClicked: console.log("Delete category: " + model.catName)
+                    onEditClicked: {
+                        categoryDialog.openEdit(modelData.id, modelData.name, modelData.parentId, modelData.active)
+                    }
+
+                    onDeleteClicked: {
+                        deleteCategoryDialog.openWithCategory(modelData.id, modelData.name)
+                    }
                 }
 
                 ScrollBar.vertical: ScrollBar {

@@ -1,79 +1,78 @@
 import QtQuick
+import QtQuick.Controls
 
 Rectangle {
     id: dropdownDialogBox
 
-    height: 212.33
-    width: 239.73
+    // ===== Dynamic API =====
+    property var model: []                    // String array: ["Option A", "Option B", ...]
+    property int selectedIndex: -1            // Currently selected item index
+    signal itemSelected(int index, string value)
 
-    border.color: "#80000000"
-    border.width: 1.14
+    // Bounded height: dynamic up to 216px (approx 5-6 items), scrollable thereafter
+    width: 240
+    height: Math.min(listView.contentHeight + 16, 216)
+
+    border.color: "#d1d5db"
+    border.width: 1
     color: "#ffffff"
-    radius: 9.13
+    radius: 8
 
-    DropdownItem {
-        id: dropdownItem
-
-        y: 9.13
-
-        _state: DropdownItem.State_1.State_1_Default
-        clip: true
-        placeholder_1FontPixelSize: 18
-        placeholder_1Height: 22
-        placeholder_1Width: 200
-        placeholder_1X: 20.85
-        placeholder_1Y: 8.41
+    // Drop-shadow effect (subtle)
+    Rectangle {
+        anchors.fill: parent
+        anchors.margins: -1
+        radius: parent.radius + 1
+        color: "#0a000000"
+        z: -1
     }
-    DropdownItem {
-        id: dropdownItem_1
 
-        y: 47.95
-
-        _state: DropdownItem.State_1.State_1_Default
+    ListView {
+        id: listView
+        anchors.fill: parent
+        anchors.topMargin: 8
+        anchors.bottomMargin: 8
         clip: true
-        placeholder_1FontPixelSize: 18
-        placeholder_1Height: 22
-        placeholder_1Width: 200
-        placeholder_1X: 20.85
-        placeholder_1Y: 8.41
-    }
-    DropdownItem {
-        id: dropdownItem_2
+        model: dropdownDialogBox.model
 
-        y: 86.76
+        delegate: DropdownItem {
+            width: listView.width
+            height: 36
+            clip: true
 
-        _state: DropdownItem.State_1.State_1_Default
-        clip: true
-        placeholder_1FontPixelSize: 18
-        placeholder_1Height: 22
-        placeholder_1Width: 200
-        placeholder_1X: 20.85
-        placeholder_1Y: 8.41
-    }
-    DropdownItem {
-        id: dropdownItem_3
+            // Set display text from model data — proportional to Dropdown_1 button
+            placeholder_1Text: modelData
+            placeholder_1FontPixelSize: 14
+            placeholder_1Height: 20
+            placeholder_1Width: width - 32
+            placeholder_1X: 14
+            placeholder_1Y: 8
 
-        y: 125.57
+            // Manage selection + hover state
+            _state: {
+                if (index === dropdownDialogBox.selectedIndex) {
+                    return itemMouse.containsMouse
+                        ? DropdownItem.State_1.State_1_hover_selected
+                        : DropdownItem.State_1.State_1_selected
+                } else {
+                    return itemMouse.containsMouse
+                        ? DropdownItem.State_1.State_1_hover
+                        : DropdownItem.State_1.State_1_Default
+                }
+            }
 
-        _state: DropdownItem.State_1.State_1_Default
-        clip: true
-        placeholder_1FontPixelSize: 18
-        placeholder_1Height: 22
-        placeholder_1Width: 200
-        placeholder_1X: 20.85
-        placeholder_1Y: 8.41
-    }
-    DropdownItem {
-        id: dropdownItem_4
+            MouseArea {
+                id: itemMouse
+                anchors.fill: parent
+                hoverEnabled: true
+                cursorShape: Qt.PointingHandCursor
+                onClicked: {
+                    dropdownDialogBox.selectedIndex = index
+                    dropdownDialogBox.itemSelected(index, modelData)
+                }
+            }
+        }
 
-        y: 164.39
 
-        _state: DropdownItem.State_1.State_1_Default
-        clip: true
-        placeholder_1FontPixelSize: 18
-        placeholder_1Height: 22
-        placeholder_1Width: 200
-        placeholder_1X: 20.85
-        placeholder_1Y: 8.41
     }
 }
