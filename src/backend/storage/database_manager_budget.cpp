@@ -15,7 +15,8 @@ void DatabaseManager::loadBudgetsFromCSV()
 {
     m_budgets.clear();
 
-    QFile file("budgets.csv");
+    QString fullPath = QCoreApplication::applicationDirPath() + "/data/budgets.csv";
+    QFile file(fullPath);
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
         return; // file chưa tồn tại (lần chạy đầu) -> giữ m_budgets rỗng
 
@@ -41,13 +42,14 @@ void DatabaseManager::loadBudgetsFromCSV()
 
         m_budgets.append(Budget(id, name, priority, categoryId, limit, startDate, endDate, spent));
     }
-    qDebug() << "Đã tải" << m_budgets.size() << "danh mục từ file CSV vào RAM.";
+    qDebug() << "Đã tải" << m_budgets.size() << "danh mục từ budgets.CSV vào RAM.";
     file.close();
 }
 
 void DatabaseManager::saveBudgetsToCSV() const
 {
-    QFile file("budgets.csv");
+    QString fullPath = QCoreApplication::applicationDirPath() + "/data/budgets.csv";
+    QFile file(fullPath);
     if (!file.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Truncate))
         return;
 

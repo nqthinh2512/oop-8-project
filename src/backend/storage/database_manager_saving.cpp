@@ -14,7 +14,8 @@ void DatabaseManager::loadSavingsFromCSV()
 {
     m_savings.clear();
 
-    QFile file("savings.csv");
+    QString fullPath = QCoreApplication::applicationDirPath() + "/data/savings.csv";
+    QFile file(fullPath);
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
         return;
 
@@ -43,7 +44,8 @@ void DatabaseManager::loadSavingsFromCSV()
 
 void DatabaseManager::saveSavingsToCSV() const
 {
-    QFile file("savings.csv");
+    QString fullPath = QCoreApplication::applicationDirPath() + "/data/savings.csv";
+    QFile file(fullPath);
     if (!file.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Truncate))
         return;
 

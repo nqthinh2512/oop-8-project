@@ -11,6 +11,7 @@
 #include <QObject>
 #include <QVector>
 #include <QString>
+#include <QCoreApplication>
 #include "../models/category.h"
 #include "../models/bill.h"
 #include "../models/budget.h"
@@ -21,13 +22,6 @@ class DatabaseManager : public QObject {
     Q_OBJECT
 
 private:
-
-    explicit DatabaseManager(QObject *parent = nullptr): QObject(parent){
-        loadCategoriesFromCSV();
-        loadBudgetsFromCSV();
-        loadSavingsFromCSV();
-    }
-    ~DatabaseManager() = default;
 
     //===========================CATEGORY SECTION=============================
 
@@ -61,6 +55,9 @@ private:
 
 public:
 
+    explicit DatabaseManager(QObject *parent = nullptr): QObject(parent){}
+    ~DatabaseManager() = default;
+
     // Hàm lấy instance duy nhất để sử dụng toàn hệ thống
     static DatabaseManager& instance() {
         static DatabaseManager instance;
@@ -80,11 +77,12 @@ public:
     // API lấy danh sách danh mục cấp cho giao diện UI hiển thị
     const QVector<Category>& getAllCategories() const { return m_categories; }
 
-    // Hàm thêm danh mục tùy chỉnh từ Giao diện (UI truyền: Tên, và Root ID từ 1 đến 5)
-    void addUserCustomCategory(const QString& name, int parentId);
-
+    void addUserCustomCategory(const QString& name, int parentId, bool active = true);
+    void updateCategory(int id, const QString& name, int newParentId, bool active);
     void updateCategoryParent(int id, int newParentId);
     void removeCategory(int id);
+    void migrateAndRemoveCategory(int sourceCatId, int targetCatId);
+    void deactivateCategory(int id);
 
     //=============================BILL SECTION==================================
 
