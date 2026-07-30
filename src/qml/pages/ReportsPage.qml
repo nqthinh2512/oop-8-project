@@ -2,6 +2,8 @@ import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls
 
+import "../components"
+
 Rectangle {
     id: reportsPage
 
@@ -56,29 +58,29 @@ Rectangle {
 
                     ReportBox1_1 {
                         titleText: "MONTHLY INCOME"
-                        amountText: "1,000 VND"
-                        labelText: "July 2026"
-                        subtitleText: "+4.2% vs June"
-                        subtitleColor: "#6366f1"
+                        amountText: reportsController.monthlyIncomeFormatted
+                        labelText: "Current Month"
+                        subtitleText: "Total Earned"
+                        subtitleColor: "#10b981"
                         Layout.fillWidth: true
                         Layout.preferredWidth: 1
                     }
 
                     ReportBox1_1 {
                         titleText: "MONTHLY EXPENSES"
-                        amountText: "1,000 VND"
-                        labelText: "July 2026"
-                        subtitleText: "-11.6% vs June"
-                        subtitleColor: "#6366f1"
+                        amountText: reportsController.monthlyExpenseFormatted
+                        labelText: "Current Month"
+                        subtitleText: "Total Spent"
+                        subtitleColor: "#ef4444"
                         Layout.fillWidth: true
                         Layout.preferredWidth: 1
                     }
 
                     ReportBox1_1 {
                         titleText: "NET WORTH"
-                        amountText: "4,000 VND"
-                        labelText: "Total Assets"
-                        subtitleText: "+3,000 VND This Month"
+                        amountText: reportsController.netWorthFormatted
+                        labelText: "Total Balance"
+                        subtitleText: "Cumulative"
                         subtitleColor: "#6366f1"
                         Layout.fillWidth: true
                         Layout.preferredWidth: 1
@@ -86,9 +88,10 @@ Rectangle {
 
                     ReportBox1_1 {
                         titleText: "SAVINGS RATE"
-                        amountText: "1%"
-                        labelText: "Of Income"
-                        subtitleText: ""
+                        amountText: reportsController.savingsRateFormatted
+                        labelText: "Of Monthly Income"
+                        subtitleText: "Net Savings %"
+                        subtitleColor: "#0284c7"
                         Layout.fillWidth: true
                         Layout.preferredWidth: 1
                     }
@@ -104,11 +107,11 @@ Rectangle {
                     ReportBox2_1 {
                         titleText: "Bills"
                         row1Label: "Total Due"
-                        row1Amount: "100,000 VND"
+                        row1Amount: reportsController.billsSnapshot.dueFormatted || "0 VND"
                         row2Label: "Overdue"
-                        row2Amount: "2,000,000 VND"
+                        row2Amount: reportsController.billsSnapshot.overdueFormatted || "0 VND"
                         row3Label: "Paid"
-                        row3Amount: "1,000 VND"
+                        row3Amount: reportsController.billsSnapshot.paidFormatted || "0 VND"
                         Layout.fillWidth: true
                         Layout.preferredWidth: 1
                     }
@@ -116,11 +119,11 @@ Rectangle {
                     ReportBox2_1 {
                         titleText: "Budgets"
                         row1Label: "Total Spent"
-                        row1Amount: "1,000,000 VND"
+                        row1Amount: reportsController.budgetsSnapshot.spentFormatted || "0 VND"
                         row2Label: "Total Limit"
-                        row2Amount: "2,000,000 VND"
+                        row2Amount: reportsController.budgetsSnapshot.limitFormatted || "0 VND"
                         row3Label: "Remaining"
-                        row3Amount: "2,500,000 VND"
+                        row3Amount: reportsController.budgetsSnapshot.remainingFormatted || "0 VND"
                         Layout.fillWidth: true
                         Layout.preferredWidth: 1
                     }
@@ -128,11 +131,11 @@ Rectangle {
                     ReportBox2_1 {
                         titleText: "Savings"
                         row1Label: "Total Saved"
-                        row1Amount: "1,000,000"
+                        row1Amount: reportsController.savingsSnapshot.savedFormatted || "0 VND"
                         row2Label: "Total Target"
-                        row2Amount: "2,000,000"
+                        row2Amount: reportsController.savingsSnapshot.targetFormatted || "0 VND"
                         row3Label: "Remaining"
-                        row3Amount: "5,000,000"
+                        row3Amount: reportsController.savingsSnapshot.remainingFormatted || "0 VND"
                         Layout.fillWidth: true
                         Layout.preferredWidth: 1
                     }
@@ -167,14 +170,14 @@ Rectangle {
 
                                 Text {
                                     text: "Income vs Expense"
-                                    font.family: "Intel One Mono"
+                                    font.family: "Inter"
                                     font.pixelSize: 18
                                     font.weight: Font.Bold
                                     color: "#0f172a"
                                 }
 
                                 Text {
-                                    text: "Last Month"
+                                    text: "Monthly Comparison"
                                     font.family: "Inter"
                                     font.pixelSize: 13
                                     color: "#64748b"
@@ -187,13 +190,78 @@ Rectangle {
                                 color: "#e2e8f0"
                             }
 
-                            // Chart canvas area placeholder
+                            // Bar Chart Canvas
                             Rectangle {
                                 Layout.fillWidth: true
                                 Layout.fillHeight: true
                                 color: "#f8fafc"
                                 radius: 8
                                 border.color: "#f1f5f9"
+
+                                Canvas {
+                                    anchors.fill: parent
+                                    anchors.margins: 12
+                                    onPaint: {
+                                        var ctx = getContext("2d");
+                                        ctx.reset();
+
+                                        var padL = 42, padB = 24, padT = 15, padR = 12;
+                                        var chartW = width - padL - padR;
+                                        var chartH = height - padT - padB;
+
+                                        // Y-Axis Value Labels & Gridlines
+                                        ctx.font = "11px 'Inter', sans-serif";
+                                        ctx.fillStyle = "#94a3b8";
+                                        ctx.textAlign = "right";
+                                        ctx.textBaseline = "middle";
+                                        ctx.strokeStyle = "#f1f5f9";
+                                        ctx.lineWidth = 1;
+
+                                        var yTicks = ["20M", "15M", "10M", "5M", "0"];
+                                        for (var i = 0; i < yTicks.length; i++) {
+                                            var ratio = i / (yTicks.length - 1);
+                                            var y = padT + ratio * chartH;
+                                            ctx.fillText(yTicks[i], padL - 8, y);
+
+                                            ctx.beginPath();
+                                            ctx.moveTo(padL, y);
+                                            ctx.lineTo(width - padR, y);
+                                            ctx.stroke();
+                                        }
+
+                                        // Bars & X-Axis Labels
+                                        var months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun"];
+                                        var incomeRatios = [0.65, 0.50, 0.80, 0.55, 0.85, 0.70];
+                                        var expenseRatios = [0.40, 0.55, 0.45, 0.60, 0.35, 0.50];
+
+                                        var count = months.length;
+                                        var groupWidth = chartW / count;
+                                        var barWidth = Math.min(20, groupWidth * 0.30);
+
+                                        ctx.textAlign = "center";
+                                        ctx.textBaseline = "top";
+
+                                        for (var b = 0; b < count; b++) {
+                                            var groupCenterX = padL + groupWidth * b + groupWidth / 2;
+                                            var xInc = groupCenterX - barWidth - 1;
+                                            var xExp = groupCenterX + 1;
+
+                                            var hInc = incomeRatios[b] * chartH;
+                                            var hExp = expenseRatios[b] * chartH;
+
+                                            ctx.fillStyle = "#10b981";
+                                            ctx.fillRect(xInc, padT + chartH - hInc, barWidth, hInc);
+
+                                            ctx.fillStyle = "#ef4444";
+                                            ctx.fillRect(xExp, padT + chartH - hExp, barWidth, hExp);
+
+                                            ctx.fillStyle = "#94a3b8";
+                                            ctx.fillText(months[b], groupCenterX, padT + chartH + 6);
+                                        }
+                                    }
+                                    onWidthChanged: requestPaint()
+                                    onHeightChanged: requestPaint()
+                                }
                             }
 
                             // Bottom Legend
@@ -203,12 +271,12 @@ Rectangle {
 
                                 Indicator_1 {
                                     labelText: "Income"
-                                    dotColor: "#34c759"
+                                    dotColor: "#10b981"
                                 }
 
                                 Indicator_1 {
                                     labelText: "Expense"
-                                    dotColor: "#ff383c"
+                                    dotColor: "#ef4444"
                                 }
                             }
                         }
@@ -235,15 +303,15 @@ Rectangle {
                                 spacing: 2
 
                                 Text {
-                                    text: "Net Worth"
-                                    font.family: "Intel One Mono"
+                                    text: "Net Worth Growth"
+                                    font.family: "Inter"
                                     font.pixelSize: 18
                                     font.weight: Font.Bold
                                     color: "#0f172a"
                                 }
 
                                 Text {
-                                    text: "Last Month"
+                                    text: "Cumulative Net Assets"
                                     font.family: "Inter"
                                     font.pixelSize: 13
                                     color: "#64748b"
@@ -256,26 +324,112 @@ Rectangle {
                                 color: "#e2e8f0"
                             }
 
-                            // Chart canvas area placeholder
+                            // Area Chart Canvas
                             Rectangle {
                                 Layout.fillWidth: true
                                 Layout.fillHeight: true
                                 color: "#f8fafc"
                                 radius: 8
                                 border.color: "#f1f5f9"
+
+                                Canvas {
+                                    anchors.fill: parent
+                                    anchors.margins: 12
+                                    onPaint: {
+                                        var ctx = getContext("2d");
+                                        ctx.reset();
+
+                                        var padL = 42, padB = 24, padT = 15, padR = 12;
+                                        var chartW = width - padL - padR;
+                                        var chartH = height - padT - padB;
+
+                                        // Y-Axis Value Labels & Gridlines
+                                        ctx.font = "11px 'Inter', sans-serif";
+                                        ctx.fillStyle = "#94a3b8";
+                                        ctx.textAlign = "right";
+                                        ctx.textBaseline = "middle";
+                                        ctx.strokeStyle = "#f1f5f9";
+                                        ctx.lineWidth = 1;
+
+                                        var yTicks = ["30M", "22.5M", "15M", "7.5M", "0"];
+                                        for (var i = 0; i < yTicks.length; i++) {
+                                            var ratio = i / (yTicks.length - 1);
+                                            var y = padT + ratio * chartH;
+                                            ctx.fillText(yTicks[i], padL - 8, y);
+
+                                            ctx.beginPath();
+                                            ctx.moveTo(padL, y);
+                                            ctx.lineTo(width - padR, y);
+                                            ctx.stroke();
+                                        }
+
+                                        // Net Worth Curve Points
+                                        var months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun"];
+                                        var nwRatios = [0.30, 0.45, 0.55, 0.62, 0.78, 0.88];
+                                        var count = months.length;
+                                        var step = chartW / (count - 1);
+
+                                        // Draw Area Gradient Fill
+                                        ctx.beginPath();
+                                        ctx.moveTo(padL, padT + chartH);
+                                        for (var p = 0; p < count; p++) {
+                                            var px = padL + p * step;
+                                            var py = padT + chartH - (nwRatios[p] * chartH);
+                                            ctx.lineTo(px, py);
+                                        }
+                                        ctx.lineTo(padL + (count - 1) * step, padT + chartH);
+                                        ctx.closePath();
+
+                                        var grad = ctx.createLinearGradient(0, padT, 0, padT + chartH);
+                                        grad.addColorStop(0, "rgba(99, 102, 241, 0.35)");
+                                        grad.addColorStop(1, "rgba(99, 102, 241, 0.0)");
+                                        ctx.fillStyle = grad;
+                                        ctx.fill();
+
+                                        // Draw Line
+                                        ctx.beginPath();
+                                        ctx.strokeStyle = "#6366f1";
+                                        ctx.lineWidth = 2.5;
+                                        for (var l = 0; l < count; l++) {
+                                            var lx = padL + l * step;
+                                            var ly = padT + chartH - (nwRatios[l] * chartH);
+                                            if (l === 0) ctx.moveTo(lx, ly);
+                                            else ctx.lineTo(lx, ly);
+                                        }
+                                        ctx.stroke();
+
+                                        // Draw Month Labels & Dots
+                                        ctx.textAlign = "center";
+                                        ctx.textBaseline = "top";
+                                        for (var d = 0; d < count; d++) {
+                                            var dx = padL + d * step;
+                                            var dy = padT + chartH - (nwRatios[d] * chartH);
+
+                                            ctx.fillStyle = "#6366f1";
+                                            ctx.beginPath();
+                                            ctx.arc(dx, dy, 4, 0, 2 * Math.PI);
+                                            ctx.fill();
+
+                                            ctx.fillStyle = "#94a3b8";
+                                            ctx.fillText(months[d], dx, padT + chartH + 6);
+                                        }
+                                    }
+                                    onWidthChanged: requestPaint()
+                                    onHeightChanged: requestPaint()
+                                }
                             }
                         }
                     }
                 }
 
                 // =================================================================
-                // 5. ROW 4: 2 CATEGORY BREAKDOWN CARDS
+                // 5. ROW 4: 2 CATEGORY BREAKDOWN CARDS (Top 5 + Unlisted Donut Charts)
                 // =================================================================
                 RowLayout {
                     Layout.fillWidth: true
                     spacing: 20
 
-                    // Left: Expense by Category
+                    // Left: Expense by Category (Top 5 + Unlisted)
                     Rectangle {
                         Layout.fillWidth: true
                         Layout.preferredWidth: 1
@@ -297,14 +451,14 @@ Rectangle {
 
                                 Text {
                                     text: "Expense by Category"
-                                    font.family: "Intel One Mono"
+                                    font.family: "Inter"
                                     font.pixelSize: 18
                                     font.weight: Font.Bold
                                     color: "#0f172a"
                                 }
 
                                 Text {
-                                    text: "July 2026"
+                                    text: "Top 5 Categories & Unlisted"
                                     font.family: "Inter"
                                     font.pixelSize: 13
                                     color: "#64748b"
@@ -322,7 +476,7 @@ Rectangle {
                                 Layout.fillHeight: true
                                 spacing: 24
 
-                                // Donut Chart Canvas Area
+                                // Donut Chart Canvas
                                 Rectangle {
                                     Layout.fillWidth: true
                                     Layout.preferredWidth: 1
@@ -330,6 +484,50 @@ Rectangle {
                                     color: "#f8fafc"
                                     radius: 8
                                     border.color: "#f1f5f9"
+
+                                    Canvas {
+                                        id: expenseCanvas
+                                        anchors.fill: parent
+                                        anchors.margins: 12
+                                        property var chartData: reportsController.categoryExpenseReport
+
+                                        onPaint: {
+                                            var ctx = getContext("2d");
+                                            ctx.reset();
+
+                                            var centerX = width / 2;
+                                            var centerY = height / 2;
+                                            var outerRadius = Math.min(centerX, centerY) - 8;
+                                            var innerRadius = outerRadius * 0.55;
+
+                                            if (!chartData || chartData.length === 0) {
+                                                ctx.fillStyle = "#e2e8f0";
+                                                ctx.beginPath();
+                                                ctx.arc(centerX, centerY, outerRadius, 0, 2 * Math.PI);
+                                                ctx.arc(centerX, centerY, innerRadius, 2 * Math.PI, 0, true);
+                                                ctx.fill();
+                                                return;
+                                            }
+
+                                            var startAngle = -Math.PI / 2;
+                                            for (var i = 0; i < chartData.length; i++) {
+                                                var item = chartData[i];
+                                                var sliceAngle = (item.percentage / 100.0) * (2 * Math.PI);
+                                                var endAngle = startAngle + sliceAngle;
+
+                                                ctx.fillStyle = item.color;
+                                                ctx.beginPath();
+                                                ctx.arc(centerX, centerY, outerRadius, startAngle, endAngle);
+                                                ctx.arc(centerX, centerY, innerRadius, endAngle, startAngle, true);
+                                                ctx.closePath();
+                                                ctx.fill();
+
+                                                startAngle = endAngle;
+                                            }
+                                        }
+                                        onWidthChanged: requestPaint()
+                                        onHeightChanged: requestPaint()
+                                    }
                                 }
 
                                 // Legend List
@@ -338,18 +536,20 @@ Rectangle {
                                     Layout.alignment: Qt.AlignVCenter
                                     spacing: 8
 
-                                    Indicator_1 { labelText: "category1"; dotColor: "#3b82f6" }
-                                    Indicator_1 { labelText: "category2"; dotColor: "#10b981" }
-                                    Indicator_1 { labelText: "category3"; dotColor: "#f59e0b" }
-                                    Indicator_1 { labelText: "category4"; dotColor: "#ef4444" }
-                                    Indicator_1 { labelText: "category5"; dotColor: "#8b5cf6" }
-                                    Indicator_1 { labelText: "unlisted"; dotColor: "#94a3b8" }
+                                    Repeater {
+                                        model: reportsController.categoryExpenseReport
+
+                                        Indicator_1 {
+                                            labelText: modelData.name + " (" + Math.round(modelData.percentage) + "%)"
+                                            dotColor: modelData.color
+                                        }
+                                    }
                                 }
                             }
                         }
                     }
 
-                    // Right: Income by Category
+                    // Right: Income by Category (Top 5 + Unlisted)
                     Rectangle {
                         Layout.fillWidth: true
                         Layout.preferredWidth: 1
@@ -371,14 +571,14 @@ Rectangle {
 
                                 Text {
                                     text: "Income by Category"
-                                    font.family: "Intel One Mono"
+                                    font.family: "Inter"
                                     font.pixelSize: 18
                                     font.weight: Font.Bold
                                     color: "#0f172a"
                                 }
 
                                 Text {
-                                    text: "July 2026"
+                                    text: "Top 5 Categories & Unlisted"
                                     font.family: "Inter"
                                     font.pixelSize: 13
                                     color: "#64748b"
@@ -396,7 +596,7 @@ Rectangle {
                                 Layout.fillHeight: true
                                 spacing: 24
 
-                                // Donut Chart Canvas Area
+                                // Donut Chart Canvas
                                 Rectangle {
                                     Layout.fillWidth: true
                                     Layout.preferredWidth: 1
@@ -404,6 +604,50 @@ Rectangle {
                                     color: "#f8fafc"
                                     radius: 8
                                     border.color: "#f1f5f9"
+
+                                    Canvas {
+                                        id: incomeCanvas
+                                        anchors.fill: parent
+                                        anchors.margins: 12
+                                        property var chartData: reportsController.categoryIncomeReport
+
+                                        onPaint: {
+                                            var ctx = getContext("2d");
+                                            ctx.reset();
+
+                                            var centerX = width / 2;
+                                            var centerY = height / 2;
+                                            var outerRadius = Math.min(centerX, centerY) - 8;
+                                            var innerRadius = outerRadius * 0.55;
+
+                                            if (!chartData || chartData.length === 0) {
+                                                ctx.fillStyle = "#e2e8f0";
+                                                ctx.beginPath();
+                                                ctx.arc(centerX, centerY, outerRadius, 0, 2 * Math.PI);
+                                                ctx.arc(centerX, centerY, innerRadius, 2 * Math.PI, 0, true);
+                                                ctx.fill();
+                                                return;
+                                            }
+
+                                            var startAngle = -Math.PI / 2;
+                                            for (var i = 0; i < chartData.length; i++) {
+                                                var item = chartData[i];
+                                                var sliceAngle = (item.percentage / 100.0) * (2 * Math.PI);
+                                                var endAngle = startAngle + sliceAngle;
+
+                                                ctx.fillStyle = item.color;
+                                                ctx.beginPath();
+                                                ctx.arc(centerX, centerY, outerRadius, startAngle, endAngle);
+                                                ctx.arc(centerX, centerY, innerRadius, endAngle, startAngle, true);
+                                                ctx.closePath();
+                                                ctx.fill();
+
+                                                startAngle = endAngle;
+                                            }
+                                        }
+                                        onWidthChanged: requestPaint()
+                                        onHeightChanged: requestPaint()
+                                    }
                                 }
 
                                 // Legend List
@@ -412,12 +656,14 @@ Rectangle {
                                     Layout.alignment: Qt.AlignVCenter
                                     spacing: 8
 
-                                    Indicator_1 { labelText: "category1"; dotColor: "#3b82f6" }
-                                    Indicator_1 { labelText: "category2"; dotColor: "#10b981" }
-                                    Indicator_1 { labelText: "category3"; dotColor: "#f59e0b" }
-                                    Indicator_1 { labelText: "category4"; dotColor: "#ef4444" }
-                                    Indicator_1 { labelText: "category5"; dotColor: "#8b5cf6" }
-                                    Indicator_1 { labelText: "unlisted"; dotColor: "#94a3b8" }
+                                    Repeater {
+                                        model: reportsController.categoryIncomeReport
+
+                                        Indicator_1 {
+                                            labelText: modelData.name + " (" + Math.round(modelData.percentage) + "%)"
+                                            dotColor: modelData.color
+                                        }
+                                    }
                                 }
                             }
                         }

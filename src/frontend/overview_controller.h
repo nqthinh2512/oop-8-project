@@ -19,6 +19,9 @@ class OverviewController : public QObject {
     Q_PROPERTY(QString netBalanceFormatted READ netBalanceFormatted NOTIFY dataChanged)
 
     Q_PROPERTY(QVariantList recentTransactions READ recentTransactions NOTIFY dataChanged)
+    Q_PROPERTY(QVariantList upcomingBills READ upcomingBills NOTIFY dataChanged)
+    Q_PROPERTY(QVariantMap topSaving READ topSaving NOTIFY dataChanged)
+    Q_PROPERTY(QVariantMap topBudget READ topBudget NOTIFY dataChanged)
 
 public:
     explicit OverviewController(QObject *parent = nullptr);
@@ -32,6 +35,9 @@ public:
     QString netBalanceFormatted() const;
 
     QVariantList recentTransactions() const;
+    QVariantList upcomingBills() const;
+    QVariantMap topSaving() const;
+    QVariantMap topBudget() const;
 
     Q_INVOKABLE void refresh();
 
