@@ -1,9 +1,9 @@
 // src/main.cpp
+#include <QCoreApplication>
+#include <QDebug>
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
 #include <QQmlContext>
-#include <QCoreApplication>
-#include <QDebug>
 
 #include "backend/storage/database_manager.h"
 #include "frontend/categories_controller.h"
@@ -12,11 +12,12 @@
 
 #include "frontend/settings_controller.h"
 
-int main(int argc, char *argv[]) {
+int main(int argc, char *argv[])
+{
     QGuiApplication app(argc, argv);
 
     // Initialize Database & load data from CSVs
-    DatabaseManager& db = DatabaseManager::instance();
+    DatabaseManager &db = DatabaseManager::instance();
     db.loadCategoriesFromCSV();
     db.loadTransactionsFromCSV();
     db.loadBillsFromCSV();

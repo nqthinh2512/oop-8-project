@@ -61,6 +61,9 @@ qt_add_executable(appFinanceDashboard
 
     frontend/savings_controller.h
     frontend/savings_controller.cpp
+
+    frontend/settings_controller.cpp
+    frontend/settings_controller.h
 )
 
 # 2. REGISTER QML MODULE & ALL QML FILES AND ASSETS
