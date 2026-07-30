@@ -9,60 +9,42 @@ Rectangle {
     clip: true
     color: "#f8fafc"
 
-    // Component State
-    property bool isEditing: false
-
-    // Profile Data (Original / DB State)
-    property string origFullName: "Admin User"
-    property string origEmail: "admin.user@phinma.edu.ph"
-    property string origContact: "09123456789"
+    property bool isEditing: settingsController.isEditing
 
     // Profile Data (Current Input State)
-    property string currentFullName: origFullName
-    property string currentEmail: origEmail
-    property string currentContact: origContact
+    property string currentFullName: settingsController.fullName
+    property string currentEmail: settingsController.email
+    property string currentContact: settingsController.contact
 
     // Password State
     property bool showCurrentPwd: false
     property bool showNewPwd: false
     property bool showConfirmPwd: false
 
-    // Reset Function
-    function cancelEdit() {
-        isEditing = false;
-        currentFullName = origFullName;
-        currentEmail = origEmail;
-        currentContact = origContact;
-        
-        // Clear password fields
-        currentPwdInput.text = "";
-        newPwdInput.text = "";
-        confirmPwdInput.text = "";
-        
-        // Reset password visibility
-        showCurrentPwd = false;
-        showNewPwd = false;
-        showConfirmPwd = false;
-    }
-
-    // Save Function
-    function saveChanges() {
-        // Here you would typically validate and save to DB
-        origFullName = currentFullName;
-        origEmail = currentEmail;
-        origContact = currentContact;
-        isEditing = false;
-        
-        // Clear passwords after save
-        currentPwdInput.text = "";
-        newPwdInput.text = "";
-        confirmPwdInput.text = "";
+    // Sync input state when edit mode is activated/canceled
+    Connections {
+        target: settingsController
+        function onIsEditingChanged() {
+            if (settingsController.isEditing) {
+                currentFullName = settingsController.fullName;
+                currentEmail = settingsController.email;
+                currentContact = settingsController.contact;
+            } else {
+                // Clear passwords when edit mode is exited
+                currentPwdInput.text = "";
+                newPwdInput.text = "";
+                confirmPwdInput.text = "";
+                showCurrentPwd = false;
+                showNewPwd = false;
+                showConfirmPwd = false;
+            }
+        }
     }
 
     // If page is hidden (navigated away), reset state
     onVisibleChanged: {
         if (!visible && isEditing) {
-            cancelEdit();
+            settingsController.cancelEdit();
         }
     }
 
@@ -128,11 +110,7 @@ Rectangle {
                         anchors.fill: parent
                         cursorShape: Qt.PointingHandCursor
                         onClicked: {
-                            if (isEditing) {
-                                cancelEdit();
-                            } else {
-                                isEditing = true;
-                            }
+                            settingsController.toggleEdit();
                         }
                     }
                 }
@@ -180,7 +158,7 @@ Rectangle {
                             Layout.fillWidth: true
                             Text { text: "Full Name"; font.pixelSize: 14; color: "#64748b"; font.family: "Inter" }
                             Text { 
-                                text: origFullName; font.pixelSize: 16; color: "#0f172a"; font.family: "Inter"; font.weight: Font.Medium 
+                                text: settingsController.fullName; font.pixelSize: 16; color: "#0f172a"; font.family: "Inter"; font.weight: Font.Medium 
                                 visible: !isEditing
                             }
                             Rectangle {
@@ -220,7 +198,7 @@ Rectangle {
                             Layout.fillWidth: true
                             Text { text: "Email"; font.pixelSize: 14; color: "#64748b"; font.family: "Inter" }
                             Text { 
-                                text: origEmail; font.pixelSize: 16; color: "#0f172a"; font.family: "Inter"; font.weight: Font.Medium 
+                                text: settingsController.email; font.pixelSize: 16; color: "#0f172a"; font.family: "Inter"; font.weight: Font.Medium 
                                 visible: !isEditing
                             }
                             Rectangle {
@@ -250,7 +228,7 @@ Rectangle {
                             Layout.fillWidth: true
                             Text { text: "Contact Number"; font.pixelSize: 14; color: "#64748b"; font.family: "Inter" }
                             Text { 
-                                text: origContact; font.pixelSize: 16; color: "#0f172a"; font.family: "Inter"; font.weight: Font.Medium 
+                                text: settingsController.contact; font.pixelSize: 16; color: "#0f172a"; font.family: "Inter"; font.weight: Font.Medium 
                                 visible: !isEditing
                             }
                             Rectangle {
@@ -520,7 +498,7 @@ Rectangle {
                 MouseArea {
                     anchors.fill: parent
                     cursorShape: Qt.PointingHandCursor
-                    onClicked: saveChanges()
+                    onClicked: settingsController.saveChanges(currentFullName, currentEmail, currentContact)
                 }
             }
             

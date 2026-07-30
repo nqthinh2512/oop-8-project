@@ -10,6 +10,8 @@
 #include "frontend/overview_controller.h"
 #include "frontend/reports_controller.h"
 
+#include "frontend/settings_controller.h"
+
 int main(int argc, char *argv[]) {
     QGuiApplication app(argc, argv);
 
@@ -25,6 +27,7 @@ int main(int argc, char *argv[]) {
     CategoriesController categoriesCtrl;
     OverviewController overviewCtrl;
     ReportsController reportsCtrl;
+    SettingsController settingsCtrl;
 
     QQmlApplicationEngine engine;
 
@@ -32,6 +35,7 @@ int main(int argc, char *argv[]) {
     engine.rootContext()->setContextProperty("categoriesController", &categoriesCtrl);
     engine.rootContext()->setContextProperty("overviewController", &overviewCtrl);
     engine.rootContext()->setContextProperty("reportsController", &reportsCtrl);
+    engine.rootContext()->setContextProperty("settingsController", &settingsCtrl);
 
     engine.load(QUrl(QStringLiteral("qrc:/qt/qml/src/qml/Main.qml")));
 
