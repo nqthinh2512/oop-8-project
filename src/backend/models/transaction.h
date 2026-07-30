@@ -4,7 +4,7 @@
 #include <QString>
 #include <QDateTime>
 
-// Class Transaction là Abstract Class (Lớp trừu tượng) phục vụ yêu cầu Abstraction & Đa hình (Polymorphism)
+// class transaction hiện là abstract class nên nó đang theo tính abstraction & đa hình (polymorphism)
 class Transaction {
 private:
     int id;                 // Mã định danh duy nhất
@@ -25,8 +25,8 @@ public:
     double getAmount() const { return amount; }
     QDateTime getDateTime() const { return dateTime; }
 
-    // Pure Virtual Function (Hàm ảo thuần túy) -> Biến Transaction thành Lớp Trừu Tượng (Abstract Class)
-    // Giúp thực hiện Đa Hình (Polymorphism) runtime khi tính tổng Thu nhập (+) / Chi tiêu (-)
+    // cái virtual function này biến class thành abstract class nên.. đừng có xóa, thanks.
+    // đồng thời thỏa mãn cái requierment polymorphism
     virtual double getSignedAmount() const = 0;
 };
 
@@ -37,7 +37,7 @@ public:
 
     Income(int n_id, double n_amount, const QDateTime& n_date=QDateTime::currentDateTime(), const QString& n_note="", int n_categoryid=0);
 
-    // Ghi đè hàm ảo thuần túy: Thu nhập trả về số dương (+amount)
+    // Ghi đè hàm ảo
     double getSignedAmount() const override;
 };
 
@@ -48,7 +48,7 @@ public:
 
     Expense(int n_id, double n_amount, const QDateTime& n_date=QDateTime::currentDateTime(), const QString& n_note="", int n_categoryid=0);
 
-    // Ghi đè hàm ảo thuần túy: Chi tiêu trả về số âm (-amount)
+    // Ghi đè hàm ảo
     double getSignedAmount() const override;
 };
 

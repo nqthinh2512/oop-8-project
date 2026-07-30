@@ -42,8 +42,21 @@ void DatabaseManager::loadBudgetsFromCSV()
 
         m_budgets.append(Budget(id, name, priority, categoryId, limit, startDate, endDate, spent));
     }
-    qDebug() << "Đã tải" << m_budgets.size() << "danh mục từ budgets.CSV vào RAM.";
     file.close();
+
+    // khởi tạo dữ liệu __TẠM THỜI__ để test tính năng
+    if (m_budgets.isEmpty()) {
+        QDate today = QDate::currentDate();
+        QDate monthStart(today.year(), today.month(), 1);
+        QDate monthEnd = monthStart.addMonths(1).addDays(-1);
+
+        m_budgets.append(Budget(1, "Monthly Living Budget", Priority::High, 15, 5000000.0, monthStart, monthEnd, 1300000.0));
+        m_budgets.append(Budget(2, "Dining & Entertainment", Priority::Medium, 5, 2000000.0, monthStart, monthEnd, 850000.0));
+
+        saveBudgetsToCSV();
+    }
+
+    qDebug() << "Đã tải" << m_budgets.size() << "ngân sách từ budgets.csv vào RAM.";
 }
 
 void DatabaseManager::saveBudgetsToCSV() const
