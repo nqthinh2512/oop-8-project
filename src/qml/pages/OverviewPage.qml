@@ -8,6 +8,13 @@ Rectangle {
     color: "#f8fafc"
     clip: true
 
+    // Navigate to a page by sidebar index
+    function navigateTo(pageIndex) {
+        if (typeof sidebarMenu !== "undefined") {
+            sidebarMenu.selectedIndex = pageIndex
+        }
+    }
+
     ScrollView {
         id: scrollView
         anchors.fill: parent
@@ -53,38 +60,41 @@ Rectangle {
 
                 OverviewKpiCard {
                     Layout.fillWidth: true
-                    cardTitle: "Total balance"
+                    Layout.preferredWidth: 0
+                    cardTitle: "Net Balance"
                     showViewAll: false
-                    amountText: "$10,234"
-                    dateText: "July, 2026"
+                    amountText: overviewController.netBalanceFormatted
+                    dateText: "Current Month"
                     showTrend: false
                     accentLineColor: "#6366f1"
                 }
 
                 OverviewKpiCard {
                     Layout.fillWidth: true
-                    cardTitle: "Income"
+                    Layout.preferredWidth: 0
+                    cardTitle: "Total Income"
                     showViewAll: true
-                    amountText: "$20,000"
-                    dateText: "May, 2026"
+                    amountText: overviewController.totalIncomeFormatted
+                    dateText: "Current Month"
                     showTrend: true
-                    trendText: "8%"
+                    trendText: "Active"
                     isTrendUp: true
                     accentLineColor: "#10b981"
-                    onViewAllClicked: console.log("Income View All Clicked")
+                    onViewAllClicked: overviewPage.navigateTo(1)
                 }
 
                 OverviewKpiCard {
                     Layout.fillWidth: true
-                    cardTitle: "Expense"
+                    Layout.preferredWidth: 0
+                    cardTitle: "Total Expense"
                     showViewAll: true
-                    amountText: "$200,000"
-                    dateText: "May, 2026"
+                    amountText: overviewController.totalExpenseFormatted
+                    dateText: "Current Month"
                     showTrend: true
-                    trendText: "5%"
+                    trendText: "Active"
                     isTrendUp: false
                     accentLineColor: "#ef4444"
-                    onViewAllClicked: console.log("Expense View All Clicked")
+                    onViewAllClicked: overviewPage.navigateTo(1)
                 }
             }
 
@@ -115,7 +125,7 @@ Rectangle {
                         }
 
                         View_all_1 {
-                            onClicked: console.log("Upcoming Bills View All")
+                            onClicked: overviewPage.navigateTo(2)
                         }
                     }
 
@@ -130,26 +140,24 @@ Rectangle {
 
                         ColumnLayout {
                             anchors.fill: parent
-                            anchors.margins: 20
+                            anchors.margins: 45
                             spacing: 8
 
                             Repeater {
-                                model: [
-                                    { title: "child support", category: "unimportant", amount: "$1", date: "May 16" },
-                                    { title: "electricity", category: "daily", amount: "$1", date: "May 17" },
-                                    { title: "wifi", category: "daily", amount: "$1", date: "May 18" },
-                                    { title: "something", category: "subscription", amount: "$1", date: "May 19" },
-                                    { title: "?", category: "game", amount: "$100", date: "May 20" }
-                                ]
+                                model: overviewController.upcomingBills
 
                                 Overview_item_1 {
                                     type_1: Overview_item_1.Type.Type_bill
-                                    itemTitle: modelData.title
-                                    categoryText: modelData.category
-                                    amountText: modelData.amount
-                                    dateText: modelData.date
-                                    showUnderline: index < 4
+                                    itemTitle: modelData.name
+                                    categoryText: modelData.categoryName
+                                    amountText: modelData.amountFormatted
+                                    dateText: modelData.dueDateFormatted
+                                    showUnderline: index < (overviewController.upcomingBills.length - 1)
                                 }
+                            }
+
+                            Item {
+                                Layout.fillHeight: true
                             }
                         }
                     }
@@ -174,7 +182,7 @@ Rectangle {
                         }
 
                         View_all_1 {
-                            onClicked: console.log("Statistics View All")
+                            onClicked: overviewPage.navigateTo(6)
                         }
                     }
 
@@ -224,39 +232,76 @@ Rectangle {
 
                                 Canvas {
                                     anchors.fill: parent
-                                    anchors.margins: 16
+                                    anchors.margins: 12
                                     onPaint: {
                                         var ctx = getContext("2d");
                                         ctx.reset();
-                                        ctx.strokeStyle = "#e2e8f0";
+
+                                        var padL = 42;
+                                        var padB = 24;
+                                        var padT = 15;
+                                        var padR = 12;
+
+                                        var chartW = width - padL - padR;
+                                        var chartH = height - padT - padB;
+
+                                        // Y-Axis Value Labels & Gridlines
+                                        ctx.font = "11px 'Inter', sans-serif";
+                                        ctx.fillStyle = "#94a3b8";
+                                        ctx.textAlign = "right";
+                                        ctx.textBaseline = "middle";
+                                        ctx.strokeStyle = "#f1f5f9";
                                         ctx.lineWidth = 1;
 
-                                        // Horizontal Grid lines
-                                        for (var i = 1; i <= 4; i++) {
-                                            var y = (height / 5) * i;
+                                        var yTicks = ["20M", "15M", "10M", "5M", "0"];
+                                        for (var i = 0; i < yTicks.length; i++) {
+                                            var ratio = i / (yTicks.length - 1);
+                                            var y = padT + ratio * chartH;
+
+                                            // Value Label on Left
+                                            ctx.fillText(yTicks[i], padL - 8, y);
+
+                                            // Grid Line
                                             ctx.beginPath();
-                                            ctx.moveTo(0, y);
-                                            ctx.lineTo(width, y);
+                                            ctx.moveTo(padL, y);
+                                            ctx.lineTo(width - padR, y);
                                             ctx.stroke();
                                         }
 
-                                        // Sample Bar Chart / Area Chart representation
-                                        var barWidth = Math.min(30, width / 16);
-                                        var count = 6;
-                                        var gap = width / (count + 1);
+                                        // X-Axis Month Labels & Bars
+                                        var months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun"];
+                                        var incomeRatios = [0.65, 0.50, 0.80, 0.55, 0.85, 0.70];
+                                        var expenseRatios = [0.40, 0.55, 0.45, 0.60, 0.35, 0.50];
+
+                                        var count = months.length;
+                                        var groupWidth = chartW / count;
+                                        var barWidth = Math.min(22, groupWidth * 0.32);
+
+                                        ctx.textAlign = "center";
+                                        ctx.textBaseline = "top";
 
                                         for (var b = 0; b < count; b++) {
-                                            var x = gap * (b + 1) - barWidth;
-                                            var hInc = Math.random() * (height * 0.6) + 20;
-                                            var hExp = Math.random() * (height * 0.5) + 15;
+                                            var groupCenterX = padL + groupWidth * b + groupWidth / 2;
+                                            var xInc = groupCenterX - barWidth - 1;
+                                            var xExp = groupCenterX + 1;
+
+                                            var hInc = incomeRatios[b] * chartH;
+                                            var hExp = expenseRatios[b] * chartH;
+
+                                            var yInc = padT + chartH - hInc;
+                                            var yExp = padT + chartH - hExp;
 
                                             // Income bar (green)
-                                            ctx.fillStyle = "#34c759";
-                                            ctx.fillRect(x, height - hInc, barWidth / 2 - 2, hInc);
+                                            ctx.fillStyle = "#10b981";
+                                            ctx.fillRect(xInc, yInc, barWidth, hInc);
 
-                                            // Expense bar (pink/red)
-                                            ctx.fillStyle = "#ff383c";
-                                            ctx.fillRect(x + barWidth / 2, height - hExp, barWidth / 2 - 2, hExp);
+                                            // Expense bar (red)
+                                            ctx.fillStyle = "#ef4444";
+                                            ctx.fillRect(xExp, yExp, barWidth, hExp);
+
+                                            // Month Label underneath
+                                            ctx.fillStyle = "#94a3b8";
+                                            ctx.fillText(months[b], groupCenterX, padT + chartH + 6);
                                         }
                                     }
                                     onWidthChanged: requestPaint()
@@ -309,37 +354,37 @@ Rectangle {
                         }
 
                         View_all_1 {
-                            onClicked: console.log("Recent Transactions View All")
+                            onClicked: overviewPage.navigateTo(1)
                         }
                     }
 
                     Rectangle {
                         Layout.fillWidth: true
-                        Layout.preferredHeight: 240
+                        implicitHeight: txColumn.implicitHeight + 40
+                        Layout.preferredHeight: implicitHeight
                         color: "#ffffff"
                         radius: 12
                         border.color: "#f1f5f9"
                         border.width: 1
 
                         ColumnLayout {
-                            anchors.fill: parent
+                            id: txColumn
+                            anchors.left: parent.left
+                            anchors.right: parent.right
+                            anchors.top: parent.top
                             anchors.margins: 20
                             spacing: 6
 
                             Repeater {
-                                model: [
-                                    { title: "salary", category: "income", amount: "$1", date: "16-12-2025", type: Overview_item_1.Type.Type_income },
-                                    { title: "salary", category: "income", amount: "$1", date: "16-12-2025", type: Overview_item_1.Type.Type_income },
-                                    { title: "salary", category: "income", amount: "$1", date: "16-12-2025", type: Overview_item_1.Type.Type_income }
-                                ]
+                                model: overviewController.recentTransactions
 
                                 Overview_item_1 {
-                                    type_1: modelData.type
-                                    itemTitle: modelData.title
-                                    categoryText: modelData.category
-                                    amountText: modelData.amount
-                                    dateText: modelData.date
-                                    showUnderline: index < 2
+                                    type_1: modelData.isIncome ? Overview_item_1.Type.Type_income : Overview_item_1.Type.Type_expense
+                                    itemTitle: modelData.note && modelData.note !== "" ? modelData.note : modelData.categoryName
+                                    categoryText: modelData.categoryName
+                                    amountText: modelData.amountFormatted
+                                    dateText: modelData.dateFormatted
+                                    showUnderline: index < (overviewController.recentTransactions.length - 1)
                                 }
                             }
                         }
@@ -364,7 +409,7 @@ Rectangle {
                         }
 
                         View_all_1 {
-                            onClicked: console.log("Savings View All")
+                            onClicked: overviewPage.navigateTo(4)
                         }
                     }
 
@@ -389,7 +434,7 @@ Rectangle {
                                     font.pixelSize: 22
                                     font.weight: Font.ExtraBold
                                     color: "#0f172a"
-                                    text: "PC"
+                                    text: overviewController.topSaving.name || "No Savings"
                                     Layout.fillWidth: true
                                 }
 
@@ -410,25 +455,25 @@ Rectangle {
                                     ColumnLayout {
                                         spacing: 2
                                         Text { text: "Saved money"; color: "#94a3b8"; font.pixelSize: 12; font.family: "Inter" }
-                                        Text { text: "$12,500"; color: "#0f172a"; font.pixelSize: 18; font.weight: Font.Bold; font.family: "Inter" }
+                                        Text { text: overviewController.topSaving.currentFormatted || "0 VND"; color: "#0f172a"; font.pixelSize: 18; font.weight: Font.Bold; font.family: "Inter" }
                                     }
 
                                     ColumnLayout {
                                         spacing: 2
                                         Text { text: "Goal"; color: "#94a3b8"; font.pixelSize: 12; font.family: "Inter" }
-                                        Text { text: "$20,000"; color: "#0f172a"; font.pixelSize: 16; font.weight: Font.DemiBold; font.family: "Inter" }
+                                        Text { text: overviewController.topSaving.targetFormatted || "0 VND"; color: "#0f172a"; font.pixelSize: 16; font.weight: Font.DemiBold; font.family: "Inter" }
                                     }
                                 }
 
                                 Item { Layout.fillWidth: true }
 
                                 GaugeMeter {
-                                    currentValue: 12500
-                                    maxValue: 20000
+                                    currentValue: overviewController.topSaving.current || 0
+                                    maxValue: overviewController.topSaving.target || 1
                                     progressColor: "#0284c7"
-                                    currentLabel: "12K"
-                                    minLabel: "$0"
-                                    maxLabel: "$20k"
+                                    currentLabel: Math.round((overviewController.topSaving.progress || 0)) + "%"
+                                    minLabel: "0%"
+                                    maxLabel: "100%"
                                     Layout.preferredWidth: 140
                                     Layout.preferredHeight: 90
                                 }
@@ -455,7 +500,7 @@ Rectangle {
                         }
 
                         View_all_1 {
-                            onClicked: console.log("Budgets View All")
+                            onClicked: overviewPage.navigateTo(3)
                         }
                     }
 
@@ -480,7 +525,7 @@ Rectangle {
                                     font.pixelSize: 22
                                     font.weight: Font.ExtraBold
                                     color: "#0f172a"
-                                    text: "Entertainment"
+                                    text: overviewController.topBudget.name || "No Budgets"
                                     Layout.fillWidth: true
                                 }
 
@@ -501,25 +546,25 @@ Rectangle {
                                     ColumnLayout {
                                         spacing: 2
                                         Text { text: "Spent money"; color: "#94a3b8"; font.pixelSize: 12; font.family: "Inter" }
-                                        Text { text: "$12,500"; color: "#0f172a"; font.pixelSize: 18; font.weight: Font.Bold; font.family: "Inter" }
+                                        Text { text: overviewController.topBudget.spentFormatted || "0 VND"; color: "#0f172a"; font.pixelSize: 18; font.weight: Font.Bold; font.family: "Inter" }
                                     }
 
                                     ColumnLayout {
                                         spacing: 2
                                         Text { text: "Limit"; color: "#94a3b8"; font.pixelSize: 12; font.family: "Inter" }
-                                        Text { text: "$20,000"; color: "#0f172a"; font.pixelSize: 16; font.weight: Font.DemiBold; font.family: "Inter" }
+                                        Text { text: overviewController.topBudget.limitFormatted || "0 VND"; color: "#0f172a"; font.pixelSize: 16; font.weight: Font.DemiBold; font.family: "Inter" }
                                     }
                                 }
 
                                 Item { Layout.fillWidth: true }
 
                                 GaugeMeter {
-                                    currentValue: 12500
-                                    maxValue: 20000
+                                    currentValue: overviewController.topBudget.spent || 0
+                                    maxValue: overviewController.topBudget.limit || 1
                                     progressColor: "#f97316"
-                                    currentLabel: "12K"
-                                    minLabel: "$0"
-                                    maxLabel: "$20k"
+                                    currentLabel: Math.round((overviewController.topBudget.progress || 0)) + "%"
+                                    minLabel: "0%"
+                                    maxLabel: "100%"
                                     Layout.preferredWidth: 140
                                     Layout.preferredHeight: 90
                                 }

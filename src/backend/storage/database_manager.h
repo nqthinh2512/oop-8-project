@@ -31,8 +31,8 @@ private:
 
 
     //=============================BILL SECTION==================================
-
-
+    QVector<Bill> m_bills;
+    int generateNextBillId() const;
 
 
     //=============================BUDGET SECTION==================================
@@ -48,6 +48,8 @@ private:
 
 
     //==========================TRANSACTION SECTION=================================
+    QVector<Transaction*> m_transactions;
+    int generateNextTransactionId() const;
 
 
 
@@ -56,7 +58,10 @@ private:
 public:
 
     explicit DatabaseManager(QObject *parent = nullptr): QObject(parent){}
-    ~DatabaseManager() = default;
+    ~DatabaseManager() {
+        qDeleteAll(m_transactions);
+        m_transactions.clear();
+    }
 
     // Hàm lấy instance duy nhất để sử dụng toàn hệ thống
     static DatabaseManager& instance() {
@@ -85,9 +90,9 @@ public:
     void deactivateCategory(int id);
 
     //=============================BILL SECTION==================================
-
-
-
+    void loadBillsFromCSV();
+    void saveBillsToCSV() const;
+    const QVector<Bill>& getAllBills() const { return m_bills; }
 
     //=============================BUDGET SECTION==================================
     // Đọc và Ghi file CSV
@@ -122,10 +127,11 @@ public:
 
 
 
-
-
-
     //==========================TRANSACTION SECTION=================================
+    void loadTransactionsFromCSV();
+    void saveTransactionsToCSV() const;
+    const QVector<Transaction*>& getAllTransactions() const { return m_transactions; }
+    void addTransaction(Transaction* transaction);
 };
 
 #endif // DATABASE_MANAGER_H

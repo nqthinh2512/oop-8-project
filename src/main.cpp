@@ -15,8 +15,10 @@ int main(int argc, char *argv[]) {
 
     // Initialize Database & load data from CSVs
     DatabaseManager& db = DatabaseManager::instance();
-    db.loadBudgetsFromCSV();
     db.loadCategoriesFromCSV();
+    db.loadTransactionsFromCSV();
+    db.loadBillsFromCSV();
+    db.loadBudgetsFromCSV();
     db.loadSavingsFromCSV();
 
     // Instantiate Controllers for your pages

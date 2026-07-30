@@ -40,6 +40,18 @@ void DatabaseManager::loadSavingsFromCSV()
         m_savings.append(Saving(id, name, dueDate, target, current, categoryId));
     }
     file.close();
+
+    // khởi tạo dữ liệu __TẠM THỜI__ để test tính năng
+    if (m_savings.isEmpty()) {
+        QDate today = QDate::currentDate();
+
+        m_savings.append(Saving(1, "Emergency Fund", today.addMonths(6), 10000000.0, 4500000.0, 17));
+        m_savings.append(Saving(2, "Summer Vacation Fund", today.addMonths(3), 5000000.0, 2000000.0, 18));
+
+        saveSavingsToCSV();
+    }
+
+    qDebug() << "Đã tải" << m_savings.size() << "hũ tiết kiệm từ savings.csv vào RAM.";
 }
 
 void DatabaseManager::saveSavingsToCSV() const
