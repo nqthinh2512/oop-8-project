@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls
+import "../components/dialogs"
 
 Rectangle {
     id: transactionsPage
@@ -64,6 +65,8 @@ Rectangle {
                         id: searchBar
                         placeholderText: "Search category name"
                         Layout.preferredWidth: 260
+                        text: transactionsController.searchKeyword
+                        onTextEdited: function(newText) { transactionsController.searchKeyword = newText }
                     }
 
                     // Filter Pills
@@ -72,19 +75,23 @@ Rectangle {
 
                         UniversalButton_1 {
                             buttonText: "All"
-                            _state: UniversalButton_1.State_1.State_1_selected
+                            _state: transactionsController.filterType === -1 ? UniversalButton_1.State_1.State_1_selected : UniversalButton_1.State_1.State_1_default
+                            onClicked: transactionsController.filterType = -1
                         }
                         UniversalButton_1 {
                             buttonText: "Income"
-                            _state: UniversalButton_1.State_1.State_1_default
+                            _state: transactionsController.filterType === 0 ? UniversalButton_1.State_1.State_1_selected : UniversalButton_1.State_1.State_1_default
+                            onClicked: transactionsController.filterType = 0
                         }
                         UniversalButton_1 {
                             buttonText: "Expense"
-                            _state: UniversalButton_1.State_1.State_1_default
+                            _state: transactionsController.filterType === 1 ? UniversalButton_1.State_1.State_1_selected : UniversalButton_1.State_1.State_1_default
+                            onClicked: transactionsController.filterType = 1
                         }
                         UniversalButton_1 {
                             buttonText: "Transfer"
-                            _state: UniversalButton_1.State_1.State_1_default
+                            _state: transactionsController.filterType === 2 ? UniversalButton_1.State_1.State_1_selected : UniversalButton_1.State_1.State_1_default
+                            onClicked: transactionsController.filterType = 2
                         }
                     }
 
@@ -111,7 +118,10 @@ Rectangle {
                         buttonText: "+ Add Transaction"
                         _state: UniversalButton_1.State_1.State_1_selected
                         Layout.alignment: Qt.AlignRight | Qt.AlignVCenter
-                        onClicked: console.log("Add Transaction clicked")
+                        onClicked: {
+                            transactionDialog.reset()
+                            transactionDialog.open()
+                        }
                     }
                 }
             }
@@ -238,16 +248,7 @@ Rectangle {
                 clip: true
                 spacing: 0
 
-                model: ListModel {
-                    ListElement { tType: 1; tName: "Name"; tAmount: "-1,000 VND"; tCat: "Category"; tAcc: "Account"; tDate: "31/12/2012" }
-                    ListElement { tType: 0; tName: "Name"; tAmount: "+1,0000 VND"; tCat: "Category"; tAcc: "Account"; tDate: "31/12/2012" }
-                    ListElement { tType: 1; tName: "Name"; tAmount: "-1,000 VND"; tCat: "Category"; tAcc: "Account"; tDate: "31/12/2012" }
-                    ListElement { tType: 2; tName: "Name"; tAmount: "-1,000 VND"; tCat: "Category"; tAcc: "Account"; tDate: "31/12/2012" }
-                    ListElement { tType: 0; tName: "Salary Deposit"; tAmount: "+25,000,000 VND"; tCat: "Income"; tAcc: "Techcombank"; tDate: "28/07/2026" }
-                    ListElement { tType: 1; tName: "Supermarket"; tAmount: "-1,250,000 VND"; tCat: "Groceries"; tAcc: "Vietcombank"; tDate: "27/07/2026" }
-                    ListElement { tType: 1; tName: "Coffee Shop"; tAmount: "-85,000 VND"; tCat: "Dining Out"; tAcc: "Cash"; tDate: "26/07/2026" }
-                    ListElement { tType: 2; tName: "Savings Deposit"; tAmount: "-5,000,000 VND"; tCat: "Transfer"; tAcc: "MB Bank"; tDate: "25/07/2026" }
-                }
+                model: transactionsController.model
 
                 delegate: TransactionRow_1 {
                     width: transactionListView.width
@@ -258,13 +259,69 @@ Rectangle {
                     accountText: model.tAcc
                     dateText: model.tDate
 
-                    onEditClicked: console.log("Edit clicked for index:", index)
-                    onTrashClicked: console.log("Trash clicked for index:", index)
+                    onEditClicked: {
+                        transactionDialog.reset()
+                        transactionDialog.isEditMode = true
+                        transactionDialog.transactionId = model.tId
+                        transactionDialog.transactionTitle = model.tName
+                        
+                        // Extract only numeric digits from amount
+                        var rawAmount = model.tAmount.replace(/[^0-9]/g, '')
+                        transactionDialog.transactionAmount = rawAmount
+                        
+                        transactionDialog.transactionAccount = model.tAcc
+                        transactionDialog.setDateStr(model.tDate)
+                        
+                        transactionDialog.transactionTypeIndex = model.tType
+                        if (model.tType === 0) transactionDialog.transactionTypeText = "Income"
+                        else if (model.tType === 1) transactionDialog.transactionTypeText = "Expense"
+                        else if (model.tType === 2) transactionDialog.transactionTypeText = "Transfer"
+                        
+                        transactionDialog.open()
+                    }
+                    onTrashClicked: {
+                        transactionsController.deleteTransaction(model.tId)
+                    }
                 }
 
                 ScrollBar.vertical: ScrollBar {
                     policy: ScrollBar.AsNeeded
                 }
+            }
+        }
+    }
+
+    // Add Transaction Dialog Overlay
+    TransactionDialog {
+        id: transactionDialog
+        anchors.fill: parent
+
+        onAccepted: {
+            var dateStr = transactionDialog.dateField ? transactionDialog.dateField.selectedDate : "01/01/2026"
+            
+            // To get a date string, we need to expose selectedDate from the dialog or parse it.
+            // Wait, we didn't expose dateField. Let's use a dummy date for now, or assume the UI will be fully wired later.
+            // Or better, let's expose dateField.
+            
+            if (isEditMode) {
+                transactionsController.updateTransaction(
+                    transactionId,
+                    transactionTypeIndex,
+                    transactionTitle,
+                    parseFloat(transactionAmount) || 0.0,
+                    dateStr, 
+                    0, // Category ID placeholder
+                    transactionAccount
+                )
+            } else {
+                transactionsController.addTransaction(
+                    transactionTypeIndex,
+                    transactionTitle,
+                    parseFloat(transactionAmount) || 0.0,
+                    dateStr, 
+                    0,
+                    transactionAccount
+                )
             }
         }
     }

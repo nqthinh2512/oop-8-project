@@ -132,6 +132,8 @@ public:
     void saveTransactionsToCSV() const;
     const QVector<Transaction*>& getAllTransactions() const { return m_transactions; }
     void addTransaction(Transaction* transaction);
+    bool updateTransaction(int id, Transaction* newTransaction);
+    bool deleteTransaction(int id);
 };
 
 #endif // DATABASE_MANAGER_H

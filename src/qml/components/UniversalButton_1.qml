@@ -26,24 +26,24 @@ Rectangle {
     // Dynamic Visual Properties based on State
     states: [
         State {
-            name: "default"
-            when: universalButton._state === UniversalButton_1.State_1.State_1_default
+            name: "selected"
+            when: universalButton._state === UniversalButton_1.State_1.State_1_selected
 
             PropertyChanges {
                 target: universalButton
-                border.width: 1
-                border.color: "#d1d5db"
-                color: "#ffffff"
+                border.width: 0
+                border.color: "transparent"
+                color: "#3b82f6"
             }
             PropertyChanges {
                 target: label
-                color: "#4b5563"
-                font.weight: Font.Medium
+                color: "#ffffff"
+                font.weight: Font.Bold
             }
         },
         State {
             name: "hover"
-            when: universalButton._state === UniversalButton_1.State_1.State_1_hover
+            when: universalButton._state === UniversalButton_1.State_1.State_1_hover || (mouseArea.containsMouse && universalButton._state !== UniversalButton_1.State_1.State_1_selected)
 
             PropertyChanges {
                 target: universalButton
@@ -58,19 +58,19 @@ Rectangle {
             }
         },
         State {
-            name: "selected"
-            when: universalButton._state === UniversalButton_1.State_1.State_1_selected
+            name: "default"
+            when: universalButton._state === UniversalButton_1.State_1.State_1_default && !mouseArea.containsMouse
 
             PropertyChanges {
                 target: universalButton
-                border.width: 0
-                border.color: "transparent"
-                color: "#3b82f6"
+                border.width: 1
+                border.color: "#d1d5db"
+                color: "#ffffff"
             }
             PropertyChanges {
                 target: label
-                color: "#ffffff"
-                font.weight: Font.Bold
+                color: "#4b5563"
+                font.weight: Font.Medium
             }
         }
     ]
@@ -94,16 +94,6 @@ Rectangle {
         hoverEnabled: true
         cursorShape: Qt.PointingHandCursor
 
-        onEntered: {
-            if (universalButton._state !== UniversalButton_1.State_1.State_1_selected) {
-                universalButton._state = UniversalButton_1.State_1.State_1_hover
-            }
-        }
-        onExited: {
-            if (universalButton._state !== UniversalButton_1.State_1.State_1_selected) {
-                universalButton._state = UniversalButton_1.State_1.State_1_default
-            }
-        }
         onClicked: universalButton.clicked()
     }
 }

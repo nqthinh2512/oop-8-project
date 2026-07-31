@@ -11,8 +11,34 @@ Item {
     signal accepted()
     signal rejected()
 
+    property bool isEditMode: false
+    property int transactionId: -1
+    property string transactionTitle: ""
+    property string transactionAmount: ""
+    property string transactionAccount: ""
+    property alias transactionTypeIndex: dropdown_1.selectedIndex
+    property alias transactionTypeText: dropdown_1.selectedText
+    property alias dateField: date_Input_Field
+
+    function setDateStr(dateStr) {
+        var parts = dateStr.split("/");
+        if (parts.length === 3) {
+            date_Input_Field.setDate(parseInt(parts[0]), parseInt(parts[1]), parseInt(parts[2]));
+        }
+    }
+
     function open() { visible = true }
     function close() { visible = false }
+
+    function reset() {
+        isEditMode = false;
+        transactionId = -1;
+        transactionTitle = "";
+        transactionAmount = "";
+        transactionAccount = "";
+        transactionTypeIndex = 0;
+        transactionTypeText = "Income";
+    }
 
     // Dimmed background overlay
     Rectangle {
@@ -59,7 +85,7 @@ Item {
                 horizontalAlignment: Text.AlignLeft
                 lineHeight: 32
                 lineHeightMode: Text.FixedHeight
-                text: "Add Transaction"
+                text: root.isEditMode ? "Edit Transaction" : "Add Transaction"
                 textFormat: Text.PlainText
                 verticalAlignment: Text.AlignTop
                 wrapMode: Text.Wrap
@@ -113,6 +139,8 @@ Item {
                     font.weight: Font.Normal
                     clip: true
                     selectByMouse: true
+                    text: root.transactionTitle
+                    onTextChanged: root.transactionTitle = text
 
                     Text {
                         text: "input text"
@@ -166,6 +194,8 @@ Item {
                     width: 225
                     _state: Dropdown_1.State_1.State_1_default
                     clip: true
+                    model: ["Income", "Expense", "Transfer"]
+                    selectedText: "Income" // Default
                 }
             }
 
@@ -251,6 +281,8 @@ Item {
                         clip: true
                         selectByMouse: true
                         inputMethodHints: Qt.ImhFormattedNumbersOnly
+                        text: root.transactionAmount
+                        onTextChanged: root.transactionAmount = text
 
                         Text {
                             text: "input text"
@@ -310,6 +342,8 @@ Item {
                         font.weight: Font.Normal
                         clip: true
                         selectByMouse: true
+                        text: root.transactionAccount
+                        onTextChanged: root.transactionAccount = text
 
                         Text {
                             text: "input text"
@@ -388,7 +422,7 @@ Item {
                 id: saveButton
                 x: 405
                 y: 9
-                buttonText: "Add"
+                buttonText: root.isEditMode ? "Save" : "Add"
                 height: 35
                 width: 75
                 _state: UniversalButton_1.State_1.State_1_selected

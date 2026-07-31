@@ -118,3 +118,29 @@ void DatabaseManager::addTransaction(Transaction* transaction) {
     m_transactions.append(transaction);
     saveTransactionsToCSV();
 }
+
+bool DatabaseManager::updateTransaction(int id, Transaction* newTransaction) {
+    if (!newTransaction) return false;
+    for (int i = 0; i < m_transactions.size(); ++i) {
+        if (m_transactions[i] && m_transactions[i]->getId() == id) {
+            delete m_transactions[i];
+            m_transactions[i] = newTransaction;
+            saveTransactionsToCSV();
+            return true;
+        }
+    }
+    delete newTransaction;
+    return false;
+}
+
+bool DatabaseManager::deleteTransaction(int id) {
+    for (int i = 0; i < m_transactions.size(); ++i) {
+        if (m_transactions[i] && m_transactions[i]->getId() == id) {
+            delete m_transactions[i];
+            m_transactions.removeAt(i);
+            saveTransactionsToCSV();
+            return true;
+        }
+    }
+    return false;
+}
