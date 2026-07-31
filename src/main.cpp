@@ -12,6 +12,7 @@
 
 #include "frontend/settings_controller.h"
 #include "frontend/transactions_controller.h"
+#include "frontend/bills_controller.h"
 
 int main(int argc, char *argv[])
 {
@@ -31,6 +32,7 @@ int main(int argc, char *argv[])
     ReportsController reportsCtrl;
     SettingsController settingsCtrl;
     TransactionsController transactionsCtrl;
+    BillsController billsCtrl;
 
     QQmlApplicationEngine engine;
 
@@ -40,6 +42,7 @@ int main(int argc, char *argv[])
     engine.rootContext()->setContextProperty("reportsController", &reportsCtrl);
     engine.rootContext()->setContextProperty("settingsController", &settingsCtrl);
     engine.rootContext()->setContextProperty("transactionsController", &transactionsCtrl);
+    engine.rootContext()->setContextProperty("billsController", &billsCtrl);
 
     engine.load(QUrl(QStringLiteral("qrc:/qt/qml/src/qml/Main.qml")));
 

@@ -93,6 +93,9 @@ public:
     void loadBillsFromCSV();
     void saveBillsToCSV() const;
     const QVector<Bill>& getAllBills() const { return m_bills; }
+    void addBill(const Bill& b);
+    void updateBill(int id, const Bill& b);
+    void deleteBill(int id);
 
     //=============================BUDGET SECTION==================================
     // Đọc và Ghi file CSV
