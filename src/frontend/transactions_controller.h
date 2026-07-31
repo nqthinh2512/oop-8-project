@@ -21,7 +21,7 @@ public:
         TitleRole,
         AmountRole,
         CategoryRole,
-        AccountRole,
+        MethodRole,
         DateRole
     };
 
@@ -46,6 +46,7 @@ class TransactionsController : public QObject {
     Q_PROPERTY(QAbstractListModel* model READ model CONSTANT)
     Q_PROPERTY(int filterType READ filterType WRITE setFilterType NOTIFY filterTypeChanged)
     Q_PROPERTY(QString searchKeyword READ searchKeyword WRITE setSearchKeyword NOTIFY searchKeywordChanged)
+    Q_PROPERTY(int categoryIdFilter READ categoryIdFilter WRITE setCategoryIdFilter NOTIFY categoryIdFilterChanged)
 
 public:
     explicit TransactionsController(QObject *parent = nullptr);
@@ -58,14 +59,18 @@ public:
     QString searchKeyword() const { return m_searchKeyword; }
     void setSearchKeyword(const QString& keyword);
 
+    int categoryIdFilter() const { return m_categoryIdFilter; }
+    void setCategoryIdFilter(int catId);
+
     // CRUD Operations
-    Q_INVOKABLE void addTransaction(int typeIndex, const QString& title, double amount, const QString& dateStr, int categoryId, const QString& account);
-    Q_INVOKABLE void updateTransaction(int id, int typeIndex, const QString& title, double amount, const QString& dateStr, int categoryId, const QString& account);
+    Q_INVOKABLE void addTransaction(int typeIndex, const QString& title, double amount, const QString& dateStr, int categoryId, const QString& method);
+    Q_INVOKABLE void updateTransaction(int id, int typeIndex, const QString& title, double amount, const QString& dateStr, int categoryId, const QString& method);
     Q_INVOKABLE void deleteTransaction(int id);
 
 signals:
     void filterTypeChanged();
     void searchKeywordChanged();
+    void categoryIdFilterChanged();
 
 private:
     void loadTransactions();
@@ -74,6 +79,7 @@ private:
     TransactionListModel* m_model;
     int m_filterType; // -1: All, 0: Income, 1: Expense, 2: Transfer
     QString m_searchKeyword;
+    int m_categoryIdFilter; // 0: All
 };
 
 #endif // TRANSACTIONS_CONTROLLER_H

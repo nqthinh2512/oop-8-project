@@ -77,7 +77,7 @@ QVariant TransactionListModel::data(const QModelIndex &index, int role) const
         }
         return catName;
     }
-    case AccountRole: {
+    case MethodRole: {
         QString note = t->getNote();
         int sepIdx = note.indexOf("||");
         if (sepIdx != -1) return note.mid(sepIdx + 2);
@@ -98,7 +98,7 @@ QHash<int, QByteArray> TransactionListModel::roleNames() const
     roles[TitleRole] = "tName";
     roles[AmountRole] = "tAmount";
     roles[CategoryRole] = "tCat";
-    roles[AccountRole] = "tAcc";
+    roles[MethodRole] = "tMethod";
     roles[DateRole] = "tDate";
     return roles;
 }
@@ -118,7 +118,8 @@ TransactionsController::TransactionsController(QObject *parent)
     : QObject(parent),
       m_model(new TransactionListModel(this)),
       m_filterType(-1),
-      m_searchKeyword("")
+      m_searchKeyword(""),
+      m_categoryIdFilter(0)
 {
     loadTransactions();
 }
@@ -137,6 +138,15 @@ void TransactionsController::setSearchKeyword(const QString& keyword)
     if (m_searchKeyword != keyword) {
         m_searchKeyword = keyword;
         emit searchKeywordChanged();
+        applyFilter();
+    }
+}
+
+void TransactionsController::setCategoryIdFilter(int catId)
+{
+    if (m_categoryIdFilter != catId) {
+        m_categoryIdFilter = catId;
+        emit categoryIdFilterChanged();
         applyFilter();
     }
 }
@@ -177,20 +187,25 @@ void TransactionsController::applyFilter()
             }
         }
 
+        // 3. Filter by Category ID
+        if (m_categoryIdFilter > 0 && t->getCategoryId() != m_categoryIdFilter) {
+            continue;
+        }
+
         filtered.append(t);
     }
 
     m_model->setTransactions(filtered);
 }
 
-void TransactionsController::addTransaction(int typeIndex, const QString& title, double amount, const QString& dateStr, int categoryId, const QString& account)
+void TransactionsController::addTransaction(int typeIndex, const QString& title, double amount, const QString& dateStr, int categoryId, const QString& method)
 {
     // Parse date (DD/MM/YYYY)
-    QDateTime dt = QDateTime::currentDateTime();
-    QDate d = QDate::fromString(dateStr, "dd/MM/yyyy");
-    if (d.isValid()) {
-        dt.setDate(d);
+    QDate date = QDate::fromString(dateStr, "dd/MM/yyyy");
+    if (!date.isValid()) {
+        date = QDate::currentDate();
     }
+    QDateTime dt(date, QTime::currentTime());
 
     int maxId = 0;
     for (const auto* t : DatabaseManager::instance().getAllTransactions()) {
@@ -198,7 +213,10 @@ void TransactionsController::addTransaction(int typeIndex, const QString& title,
     }
     int id = maxId + 1;
 
-    QString fullNote = QString("[TYPE:%1]%2||%3").arg(typeIndex).arg(title).arg(account.isEmpty() ? "Cash/Bank" : account);
+    // Since we don't have a subclass for Transfer or a specific field for Account/Method in the base Transaction class,
+    // we encode the type and method into the Note field as a workaround:
+    // Format: "[TYPE:X]Title||Method"
+    QString fullNote = QString("[TYPE:%1]%2||%3").arg(typeIndex).arg(title).arg(method.isEmpty() ? "Cash/Bank" : method);
 
     Transaction* newTx = nullptr;
     if (typeIndex == 0) { // Income
@@ -211,16 +229,16 @@ void TransactionsController::addTransaction(int typeIndex, const QString& title,
     loadTransactions(); // Reload from DB and apply filters
 }
 
-void TransactionsController::updateTransaction(int id, int typeIndex, const QString& title, double amount, const QString& dateStr, int categoryId, const QString& account)
+void TransactionsController::updateTransaction(int id, int typeIndex, const QString& title, double amount, const QString& dateStr, int categoryId, const QString& method)
 {
-    // Parse date
-    QDateTime dt = QDateTime::currentDateTime();
-    QDate d = QDate::fromString(dateStr, "dd/MM/yyyy");
-    if (d.isValid()) {
-        dt.setDate(d);
+    QDate date = QDate::fromString(dateStr, "dd/MM/yyyy");
+    if (!date.isValid()) {
+        date = QDate::currentDate();
     }
+    QDateTime dt(date, QTime::currentTime());
 
-    QString fullNote = QString("[TYPE:%1]%2||%3").arg(typeIndex).arg(title).arg(account.isEmpty() ? "Cash/Bank" : account);
+    // Encode the type and method into the Note field as a workaround:
+    QString fullNote = QString("[TYPE:%1]%2||%3").arg(typeIndex).arg(title).arg(method.isEmpty() ? "Cash/Bank" : method);
 
     Transaction* newTx = nullptr;
     if (typeIndex == 0) {

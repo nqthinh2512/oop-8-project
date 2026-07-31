@@ -104,8 +104,18 @@ Rectangle {
 
                     // Category Dropdown
                     Dropdown_1 {
-                        selectedText: "All Main Categories"
+                        id: categoryFilterDropdown
                         Layout.preferredWidth: 200
+                        
+                        property var catData: [{id: 0, name: "All Main Categories"}].concat(categoriesController.categoriesList)
+                        model: catData.map(function(c) { return c.name; })
+                        selectedText: "All Main Categories"
+                        
+                        onSelected: function(index, value) {
+                            if (index >= 0 && index < catData.length) {
+                                transactionsController.categoryIdFilter = catData[index].id
+                            }
+                        }
                     }
 
                     // Flexible Spacer pushing Add button to right
@@ -189,7 +199,7 @@ Rectangle {
                         }
                     }
 
-                    // 4. ACCOUNT
+                    // 4. METHOD
                     Item {
                         Layout.preferredWidth: 180
                         Layout.fillHeight: true
@@ -197,7 +207,7 @@ Rectangle {
                         Text {
                             anchors.left: parent.left
                             anchors.verticalCenter: parent.verticalCenter
-                            text: "ACCOUNT"
+                            text: "METHOD"
                             font.family: "Inter"
                             font.pixelSize: 12
                             font.weight: Font.Bold
@@ -247,6 +257,7 @@ Rectangle {
                 Layout.fillHeight: true
                 clip: true
                 spacing: 0
+                boundsBehavior: Flickable.StopAtBounds
 
                 model: transactionsController.model
 
@@ -256,7 +267,7 @@ Rectangle {
                     transactionName: model.tName
                     amountText: model.tAmount
                     categoryText: model.tCat
-                    accountText: model.tAcc
+                    methodText: model.tMethod
                     dateText: model.tDate
 
                     onEditClicked: {
@@ -269,7 +280,8 @@ Rectangle {
                         var rawAmount = model.tAmount.replace(/[^0-9]/g, '')
                         transactionDialog.transactionAmount = rawAmount
                         
-                        transactionDialog.transactionAccount = model.tAcc
+                        transactionDialog.transactionMethod = model.tMethod
+                        transactionDialog.setCategoryName(model.tCat)
                         transactionDialog.setDateStr(model.tDate)
                         
                         transactionDialog.transactionTypeIndex = model.tType
@@ -280,7 +292,8 @@ Rectangle {
                         transactionDialog.open()
                     }
                     onTrashClicked: {
-                        transactionsController.deleteTransaction(model.tId)
+                        deleteDialog.pendingDeleteId = model.tId
+                        deleteDialog.open()
                     }
                 }
 
@@ -310,8 +323,8 @@ Rectangle {
                     transactionTitle,
                     parseFloat(transactionAmount) || 0.0,
                     dateStr, 
-                    0, // Category ID placeholder
-                    transactionAccount
+                    transactionDialog.transactionCategoryId,
+                    transactionMethod
                 )
             } else {
                 transactionsController.addTransaction(
@@ -319,10 +332,26 @@ Rectangle {
                     transactionTitle,
                     parseFloat(transactionAmount) || 0.0,
                     dateStr, 
-                    0,
-                    transactionAccount
+                    transactionDialog.transactionCategoryId,
+                    transactionMethod
                 )
             }
+        }
+    }
+
+    // Delete Confirmation Dialog Overlay
+    DeleteDialog {
+        id: deleteDialog
+        property int pendingDeleteId: -1
+
+        onAccepted: {
+            if (pendingDeleteId !== -1) {
+                transactionsController.deleteTransaction(pendingDeleteId)
+                pendingDeleteId = -1
+            }
+        }
+        onRejected: {
+            pendingDeleteId = -1
         }
     }
 }

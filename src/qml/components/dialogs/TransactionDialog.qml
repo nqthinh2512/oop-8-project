@@ -15,7 +15,8 @@ Item {
     property int transactionId: -1
     property string transactionTitle: ""
     property string transactionAmount: ""
-    property string transactionAccount: ""
+    property string transactionMethod: ""
+    property int transactionCategoryId: 0
     property alias transactionTypeIndex: dropdown_1.selectedIndex
     property alias transactionTypeText: dropdown_1.selectedText
     property alias dateField: date_Input_Field
@@ -27,6 +28,23 @@ Item {
         }
     }
 
+    function setCategoryName(catName) {
+        var list = categoriesController.categoriesList;
+        for (var i = 0; i < list.length; i++) {
+            if (list[i].name === catName) {
+                dropdown_3.selectedIndex = i;
+                dropdown_3.selectedText = catName;
+                transactionCategoryId = list[i].id;
+                return;
+            }
+        }
+        if (list.length > 0) {
+            dropdown_3.selectedIndex = 0;
+            dropdown_3.selectedText = list[0].name;
+            transactionCategoryId = list[0].id;
+        }
+    }
+
     function open() { visible = true }
     function close() { visible = false }
 
@@ -35,9 +53,19 @@ Item {
         transactionId = -1;
         transactionTitle = "";
         transactionAmount = "";
-        transactionAccount = "";
+        transactionMethod = "";
         transactionTypeIndex = 0;
         transactionTypeText = "Income";
+        
+        var list = categoriesController.categoriesList;
+        if (list.length > 0) {
+            dropdown_3.selectedIndex = 0;
+            dropdown_3.selectedText = list[0].name;
+            transactionCategoryId = list[0].id;
+        } else {
+            transactionCategoryId = 0;
+            dropdown_3.selectedText = "Select Category";
+        }
     }
 
     // Dimmed background overlay
@@ -154,7 +182,7 @@ Item {
             }
         }
 
-        // 3. Type, Categories, Amount & Account Row
+        // 3. Type, Categories, Amount & Method Row
         Rectangle {
             id: rowContainer
             y: 174
@@ -231,6 +259,16 @@ Item {
                     width: 225
                     _state: Dropdown_1.State_1.State_1_default
                     clip: true
+                    
+                    property var catList: categoriesController.categoriesList
+                    model: catList.map(function(c) { return c.name; })
+                    selectedText: catList.length > 0 ? catList[0].name : "Select Category"
+                    
+                    onSelected: function(index, value) {
+                        if (index >= 0 && index < catList.length) {
+                            root.transactionCategoryId = catList[index].id
+                        }
+                    }
                 }
             }
 
@@ -296,7 +334,7 @@ Item {
                 }
             }
 
-            // Account Input
+            // Method Input
             Rectangle {
                 id: dropdown_5
                 x: 255
@@ -306,7 +344,7 @@ Item {
                 color: "transparent"
 
                 Text {
-                    id: account
+                    id: methodLabel
                     height: 32
                     width: 226
                     color: "#878787"
@@ -316,7 +354,7 @@ Item {
                     horizontalAlignment: Text.AlignLeft
                     lineHeight: 32
                     lineHeightMode: Text.FixedHeight
-                    text: "Account"
+                    text: "Method"
                     textFormat: Text.PlainText
                     verticalAlignment: Text.AlignTop
                     wrapMode: Text.Wrap
@@ -342,8 +380,8 @@ Item {
                         font.weight: Font.Normal
                         clip: true
                         selectByMouse: true
-                        text: root.transactionAccount
-                        onTextChanged: root.transactionAccount = text
+                        text: root.transactionMethod
+                        onTextChanged: root.transactionMethod = text
 
                         Text {
                             text: "input text"
