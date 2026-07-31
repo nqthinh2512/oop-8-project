@@ -20,6 +20,7 @@ Item {
     property alias transactionTypeIndex: dropdown_1.selectedIndex
     property alias transactionTypeText: dropdown_1.selectedText
     property alias dateField: date_Input_Field
+    property bool isValidating: false
 
     function setDateStr(dateStr) {
         var parts = dateStr.split("/");
@@ -29,7 +30,8 @@ Item {
     }
 
     function setCategoryName(catName) {
-        var list = categoriesController.categoriesList;
+        var allCats = categoriesController.categoriesList;
+        var list = allCats.filter(function(c) { return c.parentId === 1 || c.parentId === 2; });
         for (var i = 0; i < list.length; i++) {
             if (list[i].name === catName) {
                 dropdown_3.selectedIndex = i;
@@ -56,8 +58,11 @@ Item {
         transactionMethod = "";
         transactionTypeIndex = 0;
         transactionTypeText = "Income";
+        isValidating = false;
+        dateField.clear();
         
-        var list = categoriesController.categoriesList;
+        var allCats = categoriesController.categoriesList;
+        var list = allCats.filter(function(c) { return c.parentId === 1 || c.parentId === 2; });
         if (list.length > 0) {
             dropdown_3.selectedIndex = 0;
             dropdown_3.selectedText = list[0].name;
@@ -154,6 +159,8 @@ Item {
                 width: 460
                 color: "#e9e9e9"
                 radius: 10
+                border.color: (root.isValidating && root.transactionTitle.trim() === "") ? "red" : "transparent"
+                border.width: (root.isValidating && root.transactionTitle.trim() === "") ? 1 : 0
 
                 TextInput {
                     id: textField
@@ -260,7 +267,8 @@ Item {
                     _state: Dropdown_1.State_1.State_1_default
                     clip: true
                     
-                    property var catList: categoriesController.categoriesList
+                    property var allCats: categoriesController.categoriesList
+                    property var catList: allCats.filter(function(c) { return c.parentId === 1 || c.parentId === 2; })
                     model: catList.map(function(c) { return c.name; })
                     selectedText: catList.length > 0 ? catList[0].name : "Select Category"
                     
@@ -305,6 +313,8 @@ Item {
                     width: 225
                     color: "#e9e9e9"
                     radius: 10
+                    border.color: (root.isValidating && root.transactionAmount.trim() === "") ? "red" : "transparent"
+                    border.width: (root.isValidating && root.transactionAmount.trim() === "") ? 1 : 0
 
                     TextInput {
                         id: supporting_text
@@ -320,7 +330,18 @@ Item {
                         selectByMouse: true
                         inputMethodHints: Qt.ImhFormattedNumbersOnly
                         text: root.transactionAmount
-                        onTextChanged: root.transactionAmount = text
+                        onTextChanged: {
+                            if (activeFocus) {
+                                var raw = text.replace(/[^0-9]/g, "")
+                                var formatted = raw.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                                if (text !== formatted) {
+                                    var pos = cursorPosition
+                                    text = formatted
+                                    cursorPosition = pos + (formatted.length - text.length)
+                                }
+                                root.transactionAmount = formatted
+                            }
+                        }
 
                         Text {
                             text: "input text"
@@ -367,6 +388,8 @@ Item {
                     width: 225
                     color: "#e9e9e9"
                     radius: 10
+                    border.color: (root.isValidating && root.transactionMethod.trim() === "") ? "red" : "transparent"
+                    border.width: (root.isValidating && root.transactionMethod.trim() === "") ? 1 : 0
 
                     TextInput {
                         id: supporting_text_1
@@ -428,6 +451,8 @@ Item {
                 y: 32
                 height: 42
                 width: 460
+                border.color: (root.isValidating && date_Input_Field.selectedDate.trim() === "") ? "red" : "transparent"
+                border.width: (root.isValidating && date_Input_Field.selectedDate.trim() === "") ? 1 : 0
             }
         }
 
@@ -469,6 +494,10 @@ Item {
                     anchors.fill: parent
                     cursorShape: Qt.PointingHandCursor
                     onClicked: {
+                        root.isValidating = true
+                        if (root.transactionTitle.trim() === "" || root.transactionAmount.trim() === "" || root.transactionMethod.trim() === "" || root.dateField.selectedDate.trim() === "") {
+                            return
+                        }
                         root.accepted()
                         root.close()
                     }

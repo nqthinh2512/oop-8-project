@@ -69,6 +69,7 @@ Rectangle {
 
             RowLayout {
                 anchors.left: parent.left
+                anchors.right: parent.right
                 anchors.verticalCenter: parent.verticalCenter
                 spacing: 12
 
@@ -93,6 +94,7 @@ Rectangle {
                 ColumnLayout {
                     spacing: 3
                     Layout.alignment: Qt.AlignVCenter
+                    Layout.fillWidth: true
 
                     Text {
                         color: "#0f172a"
@@ -101,6 +103,7 @@ Rectangle {
                         font.weight: Font.Bold
                         text: transactionRow.transactionName
                         elide: Text.ElideRight
+                        Layout.fillWidth: true
                     }
 
                     Rectangle {

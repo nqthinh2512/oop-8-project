@@ -25,6 +25,13 @@ Rectangle {
         dateSelected(selectedDate)
     }
 
+    function clear() {
+        dayInput.text = ""
+        monthInput.text = ""
+        yearInput.text = ""
+        selectedDate = ""
+    }
+
     // --- Interactive Date Input Segmented Fields (DD / MM / YYYY) ---
     Row {
         id: dateRow

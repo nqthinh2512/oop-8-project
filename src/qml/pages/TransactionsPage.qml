@@ -107,7 +107,9 @@ Rectangle {
                         id: categoryFilterDropdown
                         Layout.preferredWidth: 200
                         
-                        property var catData: [{id: 0, name: "All Main Categories"}].concat(categoriesController.categoriesList)
+                        property var allCats: categoriesController.categoriesList
+                        property var filteredCats: allCats.filter(function(c) { return c.parentId === 1 || c.parentId === 2; })
+                        property var catData: [{id: 0, name: "All Main Categories"}].concat(filteredCats)
                         model: catData.map(function(c) { return c.name; })
                         selectedText: "All Main Categories"
                         
@@ -321,7 +323,7 @@ Rectangle {
                     transactionId,
                     transactionTypeIndex,
                     transactionTitle,
-                    parseFloat(transactionAmount) || 0.0,
+                    parseFloat(transactionAmount.replace(/,/g, '')) || 0.0,
                     dateStr, 
                     transactionDialog.transactionCategoryId,
                     transactionMethod
@@ -330,7 +332,7 @@ Rectangle {
                 transactionsController.addTransaction(
                     transactionTypeIndex,
                     transactionTitle,
-                    parseFloat(transactionAmount) || 0.0,
+                    parseFloat(transactionAmount.replace(/,/g, '')) || 0.0,
                     dateStr, 
                     transactionDialog.transactionCategoryId,
                     transactionMethod
