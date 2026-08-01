@@ -48,5 +48,5 @@ Window {
         }
     }
 
-    DialogTestOverlay {} //Cái này chỉ để "preview" mấy cái dialog trông như thế nào thôi, nếu không cần nữa chỉ cần đóng comment nó lại.
+   // DialogTestOverlay {} //Cái này chỉ để "preview" mấy cái dialog trông như thế nào thôi, nếu không cần nữa chỉ cần đóng comment nó lại.
 }

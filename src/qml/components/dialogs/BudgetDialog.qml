@@ -7,24 +7,108 @@ Item {
     visible: false
     z: 999
 
-    signal accepted()
-    signal rejected()
+    // --- Properties & Signals kết nối với BudgetsPage ---
+    property var categoryList: []
+    property bool isEditMode: false
+    property int currentBudgetId: -1
+    property string errorMessage: ""
 
+    signal accepted(bool isEdit, int id, string name, int priority, int categoryId, double spent, double limit, string startDateStr, string endDateStr)
+    signal cancelled()
+
+    // --- Các hàm API công khai ---
     function open() { visible = true }
-    function close() { visible = false }
+    function close() { visible = false; errorMessage = "" }
 
-    // Dimmed background overlay
+    function openForAdd() {
+        isEditMode = false
+        currentBudgetId = -1
+        errorMessage = ""
+        title_1.text = "Add Budget"
+        saveButton.buttonText = "Add"
+
+        // Reset dữ liệu ô nhập
+        textField.text = ""
+        supporting_text.text = "0"
+        supporting_text_1.text = ""
+
+        // Reset Priority về Medium
+        dropdown_1.selectedIndex = 1
+        dropdown_1.selectedText = "Medium"
+
+        // Reset Category về mục đầu tiên (nếu có)
+        if (root.categoryList.length > 0) {
+            dropdown_3.selectedIndex = 0
+            dropdown_3.selectedText = root.categoryList[0].name
+        }
+
+        // Reset Period về Monthly
+        dropdown_7.selectedIndex = 1
+        dropdown_7.selectedText = "Monthly"
+
+        // Gán ngày mặc định — ĐÚNG định dạng dd/MM/yyyy mà Date_Input_Field_1 thật sự dùng
+        if (date_Input_Field.hasOwnProperty("text"))
+            date_Input_Field.text = Qt.formatDate(new Date(), "dd/MM/yyyy")
+        if (date_Input_Field_1.hasOwnProperty("text"))
+            date_Input_Field_1.text = Qt.formatDate(new Date(new Date().setMonth(new Date().getMonth() + 1)), "dd/MM/yyyy")
+
+        open()
+    }
+
+    function openForEdit(modelData) {
+        isEditMode = true
+        currentBudgetId = modelData.id || -1
+        errorMessage = ""
+        title_1.text = "Edit Budget"
+        saveButton.buttonText = "Save"
+
+        // Nap dữ liệu cần sửa
+        textField.text = modelData.name || ""
+        supporting_text.text = modelData.spentText ? modelData.spentText.replace(/[^0-9.]/g, '') : "0"
+        supporting_text_1.text = modelData.limitText ? modelData.limitText.replace(/[^0-9.]/g, '') : ""
+
+        // Priority: modelData.priority là int (0=Low,1=Medium,2=High)
+        var priorityLabels = ["Low", "Medium", "High"]
+        var pIdx = (typeof modelData.priority === "number") ? modelData.priority : 1
+        dropdown_1.selectedIndex = pIdx
+        dropdown_1.selectedText = priorityLabels[pIdx] || "Medium"
+
+        // Category: tìm đúng index theo categoryId
+        for (var i = 0; i < root.categoryList.length; i++) {
+            if (root.categoryList[i].id === modelData.categoryId) {
+                dropdown_3.selectedIndex = i
+                dropdown_3.selectedText = root.categoryList[i].name
+                break
+            }
+        }
+
+        if (date_Input_Field.hasOwnProperty("text"))
+            date_Input_Field.text = modelData.startDateText || ""
+        if (date_Input_Field_1.hasOwnProperty("text"))
+            date_Input_Field_1.text = modelData.endDateText || ""
+
+        open()
+    }
+
+    function showError(msg) {
+        errorMessage = msg
+    }
+
+    // --- Dimmed background overlay ---
     Rectangle {
         anchors.fill: parent
         color: "#66000000"
 
         MouseArea {
             anchors.fill: parent
-            onClicked: root.close()
+            onClicked: {
+                root.cancelled()
+                root.close()
+            }
         }
     }
 
-    // Centered Dialog Card
+    // --- Centered Dialog Card ---
     Rectangle {
         id: budgetDialog
         anchors.centerIn: parent
@@ -36,7 +120,7 @@ Item {
         radius: 15
         clip: true
 
-        // Absorb clicks inside the card so they don't reach the dimmed overlay
+        // Chống click xuyên qua nền mờ
         MouseArea { anchors.fill: parent }
 
         // 1. Title Header
@@ -49,7 +133,7 @@ Item {
                 x: 20
                 y: 9
                 height: 32
-                width: 461
+                width: 300
                 color: "#191919"
                 font.capitalization: Font.Capitalize
                 font.family: "Intel One Mono"
@@ -62,6 +146,23 @@ Item {
                 textFormat: Text.PlainText
                 verticalAlignment: Text.AlignTop
                 wrapMode: Text.Wrap
+            }
+
+            // Hiển thị thông báo lỗi (nếu có)
+            Text {
+                id: errLabel
+                x: 200
+                y: 14
+                height: 24
+                width: 280
+                color: "#dc2626"
+                font.family: "Roboto"
+                font.pixelSize: 12
+                horizontalAlignment: Text.AlignRight
+                verticalAlignment: Text.AlignVCenter
+                text: root.errorMessage
+                visible: root.errorMessage !== ""
+                elide: Text.ElideRight
             }
         }
 
@@ -114,7 +215,7 @@ Item {
                     selectByMouse: true
 
                     Text {
-                        text: "input text"
+                        text: "Enter budget title..."
                         color: "#8049454f"
                         font: parent.font
                         visible: !parent.text && !parent.activeFocus
@@ -165,6 +266,10 @@ Item {
                     width: 225
                     _state: Dropdown_1.State_1.State_1_default
                     clip: true
+                    // ===== THÊM: model cho Priority, nếu không có model thì bấm vào không mở menu =====
+                    model: ["Low", "Medium", "High"]
+                    selectedText: "Medium"
+                    selectedIndex: 1
                 }
             }
 
@@ -200,6 +305,14 @@ Item {
                     width: 225
                     _state: Dropdown_1.State_1.State_1_default
                     clip: true
+                    // ===== THÊM: model lấy từ root.categoryList (do BudgetsPage truyền vào) =====
+                    model: {
+                        var names = []
+                        for (var i = 0; i < root.categoryList.length; i++) names.push(root.categoryList[i].name)
+                        return names
+                    }
+                    selectedText: root.categoryList.length > 0 ? root.categoryList[0].name : "Select Category"
+                    selectedIndex: 0
                 }
             }
 
@@ -249,10 +362,11 @@ Item {
                         font.weight: Font.Normal
                         clip: true
                         selectByMouse: true
+                        enabled: !root.isEditMode
                         inputMethodHints: Qt.ImhFormattedNumbersOnly
 
                         Text {
-                            text: "input text"
+                            text: "0.0"
                             color: "#8049454f"
                             font: parent.font
                             visible: !parent.text && !parent.activeFocus
@@ -312,7 +426,7 @@ Item {
                         inputMethodHints: Qt.ImhFormattedNumbersOnly
 
                         Text {
-                            text: "input text"
+                            text: "1000.0"
                             color: "#8049454f"
                             font: parent.font
                             visible: !parent.text && !parent.activeFocus
@@ -428,6 +542,10 @@ Item {
                 width: 460
                 _state: Dropdown_1.State_1.State_1_default
                 clip: true
+                // ===== THÊM: model cho Period (chưa lưu vào backend, chỉ hiển thị UI) =====
+                model: ["Weekly", "Monthly", "Yearly"]
+                selectedText: "Monthly"
+                selectedIndex: 1
             }
         }
 
@@ -450,7 +568,7 @@ Item {
                     anchors.fill: parent
                     cursorShape: Qt.PointingHandCursor
                     onClicked: {
-                        root.rejected()
+                        root.cancelled()
                         root.close()
                     }
                 }
@@ -460,7 +578,7 @@ Item {
                 id: saveButton
                 x: 405
                 y: 9
-                buttonText: "Add"
+                buttonText: root.isEditMode ? "Save" : "Add"
                 height: 35
                 width: 75
                 _state: UniversalButton_1.State_1.State_1_selected
@@ -469,8 +587,33 @@ Item {
                     anchors.fill: parent
                     cursorShape: Qt.PointingHandCursor
                     onClicked: {
-                        root.accepted()
-                        root.close()
+                        var name = textField.text.trim()
+                        var priorityVal = dropdown_1.selectedIndex
+                        // ===== SỬA: lấy categoryId bằng cách tra ngược root.categoryList theo selectedIndex,
+                        // vì Dropdown_1 không có property "selectedCategoryId" =====
+                        var catId = (root.categoryList.length > 0 && dropdown_3.selectedIndex < root.categoryList.length)
+                            ? root.categoryList[dropdown_3.selectedIndex].id : 0
+                        var spent = parseFloat(supporting_text.text) || 0.0
+                        var limit = parseFloat(supporting_text_1.text) || 0.0
+                        var startStr = date_Input_Field.hasOwnProperty("text") ? date_Input_Field.text : ""
+                        var endStr = date_Input_Field_1.hasOwnProperty("text") ? date_Input_Field_1.text : ""
+
+                        if (name === "" || isNaN(limit) || limit <= 0) {
+                            root.showError("Tên và hạn mức không hợp lệ!")
+                            return
+                        }
+
+                        root.accepted(
+                            root.isEditMode,
+                            root.currentBudgetId,
+                            name,
+                            priorityVal,
+                            catId,
+                            spent,
+                            limit,
+                            startStr,
+                            endStr
+                        )
                     }
                 }
             }

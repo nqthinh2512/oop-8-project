@@ -41,6 +41,8 @@ Rectangle {
 
             Text {
                 anchors.left: parent.left
+                anchors.right: parent.right
+                anchors.rightMargin: 8
                 anchors.verticalCenter: parent.verticalCenter
                 color: "#0f172a"
                 font.family: "Inter"
@@ -50,7 +52,6 @@ Rectangle {
                 elide: Text.ElideRight
             }
         }
-
         // 2. PRIORITY BADGE
         Item {
             Layout.preferredWidth: 140
@@ -58,6 +59,7 @@ Rectangle {
 
             Priority_1 {
                 anchors.left: parent.left
+                anchors.leftMargin: 12
                 anchors.verticalCenter: parent.verticalCenter
                 priority_2: budgetRow.priorityVal
             }
