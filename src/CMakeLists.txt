@@ -39,6 +39,8 @@ qt_add_executable(appFinanceDashboard
 
     backend/models/transaction.h
     backend/models/transaction.cpp
+    backend/models/transaction_factory.h
+    backend/models/transaction_factory.cpp
     
     # Frontend Controllers
     frontend/overview_controller.h

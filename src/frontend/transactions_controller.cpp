@@ -3,6 +3,7 @@
 #include <QDate>
 #include <QLocale>
 #include <QDateTime>
+#include "../backend/models/transaction_factory.h"
 
 // ============================================================================
 // TRANSACTION LIST MODEL IMPLEMENTATION
@@ -223,12 +224,7 @@ void TransactionsController::addTransaction(int typeIndex, const QString& title,
     // Format: "[TYPE:X]Title||Method"
     QString fullNote = QString("[TYPE:%1]%2||%3").arg(typeIndex).arg(title).arg(method.isEmpty() ? "Cash/Bank" : method);
 
-    Transaction* newTx = nullptr;
-    if (typeIndex == 0) { // Income
-        newTx = new Income(id, amount, dt, fullNote, categoryId);
-    } else { // Expense or Transfer
-        newTx = new Expense(id, amount, dt, fullNote, categoryId);
-    }
+    Transaction* newTx = TransactionFactory::createTransaction(typeIndex, id, amount, dt, fullNote, categoryId);
 
     DatabaseManager::instance().addTransaction(newTx);
     loadTransactions(); // Reload from DB and apply filters
@@ -245,12 +241,7 @@ void TransactionsController::updateTransaction(int id, int typeIndex, const QStr
     // Encode the type and method into the Note field as a workaround:
     QString fullNote = QString("[TYPE:%1]%2||%3").arg(typeIndex).arg(title).arg(method.isEmpty() ? "Cash/Bank" : method);
 
-    Transaction* newTx = nullptr;
-    if (typeIndex == 0) {
-        newTx = new Income(id, amount, dt, fullNote, categoryId);
-    } else {
-        newTx = new Expense(id, amount, dt, fullNote, categoryId);
-    }
+    Transaction* newTx = TransactionFactory::createTransaction(typeIndex, id, amount, dt, fullNote, categoryId);
 
     DatabaseManager::instance().updateTransaction(id, newTx);
     loadTransactions();
