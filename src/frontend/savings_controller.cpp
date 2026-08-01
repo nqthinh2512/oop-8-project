@@ -1,5 +1,219 @@
 #include "savings_controller.h"
-#include "../backend/storage/database_manager.h"
+#include <QLocale>
+#include <QDate>
+#include <cmath>
+#include <QDebug>
 
-//gọi hàm ở dưới nếu muốn lấy danh sách các danh mục đã có sẵn
-//const QVector<Category>& initializedCategories = DatabaseManager::instance().getAllCategories();
+namespace {
+QString formatVnd(double amount) {
+    return QLocale(QLocale::Vietnamese).toString(amount, 'f', 0) + " VND";
+}
+
+QDate parseDateStr(const QString &str) {
+    QDate d = QDate::fromString(str, "dd/MM/yyyy");
+    if (!d.isValid()) {
+        d = QDate::fromString(str, Qt::ISODate);
+    }
+    return d;
+}
+}
+
+SavingsController::SavingsController(QObject *parent) : QObject(parent) {}
+
+QVariantList SavingsController::savingsList() const
+{
+    if (!m_listDirty) return m_cachedList;
+
+    const auto &allSavings = DatabaseManager::instance().getAllSavings();
+    const auto &allCategories = DatabaseManager::instance().getAllCategories();
+
+    QVariantList list;
+    for (const auto &s : allSavings) {
+        // Filter by search text
+        if (!m_searchText.isEmpty() && !s.getName().contains(m_searchText, Qt::CaseInsensitive))
+            continue;
+
+        // Filter by priority (-1 = All)
+        if (m_priorityFilter != -1 && static_cast<int>(s.getPriority()) != m_priorityFilter)
+            continue;
+
+        // Filter by category (0 = All)
+        if (m_categoryFilter != 0 && s.getCategoryId() != m_categoryFilter)
+            continue;
+
+        QString categoryName = "General";
+        for (const auto &c : allCategories) {
+            if (c.getId() == s.getCategoryId()) {
+                categoryName = c.getName();
+                break;
+            }
+        }
+
+        double target = s.getTarget();
+        double current = s.getCurrent();
+        double fraction = (target > 0.0) ? (current / target) : 0.0;
+        if (fraction > 1.0) fraction = 1.0;
+        if (fraction < 0.0) fraction = 0.0;
+
+        int percent = qRound(s.getProgressPercent());
+
+        QVariantMap m;
+        m["id"] = s.getId();
+        m["sName"] = s.getName();
+        m["name"] = s.getName();
+        m["priorityVal"] = static_cast<int>(s.getPriority());
+        m["priority"] = static_cast<int>(s.getPriority());
+        m["categoryId"] = s.getCategoryId();
+        m["cat"] = categoryName;
+        m["categoryText"] = categoryName;
+        m["currentAmount"] = current;
+        m["targetAmount"] = target;
+        m["sText"] = formatVnd(current);
+        m["savedText"] = formatVnd(current);
+        m["gText"] = "/ " + formatVnd(target);
+        m["goalText"] = "/ " + formatVnd(target);
+        m["pFrac"] = fraction;
+        m["progressFraction"] = fraction;
+        m["subT"] = QString::number(percent) + "% saved";
+        m["progressSubText"] = QString::number(percent) + "% saved";
+        m["dDate"] = s.getDueDate().toString("dd/MM/yyyy");
+        m["dueDateText"] = s.getDueDate().toString("dd/MM/yyyy");
+
+        list.append(m);
+    }
+
+    m_cachedList = list;
+    m_listDirty = false;
+    return m_cachedList;
+}
+
+QVariantList SavingsController::categoryOptions() const
+{
+    const auto &allCats = DatabaseManager::instance().getAllCategories();
+    QVariantList options;
+
+    QVariantMap allMap;
+    allMap["id"] = 0;
+    allMap["name"] = "All Main Categories";
+    options.append(allMap);
+
+    for (const auto &c : allCats) {
+        if (c.getParentId() == Saving::parentCategory || c.getId() == Saving::parentCategory) {
+            QVariantMap m;
+            m["id"] = c.getId();
+            m["name"] = c.getName();
+            options.append(m);
+        }
+    }
+    return options;
+}
+
+void SavingsController::setSearchText(const QString &text)
+{
+    if (m_searchText != text) {
+        m_searchText = text;
+        m_listDirty = true;
+        emit filterChanged();
+        emit savingsListChanged();
+    }
+}
+
+void SavingsController::setPriorityFilter(int filter)
+{
+    if (m_priorityFilter != filter) {
+        m_priorityFilter = filter;
+        m_listDirty = true;
+        emit filterChanged();
+        emit savingsListChanged();
+    }
+}
+
+void SavingsController::setCategoryFilter(int filter)
+{
+    if (m_categoryFilter != filter) {
+        m_categoryFilter = filter;
+        m_listDirty = true;
+        emit filterChanged();
+        emit savingsListChanged();
+    }
+}
+
+QString SavingsController::totalSavedText() const
+{
+    double total = 0.0;
+    for (const auto &s : DatabaseManager::instance().getAllSavings()) {
+        total += s.getCurrent();
+    }
+    return formatVnd(total);
+}
+
+QString SavingsController::totalRemainingText() const
+{
+    double totalRem = 0.0;
+    for (const auto &s : DatabaseManager::instance().getAllSavings()) {
+        totalRem += s.getRemainingAmount();
+    }
+    return formatVnd(totalRem);
+}
+
+QString SavingsController::completedText() const
+{
+    int completedCount = 0;
+    const auto &all = DatabaseManager::instance().getAllSavings();
+    for (const auto &s : all) {
+        if (s.isCompleted()) {
+            completedCount++;
+        }
+    }
+    return QString("%1 / %2").arg(completedCount).arg(all.size());
+}
+
+bool SavingsController::addSaving(const QString &name, int priority, int categoryId,
+                                  double target, double current,
+                                  const QString &dueDateStr)
+{
+    QDate dueDate = parseDateStr(dueDateStr);
+    if (!dueDate.isValid()) {
+        dueDate = QDate::currentDate().addMonths(1);
+    }
+
+    Priority p = static_cast<Priority>(qBound(0, priority, 2));
+    DatabaseManager::instance().addSaving(name, p, categoryId, target, current, dueDate);
+
+    refresh();
+    return true;
+}
+
+bool SavingsController::updateSaving(int id, const QString &name, int priority, int categoryId,
+                                     double target, double current,
+                                     const QString &dueDateStr)
+{
+    QDate dueDate = parseDateStr(dueDateStr);
+    if (!dueDate.isValid()) {
+        dueDate = QDate::currentDate().addMonths(1);
+    }
+
+    Priority p = static_cast<Priority>(qBound(0, priority, 2));
+    bool success = DatabaseManager::instance().updateSaving(id, name, p, categoryId, target, current, dueDate);
+
+    if (success) {
+        refresh();
+    }
+    return success;
+}
+
+bool SavingsController::removeSaving(int id)
+{
+    bool success = DatabaseManager::instance().deleteSaving(id);
+    if (success) {
+        refresh();
+    }
+    return success;
+}
+
+void SavingsController::refresh()
+{
+    m_listDirty = true;
+    emit savingsListChanged();
+    emit totalsChanged();
+}

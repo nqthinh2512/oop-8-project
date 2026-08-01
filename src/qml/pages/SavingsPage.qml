@@ -8,6 +8,8 @@ Rectangle {
     color: "#f8fafc"
     clip: true
 
+    // savingsController đã được main.cpp bơm sẵn vào QML qua context property
+
     ColumnLayout {
         anchors.fill: parent
         anchors.margins: 24
@@ -36,7 +38,7 @@ Rectangle {
         }
 
         // =================================================================
-        // 2. TOP SUMMARY CARDS (3x PageBox_1)
+        // 2. TOP SUMMARY CARDS — Kết nối với savingsController
         // =================================================================
         RowLayout {
             Layout.fillWidth: true
@@ -44,19 +46,19 @@ Rectangle {
 
             PageBox_1 {
                 boxTitle: "TOTAL SAVED"
-                amountText: "1,000 VND"
+                amountText: savingsController.totalSavedText
                 labelText: "Across All Goals"
             }
 
             PageBox_1 {
                 boxTitle: "REMAINING"
-                amountText: "1,000 VND"
+                amountText: savingsController.totalRemainingText
                 labelText: "To Reach All Target"
             }
 
             PageBox_1 {
                 boxTitle: "COMPLETED"
-                amountText: "0 / 3"
+                amountText: savingsController.completedText
                 labelText: "Goals Fully Funded"
             }
         }
@@ -69,7 +71,7 @@ Rectangle {
             Layout.fillHeight: true
             spacing: 0
 
-            // A. Table Toolbar (Search, Priority Filters, Dropdown, Add Saving Button)
+            // A. Table Toolbar
             Rectangle {
                 Layout.fillWidth: true
                 implicitHeight: 70
@@ -89,6 +91,7 @@ Rectangle {
                         id: searchBar
                         placeholderText: "Search Saving"
                         Layout.preferredWidth: 260
+                        onTextChanged: savingsController.searchText = text
                     }
 
                     RowLayout {
@@ -96,19 +99,31 @@ Rectangle {
 
                         UniversalButton_1 {
                             buttonText: "All"
-                            _state: UniversalButton_1.State_1.State_1_selected
+                            _state: savingsController.priorityFilter === -1
+                                    ? UniversalButton_1.State_1.State_1_selected
+                                    : UniversalButton_1.State_1.State_1_default
+                            onClicked: savingsController.priorityFilter = -1
                         }
                         UniversalButton_1 {
                             buttonText: "High"
-                            _state: UniversalButton_1.State_1.State_1_default
+                            _state: savingsController.priorityFilter === 2
+                                    ? UniversalButton_1.State_1.State_1_selected
+                                    : UniversalButton_1.State_1.State_1_default
+                            onClicked: savingsController.priorityFilter = 2
                         }
                         UniversalButton_1 {
                             buttonText: "Medium"
-                            _state: UniversalButton_1.State_1.State_1_default
+                            _state: savingsController.priorityFilter === 1
+                                    ? UniversalButton_1.State_1.State_1_selected
+                                    : UniversalButton_1.State_1.State_1_default
+                            onClicked: savingsController.priorityFilter = 1
                         }
                         UniversalButton_1 {
                             buttonText: "Low"
-                            _state: UniversalButton_1.State_1.State_1_default
+                            _state: savingsController.priorityFilter === 0
+                                    ? UniversalButton_1.State_1.State_1_selected
+                                    : UniversalButton_1.State_1.State_1_default
+                            onClicked: savingsController.priorityFilter = 0
                         }
                     }
 
@@ -118,25 +133,34 @@ Rectangle {
                         color: "#cbd5e1"
                     }
 
+                    // Category filter dropdown
                     Dropdown_1 {
-                        selectedText: "All Main Categories"
-                        Layout.preferredWidth: 200
+
+                        model: {
+                            var names = []
+                            for (var i = 0; i < categoryOptionsFull.length; i++) names.push(categoryOptionsFull[i].name)
+                            return names
+                        }
+
+                        onSelected: (index, value) => {
+                            savingsController.categoryFilter = categoryOptionsFull[index].id
+                        }
                     }
 
-                    Item {
-                        Layout.fillWidth: true
-                    }
+                    Item { Layout.fillWidth: true }
 
                     UniversalButton_1 {
                         buttonText: "+Add Saving"
                         _state: UniversalButton_1.State_1.State_1_selected
                         Layout.alignment: Qt.AlignRight | Qt.AlignVCenter
-                        onClicked: console.log("Add Saving clicked")
+                        onClicked: {
+                            savingDialogContent.openForAdd()
+                        }
                     }
                 }
             }
 
-            // B. Table Column Header Bar (Matching SavingRow_1 column wrappers)
+            // B. Table Column Header Bar
             Rectangle {
                 Layout.fillWidth: true
                 implicitHeight: 48
@@ -150,107 +174,22 @@ Rectangle {
                     anchors.rightMargin: 20
                     spacing: 0
 
-                    // 1. SAVING
-                    Item {
-                        Layout.fillWidth: true
-                        Layout.preferredWidth: 200
-                        Layout.fillHeight: true
-
-                        Text {
-                            anchors.left: parent.left
-                            anchors.verticalCenter: parent.verticalCenter
-                            text: "SAVING"
-                            font.family: "Inter"
-                            font.pixelSize: 12
-                            font.weight: Font.Bold
-                            color: "#64748b"
-                        }
-                    }
-
-                    // 2. PRIORITY
-                    Item {
-                        Layout.preferredWidth: 140
-                        Layout.fillHeight: true
-
-                        Text {
-                            anchors.left: parent.left
-                            anchors.verticalCenter: parent.verticalCenter
-                            text: "PRIORITY"
-                            font.family: "Inter"
-                            font.pixelSize: 12
-                            font.weight: Font.Bold
-                            color: "#64748b"
-                        }
-                    }
-
-                    // 3. CATEGORY
-                    Item {
-                        Layout.preferredWidth: 160
-                        Layout.fillHeight: true
-
-                        Text {
-                            anchors.left: parent.left
-                            anchors.verticalCenter: parent.verticalCenter
-                            text: "CATEGORY"
-                            font.family: "Inter"
-                            font.pixelSize: 12
-                            font.weight: Font.Bold
-                            color: "#64748b"
-                        }
-                    }
-
-                    // 4. PROGRESS
-                    Item {
-                        Layout.preferredWidth: 280
-                        Layout.fillHeight: true
-
-                        Text {
-                            anchors.left: parent.left
-                            anchors.verticalCenter: parent.verticalCenter
-                            text: "PROGRESS"
-                            font.family: "Inter"
-                            font.pixelSize: 12
-                            font.weight: Font.Bold
-                            color: "#64748b"
-                        }
-                    }
-
-                    // 5. DUE DATE
-                    Item {
-                        Layout.preferredWidth: 180
-                        Layout.fillHeight: true
-
-                        Text {
-                            anchors.left: parent.left
-                            anchors.verticalCenter: parent.verticalCenter
-                            text: "DUE DATE"
-                            font.family: "Inter"
-                            font.pixelSize: 12
-                            font.weight: Font.Bold
-                            color: "#64748b"
-                        }
-                    }
-
-                    // 6. ACTIONS
-                    Item {
-                        Layout.preferredWidth: 100
-                        Layout.fillHeight: true
-
-                        Text {
-                            anchors.right: parent.right
-                            anchors.rightMargin: 8
-                            anchors.verticalCenter: parent.verticalCenter
-                            text: "ACTIONS"
-                            font.family: "Inter"
-                            font.pixelSize: 12
-                            font.weight: Font.Bold
-                            color: "#64748b"
-                        }
-                    }
+                    Item { Layout.fillWidth: true; Layout.preferredWidth: 260; Layout.fillHeight: true
+                        Text { anchors.left: parent.left; anchors.verticalCenter: parent.verticalCenter; text: "SAVING"; font.family: "Inter"; font.pixelSize: 12; font.weight: Font.Bold; color: "#64748b" } }
+                    Item { Layout.preferredWidth: 100; Layout.fillHeight: true
+                        Text { anchors.left: parent.left; anchors.verticalCenter: parent.verticalCenter; text: "PRIORITY"; font.family: "Inter"; font.pixelSize: 12; font.weight: Font.Bold; color: "#64748b" } }
+                    Item { Layout.preferredWidth: 160; Layout.fillHeight: true
+                        Text { anchors.left: parent.left; anchors.verticalCenter: parent.verticalCenter; text: "CATEGORY"; font.family: "Inter"; font.pixelSize: 12; font.weight: Font.Bold; color: "#64748b" } }
+                    Item { Layout.preferredWidth: 280; Layout.fillHeight: true
+                        Text { anchors.left: parent.left; anchors.verticalCenter: parent.verticalCenter; text: "PROGRESS"; font.family: "Inter"; font.pixelSize: 12; font.weight: Font.Bold; color: "#64748b" } }
+                    Item { Layout.preferredWidth: 180; Layout.fillHeight: true
+                        Text { anchors.left: parent.left; anchors.verticalCenter: parent.verticalCenter; text: "DUE DATE"; font.family: "Inter"; font.pixelSize: 12; font.weight: Font.Bold; color: "#64748b" } }
+                    Item { Layout.preferredWidth: 100; Layout.fillHeight: true
+                        Text { anchors.right: parent.right; anchors.rightMargin: 8; anchors.verticalCenter: parent.verticalCenter; text: "ACTIONS"; font.family: "Inter"; font.pixelSize: 12; font.weight: Font.Bold; color: "#64748b" } }
                 }
             }
 
-            // C. Dynamic Row ListView
+            // C. Dynamic Row ListView — Kết nối với savingsController.savingsList
             ListView {
                 id: listView
                 Layout.fillWidth: true
@@ -258,58 +197,61 @@ Rectangle {
                 clip: true
                 spacing: 0
 
-                model: ListModel {
-                    ListElement {
-                        sName: "Name"
-                        pVal: Priority_1.Priority_1.Priority_1_high
-                        cat: "Category"
-                        sText: "1,000 VND"
-                        gText: "/ 20,000 VND"
-                        pFrac: 0.67
-                        subT: "67% saved"
-                        dDate: "31/12/2012"
-                    }
-                    ListElement {
-                        sName: "Name"
-                        pVal: Priority_1.Priority_1.Priority_1_high
-                        cat: "Category"
-                        sText: "1,000 VND"
-                        gText: "/ 20,000 VND"
-                        pFrac: 0.67
-                        subT: "67% saved"
-                        dDate: "31/12/2012"
-                    }
-                    ListElement {
-                        sName: "Name"
-                        pVal: Priority_1.Priority_1.Priority_1_high
-                        cat: "Category"
-                        sText: "1,000 VND"
-                        gText: "/ 20,000 VND"
-                        pFrac: 0.67
-                        subT: "67% saved"
-                        dDate: "31/12/2012"
-                    }
-                }
+                model: savingsController.savingsList
 
                 delegate: SavingRow_1 {
                     width: listView.width
-                    savingName: model.sName
-                    priorityVal: model.pVal
-                    categoryText: model.cat
-                    savedText: model.sText
-                    goalText: model.gText
-                    progressFraction: model.pFrac
-                    progressSubText: model.subT
-                    dueDateText: model.dDate
+                    savingName: modelData.sName
+                    priorityVal: modelData.priorityVal
+                    categoryText: modelData.cat
+                    savedText: modelData.sText
+                    goalText: modelData.gText
+                    progressFraction: modelData.pFrac
+                    progressSubText: modelData.subT
+                    dueDateText: modelData.dDate
 
-                    onEditClicked: console.log("Edit saving: " + model.sName)
-                    onDeleteClicked: console.log("Delete saving: " + model.sName)
+                    onEditClicked: {
+                        savingDialogContent.openForEdit(modelData)
+                    }
+                    onDeleteClicked: {
+                        deleteDialogContent.openForDelete(modelData.id, modelData.sName)
+                    }
                 }
 
                 ScrollBar.vertical: ScrollBar {
                     policy: ScrollBar.AsNeeded
                 }
             }
+        }
+    }
+
+    // =================================================================
+    // 4. SAVING DIALOG (Add / Edit)
+    // =================================================================
+    SavingDialog {
+        id: savingDialogContent
+        categoryList: savingsController.categoryOptions
+
+        onAccepted: (isEdit, id, name, priority, categoryId, current, target, dueDateStr) => {
+            var ok
+            if (isEdit)
+                ok = savingsController.updateSaving(id, name, priority, categoryId, target, current, dueDateStr)
+            else
+                ok = savingsController.addSaving(name, priority, categoryId, target, current, dueDateStr)
+
+            if (!ok) {
+                savingDialogContent.showError("Dữ liệu không hợp lệ — kiểm tra lại!")
+            }
+        }
+    }
+
+    // =================================================================
+    // 5. DELETE CONFIRMATION DIALOG
+    // =================================================================
+    DeleteDialog {
+        id: deleteDialogContent
+        onAccepted: (id) => {
+            savingsController.removeSaving(id)
         }
     }
 }

@@ -8,39 +8,118 @@ Item {
     visible: false
     z: 999
 
-    signal accepted()
-    signal rejected()
+    // --- Properties & Signals kết nối với SavingsPage ---
+    property var categoryList: []
+    property bool isEditMode: false
+    property int currentSavingId: -1
+    property string errorMessage: ""
 
+    signal accepted(bool isEdit, int id, string name, int priority, int categoryId, double current, double target, string dueDateStr)
+    signal cancelled()
+
+    // --- Các hàm API công khai ---
     function open() { visible = true }
-    function close() { visible = false }
+    function close() { visible = false; errorMessage = "" }
 
-    // Dimmed background overlay
+    function openForAdd() {
+        isEditMode = false
+        currentSavingId = -1
+        errorMessage = ""
+        title_1.text = "Add Saving"
+        saveButton.buttonText = "Add"
+
+        // Reset tất cả ô nhập
+        textField.text = ""
+        amountFundedInput.text = "0"
+        saveGoalInput.text = ""
+
+        // Reset Priority về High
+        priorityDropdown.selectedIndex = 2
+        priorityDropdown.selectedText = "High"
+
+        // Reset Category về mục đầu tiên nếu có
+        if (root.categoryList.length > 0) {
+            categoryDropdown.selectedIndex = 0
+            categoryDropdown.selectedText = root.categoryList[0].name
+        }
+
+        // Ngày mặc định: tháng sau
+        var nextMonth = new Date()
+        nextMonth.setMonth(nextMonth.getMonth() + 1)
+        if (date_Input_Field.hasOwnProperty("text"))
+            date_Input_Field.text = Qt.formatDate(nextMonth, "dd/MM/yyyy")
+
+        open()
+    }
+
+    function openForEdit(modelData) {
+        isEditMode = true
+        currentSavingId = modelData.id || -1
+        errorMessage = ""
+        title_1.text = "Edit Saving"
+        saveButton.buttonText = "Save"
+
+        // Nap dữ liệu cần sửa
+        textField.text = modelData.name || ""
+        amountFundedInput.text = String(modelData.currentAmount || 0)
+        saveGoalInput.text = String(modelData.targetAmount || 0)
+
+        // Priority
+        var priorityLabels = ["Low", "Medium", "High"]
+        var pIdx = (typeof modelData.priority === "number") ? modelData.priority : 2
+        priorityDropdown.selectedIndex = pIdx
+        priorityDropdown.selectedText = priorityLabels[pIdx] || "High"
+
+        // Category: tìm đúng index theo categoryId
+        for (var i = 0; i < root.categoryList.length; i++) {
+            if (root.categoryList[i].id === modelData.categoryId) {
+                categoryDropdown.selectedIndex = i
+                categoryDropdown.selectedText = root.categoryList[i].name
+                break
+            }
+        }
+
+        // Due Date
+        if (date_Input_Field.hasOwnProperty("text"))
+            date_Input_Field.text = modelData.dueDateText || ""
+
+        open()
+    }
+
+    function showError(msg) {
+        errorMessage = msg
+    }
+
+    // --- Dimmed background overlay ---
     Rectangle {
         anchors.fill: parent
         color: "#66000000"
 
         MouseArea {
             anchors.fill: parent
-            onClicked: root.close()
+            onClicked: {
+                root.cancelled()
+                root.close()
+            }
         }
     }
 
-    // Centered Dialog Card
+    // --- Centered Dialog Card ---
     Rectangle {
         id: savingDialog
         anchors.centerIn: parent
 
-        height: 493
+        height: 540
         width: 500
 
         color: "#ffffff"
         radius: 15
         clip: true
 
-        // Absorb clicks inside the card so they don't reach the dimmed overlay
+        // Chống click xuyên qua nền mờ
         MouseArea { anchors.fill: parent }
 
-        // 1. Header Title
+        // 1. Title Header
         Image {
             id: title
             source: Qt.resolvedUrl("../../assets/title_11.png")
@@ -50,7 +129,7 @@ Item {
                 x: 20
                 y: 9
                 height: 32
-                width: 461
+                width: 300
                 color: "#191919"
                 font.capitalization: Font.Capitalize
                 font.family: "Intel One Mono"
@@ -64,6 +143,23 @@ Item {
                 verticalAlignment: Text.AlignTop
                 wrapMode: Text.Wrap
             }
+
+            // Thông báo lỗi
+            Text {
+                id: errLabel
+                x: 200
+                y: 14
+                height: 24
+                width: 280
+                color: "#dc2626"
+                font.family: "Roboto"
+                font.pixelSize: 12
+                horizontalAlignment: Text.AlignRight
+                verticalAlignment: Text.AlignVCenter
+                text: root.errorMessage
+                visible: root.errorMessage !== ""
+                elide: Text.ElideRight
+            }
         }
 
         // 2. Saving Title Field
@@ -75,7 +171,6 @@ Item {
             color: "transparent"
 
             Text {
-                id: saving_Title
                 x: 20
                 height: 32
                 width: 461
@@ -93,7 +188,6 @@ Item {
             }
 
             Rectangle {
-                id: inputBox
                 x: 20
                 y: 32
                 height: 42
@@ -115,7 +209,7 @@ Item {
                     selectByMouse: true
 
                     Text {
-                        text: "input text"
+                        text: "Nhập tên mục tiêu tiết kiệm..."
                         color: "#8049454f"
                         font: parent.font
                         visible: !parent.text && !parent.activeFocus
@@ -136,14 +230,12 @@ Item {
 
             // Priority Dropdown
             Rectangle {
-                id: dropdown
                 x: 20
                 height: 66
                 width: 225
                 color: "transparent"
 
                 Text {
-                    id: priority
                     height: 32
                     width: 226
                     color: "#878787"
@@ -160,25 +252,26 @@ Item {
                 }
 
                 Dropdown_1 {
-                    id: dropdown_1
+                    id: priorityDropdown
                     y: 32
                     height: 34
                     width: 225
                     _state: Dropdown_1.State_1.State_1_default
                     clip: true
+                    model: ["Low", "Medium", "High"]
+                    selectedText: "High"
+                    selectedIndex: 2
                 }
             }
 
             // Categories Dropdown
             Rectangle {
-                id: dropdown_2
                 x: 255
                 height: 66
                 width: 225
                 color: "transparent"
 
                 Text {
-                    id: categories
                     height: 32
                     width: 226
                     color: "#878787"
@@ -195,18 +288,24 @@ Item {
                 }
 
                 Dropdown_1 {
-                    id: dropdown_3
+                    id: categoryDropdown
                     y: 32
                     height: 34
                     width: 225
                     _state: Dropdown_1.State_1.State_1_default
                     clip: true
+                    model: {
+                        var names = []
+                        for (var i = 0; i < root.categoryList.length; i++) names.push(root.categoryList[i].name)
+                        return names
+                    }
+                    selectedText: root.categoryList.length > 0 ? root.categoryList[0].name : "Select Category"
+                    selectedIndex: 0
                 }
             }
 
             // Amount Funded Input
             Rectangle {
-                id: dropdown_4
                 x: 20
                 y: 76
                 height: 66
@@ -214,7 +313,6 @@ Item {
                 color: "transparent"
 
                 Text {
-                    id: amount_Funded
                     height: 32
                     width: 226
                     color: "#878787"
@@ -231,7 +329,6 @@ Item {
                 }
 
                 Rectangle {
-                    id: inputBox_1
                     y: 32
                     height: 34
                     width: 225
@@ -239,7 +336,7 @@ Item {
                     radius: 10
 
                     TextInput {
-                        id: supporting_text
+                        id: amountFundedInput
                         anchors.fill: parent
                         anchors.leftMargin: 15
                         anchors.rightMargin: 15
@@ -253,7 +350,7 @@ Item {
                         inputMethodHints: Qt.ImhFormattedNumbersOnly
 
                         Text {
-                            text: "input text"
+                            text: "0"
                             color: "#8049454f"
                             font: parent.font
                             visible: !parent.text && !parent.activeFocus
@@ -266,7 +363,6 @@ Item {
 
             // Save Goal Input
             Rectangle {
-                id: dropdown_5
                 x: 255
                 y: 76
                 height: 66
@@ -274,7 +370,6 @@ Item {
                 color: "transparent"
 
                 Text {
-                    id: save_Goal
                     height: 32
                     width: 226
                     color: "#878787"
@@ -291,7 +386,6 @@ Item {
                 }
 
                 Rectangle {
-                    id: inputBox_2
                     y: 32
                     height: 34
                     width: 225
@@ -299,7 +393,7 @@ Item {
                     radius: 10
 
                     TextInput {
-                        id: supporting_text_1
+                        id: saveGoalInput
                         anchors.fill: parent
                         anchors.leftMargin: 15
                         anchors.rightMargin: 15
@@ -313,7 +407,7 @@ Item {
                         inputMethodHints: Qt.ImhFormattedNumbersOnly
 
                         Text {
-                            text: "input text"
+                            text: "0"
                             color: "#8049454f"
                             font: parent.font
                             visible: !parent.text && !parent.activeFocus
@@ -327,14 +421,13 @@ Item {
 
         // 4. Due Date Field
         Rectangle {
-            id: dueDate
+            id: dueDateSection
             y: 341
             height: 74
             width: 500
             color: "transparent"
 
             Text {
-                id: due_Date
                 x: 20
                 height: 32
                 width: 461
@@ -379,7 +472,7 @@ Item {
                     anchors.fill: parent
                     cursorShape: Qt.PointingHandCursor
                     onClicked: {
-                        root.rejected()
+                        root.cancelled()
                         root.close()
                     }
                 }
@@ -389,7 +482,7 @@ Item {
                 id: saveButton
                 x: 405
                 y: 9
-                buttonText: "Add"
+                buttonText: root.isEditMode ? "Save" : "Add"
                 height: 35
                 width: 75
                 _state: UniversalButton_1.State_1.State_1_selected
@@ -398,7 +491,39 @@ Item {
                     anchors.fill: parent
                     cursorShape: Qt.PointingHandCursor
                     onClicked: {
-                        root.accepted()
+                        var name = textField.text.trim()
+                        if (name === "") {
+                            root.showError("Tên không được để trống!")
+                            return
+                        }
+
+                        var target = parseFloat(saveGoalInput.text) || 0.0
+                        if (target <= 0) {
+                            root.showError("Mục tiêu tiết kiệm phải > 0!")
+                            return
+                        }
+
+                        var current = parseFloat(amountFundedInput.text) || 0.0
+                        if (current > target) {
+                            root.showError("Số tiền đã góp không được > mục tiêu!")
+                            return
+                        }
+
+                        var priorityVal = priorityDropdown.selectedIndex
+                        var catId = (root.categoryList.length > 0 && categoryDropdown.selectedIndex < root.categoryList.length)
+                            ? root.categoryList[categoryDropdown.selectedIndex].id : 0
+                        var dueDateStr = date_Input_Field.hasOwnProperty("text") ? date_Input_Field.text : ""
+
+                        root.accepted(
+                            root.isEditMode,
+                            root.currentSavingId,
+                            name,
+                            priorityVal,
+                            catId,
+                            current,
+                            target,
+                            dueDateStr
+                        )
                         root.close()
                     }
                 }

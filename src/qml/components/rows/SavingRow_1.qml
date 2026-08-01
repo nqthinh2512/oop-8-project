@@ -34,7 +34,7 @@ Rectangle {
         // 1. SAVING NAME
         Item {
             Layout.fillWidth: true
-            Layout.preferredWidth: 200
+            Layout.preferredWidth: 260
             Layout.fillHeight: true
 
             Text {
@@ -51,7 +51,7 @@ Rectangle {
 
         // 2. PRIORITY BADGE
         Item {
-            Layout.preferredWidth: 140
+            Layout.preferredWidth: 100
             Layout.fillHeight: true
 
             Priority_1 {

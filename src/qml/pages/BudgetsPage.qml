@@ -154,9 +154,9 @@ Rectangle {
                     anchors.rightMargin: 20
                     spacing: 0
 
-                    Item { Layout.fillWidth: true; Layout.preferredWidth: 200; Layout.fillHeight: true
+                    Item { Layout.fillWidth: true; Layout.preferredWidth: 260; Layout.fillHeight: true
                         Text { anchors.left: parent.left; anchors.verticalCenter: parent.verticalCenter; text: "BUDGET"; font.family: "Inter"; font.pixelSize: 12; font.weight: Font.Bold; color: "#64748b" } }
-                    Item { Layout.preferredWidth: 140; Layout.fillHeight: true
+                    Item { Layout.preferredWidth: 100; Layout.fillHeight: true
                         Text { anchors.left: parent.left; anchors.verticalCenter: parent.verticalCenter; text: "PRIORITY"; font.family: "Inter"; font.pixelSize: 12; font.weight: Font.Bold; color: "#64748b" } }
                     Item { Layout.preferredWidth: 160; Layout.fillHeight: true
                         Text { anchors.left: parent.left; anchors.verticalCenter: parent.verticalCenter; text: "CATEGORY"; font.family: "Inter"; font.pixelSize: 12; font.weight: Font.Bold; color: "#64748b" } }

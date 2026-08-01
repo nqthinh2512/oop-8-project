@@ -54,4 +54,4 @@ signals:
     void categoriesChanged();  // danh sách category cho dropdown: hiếm khi đổi, không phụ thuộc filter
     void filterChanged();      // giá trị filter hiện tại (để QML tô màu nút đang được chọn)
 };
-#endif // BUDGETS_CONTROLLER_Himport QtQuick
+#endif // BUDGETS_CONTROLLER_H
