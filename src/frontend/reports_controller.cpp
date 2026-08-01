@@ -4,7 +4,9 @@
 #include <QDebug>
 
 ReportsController::ReportsController(QObject *parent)
-    : QObject(parent) {}
+    : QObject(parent) {
+    connect(&DatabaseManager::instance(), &DatabaseManager::dataChanged, this, &ReportsController::reportChanged);
+}
 
 QString ReportsController::formatVND(double amount) {
     QLocale locale(QLocale::Vietnamese, QLocale::Vietnam);

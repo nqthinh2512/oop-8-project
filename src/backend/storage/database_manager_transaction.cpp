@@ -111,6 +111,7 @@ void DatabaseManager::saveTransactionsToCSV() const {
             << t->getCategoryId() << "\n";
     }
     file.close();
+    const_cast<DatabaseManager*>(this)->emit dataChanged();
 }
 
 void DatabaseManager::addTransaction(Transaction* transaction) {

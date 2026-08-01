@@ -73,6 +73,10 @@ public:
     DatabaseManager(const DatabaseManager&) = delete;
     DatabaseManager& operator=(const DatabaseManager&) = delete;
 
+signals:
+    void dataChanged();
+
+public:
     //=============================CATEGORY SECTION================================
 
     // Đọc và Ghi file CSV

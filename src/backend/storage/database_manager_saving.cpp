@@ -71,6 +71,7 @@ void DatabaseManager::saveSavingsToCSV() const
             << s.getCategoryId() << "\n";
     }
     file.close();
+    const_cast<DatabaseManager*>(this)->emit dataChanged();
 }
 
 int DatabaseManager::generateNextSavingId() const

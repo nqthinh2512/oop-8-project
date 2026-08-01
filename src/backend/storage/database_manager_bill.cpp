@@ -101,6 +101,7 @@ void DatabaseManager::saveBillsToCSV() const {
             << (b.checkPaid() ? 1 : 0) << "\n";
     }
     file.close();
+    const_cast<DatabaseManager*>(this)->emit dataChanged();
 }
 
 void DatabaseManager::addBill(const Bill& b) {

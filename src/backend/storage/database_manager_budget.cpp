@@ -78,6 +78,7 @@ void DatabaseManager::saveBudgetsToCSV() const
             << b.getEndDate().toString(Qt::ISODate) << "\n";
     }
     file.close();
+    const_cast<DatabaseManager*>(this)->emit dataChanged();
 }
 
 int DatabaseManager::generateNextBudgetId() const

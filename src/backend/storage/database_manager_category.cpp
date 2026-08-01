@@ -115,6 +115,7 @@ void DatabaseManager::saveCategoriesToCSV() const {
             << (cat.isActive() ? 1 : 0) << "\n";
     }
     file.close();
+    const_cast<DatabaseManager*>(this)->emit dataChanged();
 }
 
 // 🎯 THÊM MỚI DANH MỤC TỪ UI

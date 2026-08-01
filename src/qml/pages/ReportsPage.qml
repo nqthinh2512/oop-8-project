@@ -199,8 +199,16 @@ Rectangle {
                                 border.color: "#f1f5f9"
 
                                 Canvas {
+                                    id: rptBarCanvas
                                     anchors.fill: parent
                                     anchors.margins: 12
+
+                                    Connections {
+                                        target: reportsController
+                                        function onReportChanged() {
+                                            rptBarCanvas.requestPaint()
+                                        }
+                                    }
                                     onPaint: {
                                         var ctx = getContext("2d");
                                         ctx.reset();
@@ -333,8 +341,16 @@ Rectangle {
                                 border.color: "#f1f5f9"
 
                                 Canvas {
+                                    id: rptNwCanvas
                                     anchors.fill: parent
                                     anchors.margins: 12
+
+                                    Connections {
+                                        target: reportsController
+                                        function onReportChanged() {
+                                            rptNwCanvas.requestPaint()
+                                        }
+                                    }
                                     onPaint: {
                                         var ctx = getContext("2d");
                                         ctx.reset();
@@ -491,6 +507,13 @@ Rectangle {
                                         anchors.margins: 12
                                         property var chartData: reportsController.categoryExpenseReport
 
+                                        Connections {
+                                            target: reportsController
+                                            function onReportChanged() {
+                                                expenseCanvas.requestPaint()
+                                            }
+                                        }
+
                                         onPaint: {
                                             var ctx = getContext("2d");
                                             ctx.reset();
@@ -610,6 +633,13 @@ Rectangle {
                                         anchors.fill: parent
                                         anchors.margins: 12
                                         property var chartData: reportsController.categoryIncomeReport
+
+                                        Connections {
+                                            target: reportsController
+                                            function onReportChanged() {
+                                                incomeCanvas.requestPaint()
+                                            }
+                                        }
 
                                         onPaint: {
                                             var ctx = getContext("2d");

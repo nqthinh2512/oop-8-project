@@ -2,7 +2,9 @@
 #include <QLocale>
 
 OverviewController::OverviewController(QObject *parent)
-    : QObject(parent) {}
+    : QObject(parent) {
+    connect(&DatabaseManager::instance(), &DatabaseManager::dataChanged, this, &OverviewController::dataChanged);
+}
 
 double OverviewController::totalIncome() const {
     double income = 0.0;

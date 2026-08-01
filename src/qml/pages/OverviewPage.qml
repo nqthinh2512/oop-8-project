@@ -231,8 +231,16 @@ Rectangle {
                                 radius: 8
 
                                 Canvas {
+                                    id: overviewCanvas
                                     anchors.fill: parent
                                     anchors.margins: 12
+
+                                    Connections {
+                                        target: overviewController
+                                        function onDataChanged() {
+                                            overviewCanvas.requestPaint()
+                                        }
+                                    }
                                     onPaint: {
                                         var ctx = getContext("2d");
                                         ctx.reset();
