@@ -18,10 +18,10 @@ Rectangle {
     // Exposed Data Properties
     property int type_1: TransactionRow_1.Type.Type_expense
     property string transactionName: "Name"
-    property string amountText: "-1,000 VND"
+    property string amountText: "$ 35"
     property string categoryText: "Category"
-    property string accountText: "Account"
-    property string dateText: "31/12/2012"
+    property string methodText: "Method"
+    property string dateText: "16/09/2024"
 
     // Action Signals
     signal editClicked()
@@ -69,6 +69,7 @@ Rectangle {
 
             RowLayout {
                 anchors.left: parent.left
+                anchors.right: parent.right
                 anchors.verticalCenter: parent.verticalCenter
                 spacing: 12
 
@@ -93,6 +94,7 @@ Rectangle {
                 ColumnLayout {
                     spacing: 3
                     Layout.alignment: Qt.AlignVCenter
+                    Layout.fillWidth: true
 
                     Text {
                         color: "#0f172a"
@@ -101,6 +103,7 @@ Rectangle {
                         font.weight: Font.Bold
                         text: transactionRow.transactionName
                         elide: Text.ElideRight
+                        Layout.fillWidth: true
                     }
 
                     Rectangle {
@@ -156,7 +159,7 @@ Rectangle {
             }
         }
 
-        // 4. ACCOUNT
+        // 4. METHOD
         Item {
             Layout.preferredWidth: 180
             Layout.fillHeight: true
@@ -164,11 +167,11 @@ Rectangle {
             Text {
                 anchors.left: parent.left
                 anchors.verticalCenter: parent.verticalCenter
-                color: "#475569"
                 font.family: "Inter"
                 font.pixelSize: 14
                 font.weight: Font.Medium
-                text: transactionRow.accountText
+                color: "#1e293b"
+                text: transactionRow.methodText
                 elide: Text.ElideRight
             }
         }

@@ -60,13 +60,14 @@ void DatabaseManager::loadBillsFromCSV() {
         int id = 1;
         QDate today = QDate::currentDate();
 
-        m_bills.append(Bill(id++, "Electricity Bill", 650000.0, today.addDays(10), 11, false));
-        m_bills.append(Bill(id++, "Water Supply Bill", 180000.0, today.addDays(5), 12, false));
-        m_bills.append(Bill(id++, "High-Speed Internet", 250000.0, today.addDays(15), 13, false));
-        m_bills.append(Bill(id++, "High-Speed Internet", 250000.0, today.addDays(15), 13, false));
-        m_bills.append(Bill(id++, "High-Speed Internet", 250000.0, today.addDays(15), 13, false));
-        m_bills.append(Bill(id++, "High-Speed Internet", 250000.0, today.addDays(15), 13, false));
-        m_bills.append(Bill(id++, "High-Speed Internet", 250000.0, today.addDays(15), 13, false));
+        m_bills.append(Bill(id++, "Electricity Bill", 650000.0, today.addDays(10), 11, false)); // Upcoming
+        m_bills.append(Bill(id++, "Water Supply Bill", 180000.0, today.addDays(5), 12, false)); // Upcoming
+        m_bills.append(Bill(id++, "High-Speed Internet", 250000.0, today.addDays(-2), 13, true)); // Paid
+        m_bills.append(Bill(id++, "Netflix Subscription", 250000.0, today.addDays(-15), 13, true)); // Paid
+        m_bills.append(Bill(id++, "Credit Card Bill", 1250000.0, today.addDays(-5), 11, false)); // Overdue
+        m_bills.append(Bill(id++, "Gym Membership", 500000.0, today.addDays(-2), 11, false)); // Overdue
+        m_bills.append(Bill(id++, "Car Insurance", 850000.0, today.addDays(-10), 12, false)); // Overdue
+        m_bills.append(Bill(id++, "Phone Bill", 150000.0, today.addDays(-1), 13, false)); // Overdue
         saveBillsToCSV();
     }
 
@@ -100,4 +101,33 @@ void DatabaseManager::saveBillsToCSV() const {
             << (b.checkPaid() ? 1 : 0) << "\n";
     }
     file.close();
+}
+
+void DatabaseManager::addBill(const Bill& b) {
+    Bill newBill = b;
+    if (newBill.getId() <= 0) {
+        newBill = Bill(generateNextBillId(), b.getName(), b.getAmount(), b.getDueDate(), b.getCategoryId(), b.checkPaid());
+    }
+    m_bills.append(newBill);
+    saveBillsToCSV();
+}
+
+void DatabaseManager::updateBill(int id, const Bill& b) {
+    for (int i = 0; i < m_bills.size(); ++i) {
+        if (m_bills[i].getId() == id) {
+            m_bills[i] = Bill(id, b.getName(), b.getAmount(), b.getDueDate(), b.getCategoryId(), b.checkPaid());
+            saveBillsToCSV();
+            return;
+        }
+    }
+}
+
+void DatabaseManager::deleteBill(int id) {
+    for (int i = 0; i < m_bills.size(); ++i) {
+        if (m_bills[i].getId() == id) {
+            m_bills.removeAt(i);
+            saveBillsToCSV();
+            return;
+        }
+    }
 }

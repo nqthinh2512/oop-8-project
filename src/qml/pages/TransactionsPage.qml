@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls
+import "../components/dialogs"
 
 Rectangle {
     id: transactionsPage
@@ -64,6 +65,8 @@ Rectangle {
                         id: searchBar
                         placeholderText: "Search category name"
                         Layout.preferredWidth: 260
+                        text: transactionsController.searchKeyword
+                        onTextEdited: function(newText) { transactionsController.searchKeyword = newText }
                     }
 
                     // Filter Pills
@@ -72,19 +75,23 @@ Rectangle {
 
                         UniversalButton_1 {
                             buttonText: "All"
-                            _state: UniversalButton_1.State_1.State_1_selected
+                            _state: transactionsController.filterType === -1 ? UniversalButton_1.State_1.State_1_selected : UniversalButton_1.State_1.State_1_default
+                            onClicked: transactionsController.filterType = -1
                         }
                         UniversalButton_1 {
                             buttonText: "Income"
-                            _state: UniversalButton_1.State_1.State_1_default
+                            _state: transactionsController.filterType === 0 ? UniversalButton_1.State_1.State_1_selected : UniversalButton_1.State_1.State_1_default
+                            onClicked: transactionsController.filterType = 0
                         }
                         UniversalButton_1 {
                             buttonText: "Expense"
-                            _state: UniversalButton_1.State_1.State_1_default
+                            _state: transactionsController.filterType === 1 ? UniversalButton_1.State_1.State_1_selected : UniversalButton_1.State_1.State_1_default
+                            onClicked: transactionsController.filterType = 1
                         }
                         UniversalButton_1 {
                             buttonText: "Transfer"
-                            _state: UniversalButton_1.State_1.State_1_default
+                            _state: transactionsController.filterType === 2 ? UniversalButton_1.State_1.State_1_selected : UniversalButton_1.State_1.State_1_default
+                            onClicked: transactionsController.filterType = 2
                         }
                     }
 
@@ -97,8 +104,20 @@ Rectangle {
 
                     // Category Dropdown
                     Dropdown_1 {
-                        selectedText: "All Main Categories"
+                        id: categoryFilterDropdown
                         Layout.preferredWidth: 200
+                        
+                        property var allCats: categoriesController.categoriesList
+                        property var filteredCats: allCats.filter(function(c) { return c.parentId === 1 || c.parentId === 2; })
+                        property var catData: [{id: 0, name: "All Main Categories"}].concat(filteredCats)
+                        model: catData.map(function(c) { return c.name; })
+                        selectedText: "All Main Categories"
+                        
+                        onSelected: function(index, value) {
+                            if (index >= 0 && index < catData.length) {
+                                transactionsController.categoryIdFilter = catData[index].id
+                            }
+                        }
                     }
 
                     // Flexible Spacer pushing Add button to right
@@ -111,7 +130,10 @@ Rectangle {
                         buttonText: "+ Add Transaction"
                         _state: UniversalButton_1.State_1.State_1_selected
                         Layout.alignment: Qt.AlignRight | Qt.AlignVCenter
-                        onClicked: console.log("Add Transaction clicked")
+                        onClicked: {
+                            transactionDialog.reset()
+                            transactionDialog.open()
+                        }
                     }
                 }
             }
@@ -179,7 +201,7 @@ Rectangle {
                         }
                     }
 
-                    // 4. ACCOUNT
+                    // 4. METHOD
                     Item {
                         Layout.preferredWidth: 180
                         Layout.fillHeight: true
@@ -187,7 +209,7 @@ Rectangle {
                         Text {
                             anchors.left: parent.left
                             anchors.verticalCenter: parent.verticalCenter
-                            text: "ACCOUNT"
+                            text: "METHOD"
                             font.family: "Inter"
                             font.pixelSize: 12
                             font.weight: Font.Bold
@@ -237,17 +259,9 @@ Rectangle {
                 Layout.fillHeight: true
                 clip: true
                 spacing: 0
+                boundsBehavior: Flickable.StopAtBounds
 
-                model: ListModel {
-                    ListElement { tType: 1; tName: "Name"; tAmount: "-1,000 VND"; tCat: "Category"; tAcc: "Account"; tDate: "31/12/2012" }
-                    ListElement { tType: 0; tName: "Name"; tAmount: "+1,0000 VND"; tCat: "Category"; tAcc: "Account"; tDate: "31/12/2012" }
-                    ListElement { tType: 1; tName: "Name"; tAmount: "-1,000 VND"; tCat: "Category"; tAcc: "Account"; tDate: "31/12/2012" }
-                    ListElement { tType: 2; tName: "Name"; tAmount: "-1,000 VND"; tCat: "Category"; tAcc: "Account"; tDate: "31/12/2012" }
-                    ListElement { tType: 0; tName: "Salary Deposit"; tAmount: "+25,000,000 VND"; tCat: "Income"; tAcc: "Techcombank"; tDate: "28/07/2026" }
-                    ListElement { tType: 1; tName: "Supermarket"; tAmount: "-1,250,000 VND"; tCat: "Groceries"; tAcc: "Vietcombank"; tDate: "27/07/2026" }
-                    ListElement { tType: 1; tName: "Coffee Shop"; tAmount: "-85,000 VND"; tCat: "Dining Out"; tAcc: "Cash"; tDate: "26/07/2026" }
-                    ListElement { tType: 2; tName: "Savings Deposit"; tAmount: "-5,000,000 VND"; tCat: "Transfer"; tAcc: "MB Bank"; tDate: "25/07/2026" }
-                }
+                model: transactionsController.model
 
                 delegate: TransactionRow_1 {
                     width: transactionListView.width
@@ -255,17 +269,91 @@ Rectangle {
                     transactionName: model.tName
                     amountText: model.tAmount
                     categoryText: model.tCat
-                    accountText: model.tAcc
+                    methodText: model.tMethod
                     dateText: model.tDate
 
-                    onEditClicked: console.log("Edit clicked for index:", index)
-                    onTrashClicked: console.log("Trash clicked for index:", index)
+                    onEditClicked: {
+                        transactionDialog.reset()
+                        transactionDialog.isEditMode = true
+                        transactionDialog.transactionId = model.tId
+                        transactionDialog.transactionTitle = model.tName
+                        
+                        // Extract only numeric digits from amount
+                        var rawAmount = model.tAmount.replace(/[^0-9]/g, '')
+                        transactionDialog.transactionAmount = rawAmount
+                        
+                        transactionDialog.transactionMethod = model.tMethod
+                        transactionDialog.setCategoryName(model.tCat)
+                        transactionDialog.setDateStr(model.tDate)
+                        
+                        transactionDialog.transactionTypeIndex = model.tType
+                        if (model.tType === 0) transactionDialog.transactionTypeText = "Income"
+                        else if (model.tType === 1) transactionDialog.transactionTypeText = "Expense"
+                        else if (model.tType === 2) transactionDialog.transactionTypeText = "Transfer"
+                        
+                        transactionDialog.open()
+                    }
+                    onTrashClicked: {
+                        deleteDialog.pendingDeleteId = model.tId
+                        deleteDialog.open()
+                    }
                 }
 
                 ScrollBar.vertical: ScrollBar {
                     policy: ScrollBar.AsNeeded
                 }
             }
+        }
+    }
+
+    // Add Transaction Dialog Overlay
+    TransactionDialog {
+        id: transactionDialog
+        anchors.fill: parent
+
+        onAccepted: {
+            var dateStr = transactionDialog.dateField ? transactionDialog.dateField.selectedDate : "01/01/2026"
+            
+            // To get a date string, we need to expose selectedDate from the dialog or parse it.
+            // Wait, we didn't expose dateField. Let's use a dummy date for now, or assume the UI will be fully wired later.
+            // Or better, let's expose dateField.
+            
+            if (isEditMode) {
+                transactionsController.updateTransaction(
+                    transactionId,
+                    transactionTypeIndex,
+                    transactionTitle,
+                    parseFloat(transactionAmount.replace(/,/g, '')) || 0.0,
+                    dateStr, 
+                    transactionDialog.transactionCategoryId,
+                    transactionMethod
+                )
+            } else {
+                transactionsController.addTransaction(
+                    transactionTypeIndex,
+                    transactionTitle,
+                    parseFloat(transactionAmount.replace(/,/g, '')) || 0.0,
+                    dateStr, 
+                    transactionDialog.transactionCategoryId,
+                    transactionMethod
+                )
+            }
+        }
+    }
+
+    // Delete Confirmation Dialog Overlay
+    DeleteDialog {
+        id: deleteDialog
+        property int pendingDeleteId: -1
+
+        onAccepted: {
+            if (pendingDeleteId !== -1) {
+                transactionsController.deleteTransaction(pendingDeleteId)
+                pendingDeleteId = -1
+            }
+        }
+        onRejected: {
+            pendingDeleteId = -1
         }
     }
 }

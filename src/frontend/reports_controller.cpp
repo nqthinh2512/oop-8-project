@@ -11,6 +11,12 @@ QString ReportsController::formatVND(double amount) {
     return locale.toString(static_cast<qlonglong>(qAbs(amount))) + " VND";
 }
 
+static bool isCurrentPeriod(const QDate& itemDate, const QDate& today) {
+    if (itemDate.month() == today.month() && itemDate.year() == today.year())
+        return true;
+    return qAbs(itemDate.daysTo(today)) <= 30;
+}
+
 QString ReportsController::monthlyIncomeFormatted() const {
     double total = 0.0;
     const auto& transactions = DatabaseManager::instance().getAllTransactions();
@@ -18,8 +24,7 @@ QString ReportsController::monthlyIncomeFormatted() const {
 
     for (const Transaction* t : transactions) {
         if (t && t->getSignedAmount() > 0) {
-            if (t->getDateTime().date().month() == today.month() &&
-                t->getDateTime().date().year() == today.year()) {
+            if (isCurrentPeriod(t->getDateTime().date(), today)) {
                 total += t->getAmount();
             }
         }
@@ -34,8 +39,7 @@ QString ReportsController::monthlyExpenseFormatted() const {
 
     for (const Transaction* t : transactions) {
         if (t && t->getSignedAmount() < 0) {
-            if (t->getDateTime().date().month() == today.month() &&
-                t->getDateTime().date().year() == today.year()) {
+            if (isCurrentPeriod(t->getDateTime().date(), today)) {
                 total += t->getAmount();
             }
         }
@@ -59,10 +63,12 @@ QString ReportsController::savingsRateFormatted() const {
     QDate today = QDate::currentDate();
 
     for (const Transaction* t : transactions) {
-        if (t && t->getDateTime().date().month() == today.month() &&
-            t->getDateTime().date().year() == today.year()) {
-            if (t->getSignedAmount() > 0) income += t->getAmount();
-            else expense += t->getAmount();
+        if (t && isCurrentPeriod(t->getDateTime().date(), today)) {
+            if (t->getSignedAmount() > 0) {
+                income += t->getAmount();
+            } else if (t->getSignedAmount() < 0) {
+                expense += t->getAmount();
+            }
         }
     }
 

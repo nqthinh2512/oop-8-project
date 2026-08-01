@@ -61,6 +61,7 @@ Rectangle {
             Layout.fillHeight: true
 
             Text {
+                width: parent.width
                 anchors.left: parent.left
                 anchors.verticalCenter: parent.verticalCenter
                 color: "#475569"

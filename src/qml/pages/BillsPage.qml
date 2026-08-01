@@ -43,21 +43,21 @@ Rectangle {
             spacing: 20
 
             PageBox_1 {
-                boxTitle: "TOTAL DUE"
-                amountText: "1,000 VND"
-                labelText: "Across All Bills"
-            }
-
-            PageBox_1 {
-                boxTitle: "TOTAL OVERDUE"
-                amountText: "1,000 VND"
-                labelText: "1 Bill Past Due"
-            }
-
-            PageBox_1 {
                 boxTitle: "TOTAL PAID"
-                amountText: "1,000 VND"
-                labelText: "1 Bill Paid This Month"
+                amountText: billsController.totalPaid.toLocaleString(Qt.locale(), 'f', 0) + " VND"
+                labelText: "Amount Paid"
+            }
+
+            PageBox_1 {
+                boxTitle: "UPCOMING (ON TIME)"
+                amountText: billsController.totalOnTime.toLocaleString(Qt.locale(), 'f', 0) + " VND"
+                labelText: "To Be Paid"
+            }
+
+            PageBox_1 {
+                boxTitle: "OVERDUE"
+                amountText: billsController.totalOverdue.toLocaleString(Qt.locale(), 'f', 0) + " VND"
+                labelText: "Past Due"
             }
         }
 
@@ -87,8 +87,10 @@ Rectangle {
 
                     SearchBar_1 {
                         id: searchBar
-                        placeholderText: "Search category name"
+                        placeholderText: "Search bill name"
                         Layout.preferredWidth: 260
+                        text: billsController.searchKeyword
+                        onTextEdited: function(newText) { billsController.searchKeyword = newText }
                     }
 
                     RowLayout {
@@ -96,19 +98,23 @@ Rectangle {
 
                         UniversalButton_1 {
                             buttonText: "All"
-                            _state: UniversalButton_1.State_1.State_1_selected
+                            _state: billsController.filterType === -1 ? UniversalButton_1.State_1.State_1_selected : UniversalButton_1.State_1.State_1_default
+                            onClicked: billsController.filterType = -1
                         }
                         UniversalButton_1 {
                             buttonText: "Paid"
-                            _state: UniversalButton_1.State_1.State_1_default
+                            _state: billsController.filterType === 0 ? UniversalButton_1.State_1.State_1_selected : UniversalButton_1.State_1.State_1_default
+                            onClicked: billsController.filterType = 0
                         }
                         UniversalButton_1 {
                             buttonText: "Upcoming"
-                            _state: UniversalButton_1.State_1.State_1_default
+                            _state: billsController.filterType === 1 ? UniversalButton_1.State_1.State_1_selected : UniversalButton_1.State_1.State_1_default
+                            onClicked: billsController.filterType = 1
                         }
                         UniversalButton_1 {
                             buttonText: "Overdue"
-                            _state: UniversalButton_1.State_1.State_1_default
+                            _state: billsController.filterType === 2 ? UniversalButton_1.State_1.State_1_selected : UniversalButton_1.State_1.State_1_default
+                            onClicked: billsController.filterType = 2
                         }
                     }
 
@@ -119,8 +125,20 @@ Rectangle {
                     }
 
                     Dropdown_1 {
-                        selectedText: "All Main Categories"
+                        id: categoryFilterDropdown
                         Layout.preferredWidth: 200
+                        
+                        property var allCats: categoriesController.categoriesList
+                        property var filteredCats: allCats.filter(function(c) { return c.parentId === 3; })
+                        property var catData: [{id: 0, name: "All Main Categories"}].concat(filteredCats)
+                        model: catData.map(function(c) { return c.name; })
+                        selectedText: "All Main Categories"
+                        
+                        onSelected: function(index, value) {
+                            if (index >= 0 && index < catData.length) {
+                                billsController.categoryIdFilter = catData[index].id
+                            }
+                        }
                     }
 
                     Item {
@@ -131,7 +149,10 @@ Rectangle {
                         buttonText: "+ Add Bill"
                         _state: UniversalButton_1.State_1.State_1_selected
                         Layout.alignment: Qt.AlignRight | Qt.AlignVCenter
-                        onClicked: console.log("Add Bill clicked")
+                        onClicked: {
+                            billDialog.reset()
+                            billDialog.open()
+                        }
                     }
                 }
             }
@@ -258,31 +279,84 @@ Rectangle {
                 clip: true
                 spacing: 0
 
-                model: ListModel {
-                    ListElement { name: "Name"; amount: "1,000 VND"; category: "Category"; date: "31/12/2012"; statusVal: BillRow_1.Status.Status_overdue }
-                    ListElement { name: "Name"; amount: "1,000 VND"; category: "Category"; date: "31/12/2012"; statusVal: BillRow_1.Status.Status_upcoming }
-                    ListElement { name: "Name"; amount: "1,000 VND"; category: "Category"; date: "31/12/2012"; statusVal: BillRow_1.Status.Status_paid }
-                    ListElement { name: "Electricity Bill"; amount: "120,000 VND"; category: "Utilities"; date: "30/07/2026"; statusVal: BillRow_1.Status.Status_overdue }
-                    ListElement { name: "Internet Subscription"; amount: "450,000 VND"; category: "Services"; date: "02/08/2026"; statusVal: BillRow_1.Status.Status_upcoming }
-                    ListElement { name: "Water Supply"; amount: "300,000 VND"; category: "Utilities"; date: "05/08/2026"; statusVal: BillRow_1.Status.Status_paid }
-                }
+                boundsBehavior: Flickable.StopAtBounds
+
+                model: billsController
 
                 delegate: BillRow_1 {
                     width: listView.width
-                    status_1: model.statusVal
-                    billName: model.name
-                    amountText: model.amount
-                    categoryText: model.category
-                    dueDateText: model.date
+                    status_1: model.tStatus
+                    billName: model.tName
+                    amountText: model.tAmount
+                    categoryText: model.tCat
+                    dueDateText: model.tDate
 
-                    onEditClicked: console.log("Edit bill: " + model.name)
-                    onDeleteClicked: console.log("Delete bill: " + model.name)
+                    onMarkPaidClicked: billsController.togglePaidStatus(model.tId)
+
+                    onEditClicked: {
+                        billDialog.reset()
+                        billDialog.isEditMode = true
+                        billDialog.billId = model.tId
+                        billDialog.billTitle = model.tName
+                        
+                        var rawAmount = model.tAmount.replace(/[^0-9]/g, '')
+                        billDialog.billAmount = rawAmount.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                        
+                        billDialog.setCategoryName(model.tCat)
+                        billDialog.setDateStr(model.tDate)
+                        
+                        billDialog.open()
+                    }
+                    onDeleteClicked: {
+                        deleteDialog.pendingDeleteId = model.tId
+                        deleteDialog.open()
+                    }
                 }
 
                 ScrollBar.vertical: ScrollBar {
                     policy: ScrollBar.AsNeeded
                 }
             }
+        }
+    }
+
+    BillDialog {
+        id: billDialog
+        anchors.fill: parent
+
+        onAccepted: {
+            var dateStr = billDialog.dateField ? billDialog.dateField.selectedDate : "01/01/2026"
+            if (isEditMode) {
+                billsController.updateBill(
+                    billId,
+                    billTitle,
+                    parseFloat(billAmount.replace(/,/g, '')) || 0.0,
+                    dateStr, 
+                    billDialog.billCategoryId
+                )
+            } else {
+                billsController.addBill(
+                    billTitle,
+                    parseFloat(billAmount.replace(/,/g, '')) || 0.0,
+                    dateStr, 
+                    billDialog.billCategoryId
+                )
+            }
+        }
+    }
+
+    DeleteDialog {
+        id: deleteDialog
+        property int pendingDeleteId: -1
+
+        onAccepted: {
+            if (pendingDeleteId !== -1) {
+                billsController.deleteBill(pendingDeleteId)
+                pendingDeleteId = -1
+            }
+        }
+        onRejected: {
+            pendingDeleteId = -1
         }
     }
 }

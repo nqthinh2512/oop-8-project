@@ -16,6 +16,7 @@ Item {
     property alias migrationDropdown: dropdown_1
 
     function openWithCategory(catId, catName) {
+        if (catName.length >= 50) catName = catName.slice(0,49) + ".."
         deletingCategoryId = catId
         label.text = "Choose category to move items from \"" + catName + "\" to:"
 

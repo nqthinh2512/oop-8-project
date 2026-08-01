@@ -7,11 +7,16 @@ OverviewController::OverviewController(QObject *parent)
 double OverviewController::totalIncome() const {
     double income = 0.0;
     const auto& transactions = DatabaseManager::instance().getAllTransactions();
+    QDate today = QDate::currentDate();
+
     for (const Transaction* t : transactions) {
         if (!t) continue;
-        double signedAmt = t->getSignedAmount(); // Polymorphism: Income returns +amount, Expense returns -amount
-        if (signedAmt > 0) {
-            income += signedAmt;
+        if (t->getSignedAmount() > 0) {
+            QDate tDate = t->getDateTime().date();
+            if ((tDate.month() == today.month() && tDate.year() == today.year()) ||
+                qAbs(tDate.daysTo(today)) <= 30) {
+                income += t->getAmount();
+            }
         }
     }
     return income;
@@ -20,18 +25,28 @@ double OverviewController::totalIncome() const {
 double OverviewController::totalExpense() const {
     double expense = 0.0;
     const auto& transactions = DatabaseManager::instance().getAllTransactions();
+    QDate today = QDate::currentDate();
+
     for (const Transaction* t : transactions) {
         if (!t) continue;
-        double signedAmt = t->getSignedAmount(); // Polymorphism: Income returns +amount, Expense returns -amount
-        if (signedAmt < 0) {
-            expense += (-signedAmt);
+        if (t->getSignedAmount() < 0) {
+            QDate tDate = t->getDateTime().date();
+            if ((tDate.month() == today.month() && tDate.year() == today.year()) ||
+                qAbs(tDate.daysTo(today)) <= 30) {
+                expense += t->getAmount();
+            }
         }
     }
     return expense;
 }
 
 double OverviewController::netBalance() const {
-    return totalIncome() - totalExpense();
+    double balance = 0.0;
+    const auto& transactions = DatabaseManager::instance().getAllTransactions();
+    for (const Transaction* t : transactions) {
+        if (t) balance += t->getSignedAmount();
+    }
+    return balance;
 }
 
 static QString formatVND(double amount) {

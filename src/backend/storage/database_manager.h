@@ -93,6 +93,9 @@ public:
     void loadBillsFromCSV();
     void saveBillsToCSV() const;
     const QVector<Bill>& getAllBills() const { return m_bills; }
+    void addBill(const Bill& b);
+    void updateBill(int id, const Bill& b);
+    void deleteBill(int id);
 
     //=============================BUDGET SECTION==================================
     // Đọc và Ghi file CSV
@@ -132,6 +135,8 @@ public:
     void saveTransactionsToCSV() const;
     const QVector<Transaction*>& getAllTransactions() const { return m_transactions; }
     void addTransaction(Transaction* transaction);
+    bool updateTransaction(int id, Transaction* newTransaction);
+    bool deleteTransaction(int id);
 };
 
 #endif // DATABASE_MANAGER_H

@@ -11,8 +11,67 @@ Item {
     signal accepted()
     signal rejected()
 
+    property bool isEditMode: false
+    property int transactionId: -1
+    property string transactionTitle: ""
+    property string transactionAmount: ""
+    property string transactionMethod: ""
+    property int transactionCategoryId: 0
+    property alias transactionTypeIndex: dropdown_1.selectedIndex
+    property alias transactionTypeText: dropdown_1.selectedText
+    property alias dateField: date_Input_Field
+    property bool isValidating: false
+
+    function setDateStr(dateStr) {
+        var parts = dateStr.split("/");
+        if (parts.length === 3) {
+            date_Input_Field.setDate(parseInt(parts[0]), parseInt(parts[1]), parseInt(parts[2]));
+        }
+    }
+
+    function setCategoryName(catName) {
+        var allCats = categoriesController.categoriesList;
+        var list = allCats.filter(function(c) { return c.parentId === 1 || c.parentId === 2; });
+        for (var i = 0; i < list.length; i++) {
+            if (list[i].name === catName) {
+                dropdown_3.selectedIndex = i;
+                dropdown_3.selectedText = catName;
+                transactionCategoryId = list[i].id;
+                return;
+            }
+        }
+        if (list.length > 0) {
+            dropdown_3.selectedIndex = 0;
+            dropdown_3.selectedText = list[0].name;
+            transactionCategoryId = list[0].id;
+        }
+    }
+
     function open() { visible = true }
     function close() { visible = false }
+
+    function reset() {
+        isEditMode = false;
+        transactionId = -1;
+        transactionTitle = "";
+        transactionAmount = "";
+        transactionMethod = "";
+        transactionTypeIndex = 0;
+        transactionTypeText = "Income";
+        isValidating = false;
+        dateField.clear();
+        
+        var allCats = categoriesController.categoriesList;
+        var list = allCats.filter(function(c) { return c.parentId === 1 || c.parentId === 2; });
+        if (list.length > 0) {
+            dropdown_3.selectedIndex = 0;
+            dropdown_3.selectedText = list[0].name;
+            transactionCategoryId = list[0].id;
+        } else {
+            transactionCategoryId = 0;
+            dropdown_3.selectedText = "Select Category";
+        }
+    }
 
     // Dimmed background overlay
     Rectangle {
@@ -59,7 +118,7 @@ Item {
                 horizontalAlignment: Text.AlignLeft
                 lineHeight: 32
                 lineHeightMode: Text.FixedHeight
-                text: "Add Transaction"
+                text: root.isEditMode ? "Edit Transaction" : "Add Transaction"
                 textFormat: Text.PlainText
                 verticalAlignment: Text.AlignTop
                 wrapMode: Text.Wrap
@@ -100,6 +159,8 @@ Item {
                 width: 460
                 color: "#e9e9e9"
                 radius: 10
+                border.color: (root.isValidating && root.transactionTitle.trim() === "") ? "red" : "transparent"
+                border.width: (root.isValidating && root.transactionTitle.trim() === "") ? 1 : 0
 
                 TextInput {
                     id: textField
@@ -113,6 +174,9 @@ Item {
                     font.weight: Font.Normal
                     clip: true
                     selectByMouse: true
+                    maximumLength: 30
+                    text: root.transactionTitle
+                    onTextChanged: root.transactionTitle = text
 
                     Text {
                         text: "input text"
@@ -126,7 +190,7 @@ Item {
             }
         }
 
-        // 3. Type, Categories, Amount & Account Row
+        // 3. Type, Categories, Amount & Method Row
         Rectangle {
             id: rowContainer
             y: 174
@@ -166,6 +230,8 @@ Item {
                     width: 225
                     _state: Dropdown_1.State_1.State_1_default
                     clip: true
+                    model: ["Income", "Expense", "Transfer"]
+                    selectedText: "Income" // Default
                 }
             }
 
@@ -201,6 +267,17 @@ Item {
                     width: 225
                     _state: Dropdown_1.State_1.State_1_default
                     clip: true
+                    
+                    property var allCats: categoriesController.categoriesList
+                    property var catList: allCats.filter(function(c) { return c.parentId === 1 || c.parentId === 2; })
+                    model: catList.map(function(c) { return c.name; })
+                    selectedText: catList.length > 0 ? catList[0].name : "Select Category"
+                    
+                    onSelected: function(index, value) {
+                        if (index >= 0 && index < catList.length) {
+                            root.transactionCategoryId = catList[index].id
+                        }
+                    }
                 }
             }
 
@@ -237,6 +314,8 @@ Item {
                     width: 225
                     color: "#e9e9e9"
                     radius: 10
+                    border.color: (root.isValidating && root.transactionAmount.trim() === "") ? "red" : "transparent"
+                    border.width: (root.isValidating && root.transactionAmount.trim() === "") ? 1 : 0
 
                     TextInput {
                         id: supporting_text
@@ -251,6 +330,19 @@ Item {
                         clip: true
                         selectByMouse: true
                         inputMethodHints: Qt.ImhFormattedNumbersOnly
+                        text: root.transactionAmount
+                        onTextChanged: {
+                            if (activeFocus) {
+                                var raw = text.replace(/[^0-9]/g, "")
+                                var formatted = raw.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                                if (text !== formatted) {
+                                    var pos = cursorPosition
+                                    text = formatted
+                                    cursorPosition = pos + (formatted.length - text.length)
+                                }
+                                root.transactionAmount = formatted
+                            }
+                        }
 
                         Text {
                             text: "input text"
@@ -264,7 +356,7 @@ Item {
                 }
             }
 
-            // Account Input
+            // Method Input
             Rectangle {
                 id: dropdown_5
                 x: 255
@@ -274,7 +366,7 @@ Item {
                 color: "transparent"
 
                 Text {
-                    id: account
+                    id: methodLabel
                     height: 32
                     width: 226
                     color: "#878787"
@@ -284,7 +376,7 @@ Item {
                     horizontalAlignment: Text.AlignLeft
                     lineHeight: 32
                     lineHeightMode: Text.FixedHeight
-                    text: "Account"
+                    text: "Method"
                     textFormat: Text.PlainText
                     verticalAlignment: Text.AlignTop
                     wrapMode: Text.Wrap
@@ -297,6 +389,8 @@ Item {
                     width: 225
                     color: "#e9e9e9"
                     radius: 10
+                    border.color: (root.isValidating && root.transactionMethod.trim() === "") ? "red" : "transparent"
+                    border.width: (root.isValidating && root.transactionMethod.trim() === "") ? 1 : 0
 
                     TextInput {
                         id: supporting_text_1
@@ -310,6 +404,8 @@ Item {
                         font.weight: Font.Normal
                         clip: true
                         selectByMouse: true
+                        text: root.transactionMethod
+                        onTextChanged: root.transactionMethod = text
 
                         Text {
                             text: "input text"
@@ -356,6 +452,8 @@ Item {
                 y: 32
                 height: 42
                 width: 460
+                border.color: (root.isValidating && date_Input_Field.selectedDate.trim() === "") ? "red" : "transparent"
+                border.width: (root.isValidating && date_Input_Field.selectedDate.trim() === "") ? 1 : 0
             }
         }
 
@@ -388,7 +486,7 @@ Item {
                 id: saveButton
                 x: 405
                 y: 9
-                buttonText: "Add"
+                buttonText: root.isEditMode ? "Save" : "Add"
                 height: 35
                 width: 75
                 _state: UniversalButton_1.State_1.State_1_selected
@@ -397,6 +495,10 @@ Item {
                     anchors.fill: parent
                     cursorShape: Qt.PointingHandCursor
                     onClicked: {
+                        root.isValidating = true
+                        if (root.transactionTitle.trim() === "" || root.transactionAmount.trim() === "" || root.transactionMethod.trim() === "" || root.dateField.selectedDate.trim() === "") {
+                            return
+                        }
                         root.accepted()
                         root.close()
                     }
