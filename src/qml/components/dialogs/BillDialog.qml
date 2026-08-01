@@ -166,6 +166,7 @@ Item {
                     font.weight: Font.Normal
                     clip: true
                     selectByMouse: true
+                    maximumLength: 30
                     text: root.billTitle
                     onTextChanged: root.billTitle = text
 

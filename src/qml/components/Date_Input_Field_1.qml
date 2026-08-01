@@ -32,6 +32,14 @@ Rectangle {
         selectedDate = ""
     }
 
+    function updateDateFromInputs() {
+        if (dayInput.text !== "" && monthInput.text !== "" && yearInput.text !== "") {
+            selectedDate = pad(parseInt(dayInput.text || 0)) + "/" + pad(parseInt(monthInput.text || 0)) + "/" + yearInput.text;
+        } else {
+            selectedDate = "";
+        }
+    }
+
     // --- Interactive Date Input Segmented Fields (DD / MM / YYYY) ---
     Row {
         id: dateRow
@@ -66,6 +74,7 @@ Rectangle {
 
             onTextChanged: {
                 if (text.length === 2) monthInput.forceActiveFocus()
+                updateDateFromInputs()
             }
         }
 
@@ -104,6 +113,7 @@ Rectangle {
 
             onTextChanged: {
                 if (text.length === 2) yearInput.forceActiveFocus()
+                updateDateFromInputs()
             }
         }
 
@@ -139,6 +149,7 @@ Rectangle {
                 horizontalAlignment: Text.AlignHCenter
                 verticalAlignment: Text.AlignVCenter
             }
+            onTextChanged: updateDateFromInputs()
         }
     }
 

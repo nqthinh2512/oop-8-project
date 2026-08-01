@@ -174,6 +174,7 @@ Item {
                     font.weight: Font.Normal
                     clip: true
                     selectByMouse: true
+                    maximumLength: 30
                     text: root.transactionTitle
                     onTextChanged: root.transactionTitle = text
 

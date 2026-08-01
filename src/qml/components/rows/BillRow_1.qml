@@ -54,6 +54,7 @@ Rectangle {
                 font.weight: Font.Bold
                 text: billRow.billName
                 elide: Text.ElideRight
+                Layout.fillWidth: true
             }
         }
 
