@@ -291,6 +291,8 @@ Rectangle {
                     categoryText: model.tCat
                     dueDateText: model.tDate
 
+                    onMarkPaidClicked: billsController.togglePaidStatus(model.tId)
+
                     onEditClicked: {
                         billDialog.reset()
                         billDialog.isEditMode = true

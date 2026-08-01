@@ -107,6 +107,11 @@ void TransactionListModel::setTransactions(const QVector<Transaction*>& transact
 {
     beginResetModel();
     m_transactions = transactions;
+
+    std::sort(m_transactions.begin(), m_transactions.end(), [](const Transaction* a, const Transaction* b) {
+        return a->getDateTime() > b->getDateTime();
+    });
+
     endResetModel();
 }
 

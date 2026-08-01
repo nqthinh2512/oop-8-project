@@ -15,6 +15,7 @@ Rectangle {
 
     signal editClicked()
     signal deleteClicked()
+    signal markPaidClicked()
 
     implicitHeight: 64
     height: implicitHeight
@@ -155,6 +156,26 @@ Rectangle {
                 anchors.rightMargin: 8
                 anchors.verticalCenter: parent.verticalCenter
                 spacing: 12
+
+                Rectangle {
+                    implicitWidth: 18
+                    implicitHeight: 18
+                    color: "transparent"
+                    
+                    Text {
+                        anchors.centerIn: parent
+                        text: "✓"
+                        font.pixelSize: 16
+                        font.weight: Font.Bold
+                        color: "#16a34a"
+                    }
+
+                    MouseArea {
+                        anchors.fill: parent
+                        cursorShape: Qt.PointingHandCursor
+                        onClicked: billRow.markPaidClicked()
+                    }
+                }
 
                 Edit_2 {
                     implicitWidth: 18

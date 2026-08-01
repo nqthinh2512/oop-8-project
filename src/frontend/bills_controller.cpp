@@ -64,6 +64,10 @@ void BillsController::loadBills()
         }
     }
 
+    std::sort(m_filteredBills.begin(), m_filteredBills.end(), [](const Bill* a, const Bill* b) {
+        return a->getDueDate() < b->getDueDate();
+    });
+
     endResetModel();
     emit statsChanged();
 }
