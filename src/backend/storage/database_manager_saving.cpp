@@ -1,7 +1,3 @@
-// database_manager_saving.cpp
-// File này CHỈ chứa phần định nghĩa (implementation) của các hàm thuộc
-// SAVING SECTION đã khai báo trong database_manager.h
-
 #include "database_manager.h"
 #include <QFile>
 #include <QTextStream>
@@ -16,42 +12,44 @@ void DatabaseManager::loadSavingsFromCSV()
 
     QString fullPath = QCoreApplication::applicationDirPath() + "/data/savings.csv";
     QFile file(fullPath);
-    if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
-        return;
 
-    QTextStream in(&file);
-    while (!in.atEnd()) {
-        QString line = in.readLine();
-        if (line.trimmed().isEmpty())
-            continue;
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        qWarning() << "Không mở được file:" << fullPath << "- sẽ dùng dữ liệu mẫu tạm thời.";
+    } else {
+        QTextStream in(&file);
+        while (!in.atEnd()) {
+            QString line = in.readLine();
+            if (line.trimmed().isEmpty())
+                continue;
 
-        // Cấu trúc 1 dòng mới: id;name;priority;categoryId;target;current;dueDate
-        // Hoặc hỗ trợ cấu trúc cũ 6 phần: id;name;dueDate;target;current;categoryId
-        QStringList f = line.split(';');
-        if (f.size() >= 7) {
-            int id            = f[0].toInt();
-            QString name      = f[1];
-            Priority p        = static_cast<Priority>(f[2].toInt());
-            int categoryId    = f[3].toInt();
-            double target     = f[4].toDouble();
-            double current    = f[5].toDouble();
-            QDate dueDate     = QDate::fromString(f[6], Qt::ISODate);
+            // Cấu trúc 1 dòng mới: id;name;priority;categoryId;target;current;dueDate
+            // Hoặc hỗ trợ cấu trúc cũ 6 phần: id;name;dueDate;target;current;categoryId
+            QStringList f = line.split(';');
+            if (f.size() >= 7) {
+                int id            = f[0].toInt();
+                QString name      = f[1];
+                Priority p        = static_cast<Priority>(f[2].toInt());
+                int categoryId    = f[3].toInt();
+                double target     = f[4].toDouble();
+                double current    = f[5].toDouble();
+                QDate dueDate     = QDate::fromString(f[6], Qt::ISODate);
 
-            m_savings.append(Saving(id, name, p, dueDate, target, current, categoryId));
-        } else if (f.size() >= 6) {
-            int id            = f[0].toInt();
-            QString name      = f[1];
-            QDate dueDate     = QDate::fromString(f[2], Qt::ISODate);
-            double target     = f[3].toDouble();
-            double current    = f[4].toDouble();
-            int categoryId    = f[5].toInt();
+                m_savings.append(Saving(id, name, p, dueDate, target, current, categoryId));
+            } else if (f.size() >= 6) {
+                int id            = f[0].toInt();
+                QString name      = f[1];
+                QDate dueDate     = QDate::fromString(f[2], Qt::ISODate);
+                double target     = f[3].toDouble();
+                double current    = f[4].toDouble();
+                int categoryId    = f[5].toInt();
 
-            m_savings.append(Saving(id, name, Priority::High, dueDate, target, current, categoryId));
+                m_savings.append(Saving(id, name, Priority::High, dueDate, target, current, categoryId));
+            }
         }
+        file.close();
     }
-    file.close();
 
-    // khởi tạo dữ liệu __TẠM THỜI__ để test tính năng nếu file rỗng
+    // khởi tạo dữ liệu __TẠM THỜI__ để test tính năng nếu file rỗng hoặc không đọc được
     if (m_savings.isEmpty()) {
         QDate today = QDate::currentDate();
 
@@ -68,8 +66,10 @@ void DatabaseManager::saveSavingsToCSV() const
 {
     QString fullPath = QCoreApplication::applicationDirPath() + "/data/savings.csv";
     QFile file(fullPath);
-    if (!file.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Truncate))
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Truncate)) {
+        qWarning() << "Không ghi được file:" << fullPath;
         return;
+    }
 
     QTextStream out(&file);
     for (const Saving& s : m_savings) {

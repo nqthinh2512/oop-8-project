@@ -92,11 +92,6 @@ QVariantList SavingsController::categoryOptions() const
     const auto &allCats = DatabaseManager::instance().getAllCategories();
     QVariantList options;
 
-    QVariantMap allMap;
-    allMap["id"] = 0;
-    allMap["name"] = "All Main Categories";
-    options.append(allMap);
-
     for (const auto &c : allCats) {
         if (c.getParentId() == Saving::parentCategory || c.getId() == Saving::parentCategory) {
             QVariantMap m;

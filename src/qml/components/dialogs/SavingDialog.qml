@@ -1,14 +1,13 @@
 import QtQuick
 import ".."
 
-
 Item {
     id: root
     anchors.fill: parent
     visible: false
     z: 999
 
-    // --- Properties & Signals kết nối với SavingsPage ---
+    // --- Properties & Signals ---
     property var categoryList: []
     property bool isEditMode: false
     property int currentSavingId: -1
@@ -17,8 +16,7 @@ Item {
     signal accepted(bool isEdit, int id, string name, int priority, int categoryId, double current, double target, string dueDateStr)
     signal cancelled()
 
-    // --- Các hàm API công khai ---
-    function open() { visible = true }
+    function open()  { visible = true }
     function close() { visible = false; errorMessage = "" }
 
     function openForAdd() {
@@ -26,28 +24,22 @@ Item {
         currentSavingId = -1
         errorMessage = ""
         title_1.text = "Add Saving"
-        saveButton.buttonText = "Add"
 
-        // Reset tất cả ô nhập
         textField.text = ""
-        amountFundedInput.text = "0"
+        amountFundedInput.text = ""
         saveGoalInput.text = ""
 
-        // Reset Priority về High
-        priorityDropdown.selectedIndex = 2
-        priorityDropdown.selectedText = "High"
+        dropdown_1.selectedIndex = 2
+        dropdown_1.selectedText = "High"
 
-        // Reset Category về mục đầu tiên nếu có
         if (root.categoryList.length > 0) {
-            categoryDropdown.selectedIndex = 0
-            categoryDropdown.selectedText = root.categoryList[0].name
+            dropdown_3.selectedIndex = 0
+            dropdown_3.selectedText = root.categoryList[0].name
         }
 
-        // Ngày mặc định: tháng sau
         var nextMonth = new Date()
         nextMonth.setMonth(nextMonth.getMonth() + 1)
-        if (date_Input_Field.hasOwnProperty("text"))
-            date_Input_Field.text = Qt.formatDate(nextMonth, "dd/MM/yyyy")
+        date_Input_Field.text = Qt.formatDate(nextMonth, "dd/MM/yyyy")
 
         open()
     }
@@ -57,160 +49,136 @@ Item {
         currentSavingId = modelData.id || -1
         errorMessage = ""
         title_1.text = "Edit Saving"
-        saveButton.buttonText = "Save"
 
-        // Nap dữ liệu cần sửa
         textField.text = modelData.name || ""
         amountFundedInput.text = String(modelData.currentAmount || 0)
         saveGoalInput.text = String(modelData.targetAmount || 0)
 
-        // Priority
         var priorityLabels = ["Low", "Medium", "High"]
         var pIdx = (typeof modelData.priority === "number") ? modelData.priority : 2
-        priorityDropdown.selectedIndex = pIdx
-        priorityDropdown.selectedText = priorityLabels[pIdx] || "High"
+        dropdown_1.selectedIndex = pIdx
+        dropdown_1.selectedText = priorityLabels[pIdx] || "High"
 
-        // Category: tìm đúng index theo categoryId
         for (var i = 0; i < root.categoryList.length; i++) {
             if (root.categoryList[i].id === modelData.categoryId) {
-                categoryDropdown.selectedIndex = i
-                categoryDropdown.selectedText = root.categoryList[i].name
+                dropdown_3.selectedIndex = i
+                dropdown_3.selectedText = root.categoryList[i].name
                 break
             }
         }
 
-        // Due Date
-        if (date_Input_Field.hasOwnProperty("text"))
-            date_Input_Field.text = modelData.dueDateText || ""
-
+        date_Input_Field.text = modelData.dueDateText || ""
         open()
     }
 
-    function showError(msg) {
-        errorMessage = msg
-    }
+    function showError(msg) { errorMessage = msg }
 
-    // --- Dimmed background overlay ---
+    // --- Dimmed overlay ---
     Rectangle {
         anchors.fill: parent
         color: "#66000000"
-
         MouseArea {
             anchors.fill: parent
-            onClicked: {
-                root.cancelled()
-                root.close()
-            }
+            onClicked: { root.cancelled(); root.close() }
         }
     }
 
-    // --- Centered Dialog Card ---
+    // --- Dialog Card ---
     Rectangle {
-        id: savingDialog
+        id: card
         anchors.centerIn: parent
-
-        height: 540
         width: 500
-
-        color: "#ffffff"
+        height: 510
         radius: 15
+        color: "#ffffff"
         clip: true
+        MouseArea { anchors.fill: parent } // block click-through
 
-        // Chống click xuyên qua nền mờ
-        MouseArea { anchors.fill: parent }
-
-        // 1. Title Header
-        Image {
-            id: title
-            source: Qt.resolvedUrl("../../assets/title_11.png")
+        // --- Title bar ---
+        Rectangle {
+            id: titleBar
+            anchors.top: parent.top
+            width: parent.width
+            height: 60
+            color: "#f8fafc"
+            radius: 15
+            // square bottom corners
+            Rectangle {
+                anchors.bottom: parent.bottom
+                width: parent.width
+                height: parent.radius
+                color: parent.color
+            }
 
             Text {
                 id: title_1
-                x: 20
-                y: 9
-                height: 32
-                width: 300
-                color: "#191919"
-                font.capitalization: Font.Capitalize
-                font.family: "Intel One Mono"
-                font.pixelSize: 24
-                font.weight: Font.DemiBold
-                horizontalAlignment: Text.AlignLeft
-                lineHeight: 32
-                lineHeightMode: Text.FixedHeight
+                anchors.left: parent.left
+                anchors.leftMargin: 20
+                anchors.verticalCenter: parent.verticalCenter
                 text: "Add Saving"
-                textFormat: Text.PlainText
-                verticalAlignment: Text.AlignTop
-                wrapMode: Text.Wrap
-            }
-
-            // Thông báo lỗi
-            Text {
-                id: errLabel
-                x: 200
-                y: 14
-                height: 24
-                width: 280
-                color: "#dc2626"
-                font.family: "Roboto"
-                font.pixelSize: 12
-                horizontalAlignment: Text.AlignRight
-                verticalAlignment: Text.AlignVCenter
-                text: root.errorMessage
-                visible: root.errorMessage !== ""
-                elide: Text.ElideRight
+                color: "#191919"
+                font.family: "Intel One Mono"
+                font.pixelSize: 22
+                font.weight: Font.DemiBold
             }
         }
 
-        // 2. Saving Title Field
-        Rectangle {
-            id: titleInput
-            y: 75
-            height: 74
-            width: 500
-            color: "transparent"
+        // --- Error message ---
+        Text {
+            id: errLabel
+            anchors.top: titleBar.bottom
+            anchors.topMargin: 4
+            anchors.right: parent.right
+            anchors.rightMargin: 16
+            height: 20
+            color: "#dc2626"
+            font.family: "Roboto"
+            font.pixelSize: 12
+            horizontalAlignment: Text.AlignRight
+            text: root.errorMessage
+            visible: root.errorMessage !== ""
+        }
+
+        // --- Saving Title ---
+        Column {
+            id: titleSection
+            anchors.top: titleBar.bottom
+            anchors.topMargin: 14
+            anchors.left: parent.left
+            anchors.leftMargin: 20
+            anchors.right: parent.right
+            anchors.rightMargin: 20
+            spacing: 6
 
             Text {
-                x: 20
-                height: 32
-                width: 461
+                text: "Saving Title"
                 color: "#878787"
                 font.family: "Intel One Mono"
-                font.pixelSize: 20
+                font.pixelSize: 14
                 font.weight: Font.DemiBold
-                horizontalAlignment: Text.AlignLeft
-                lineHeight: 32
-                lineHeightMode: Text.FixedHeight
-                text: "Saving Title"
-                textFormat: Text.PlainText
-                verticalAlignment: Text.AlignTop
-                wrapMode: Text.Wrap
             }
 
             Rectangle {
-                x: 20
-                y: 32
-                height: 42
-                width: 460
+                width: parent.width
+                height: 40
                 color: "#e9e9e9"
                 radius: 10
 
                 TextInput {
                     id: textField
                     anchors.fill: parent
-                    anchors.leftMargin: 15
-                    anchors.rightMargin: 15
+                    anchors.leftMargin: 14
+                    anchors.rightMargin: 14
                     verticalAlignment: Text.AlignVCenter
                     color: "#191919"
                     font.family: "Roboto"
-                    font.pixelSize: 16
-                    font.weight: Font.Normal
+                    font.pixelSize: 15
                     clip: true
                     selectByMouse: true
 
                     Text {
                         text: "Nhập tên mục tiêu tiết kiệm..."
-                        color: "#8049454f"
+                        color: "#aab0bb"
                         font: parent.font
                         visible: !parent.text && !parent.activeFocus
                         anchors.fill: parent
@@ -220,80 +188,35 @@ Item {
             }
         }
 
-        // 3. Priority, Categories, Amount Funded & Save Goal Grid Row
-        Rectangle {
-            id: rowContainer
-            y: 174
-            height: 142
-            width: 500
-            color: "transparent"
+        // --- Priority & Category row ---
+        Row {
+            id: row1
+            anchors.top: titleSection.bottom
+            anchors.topMargin: 14
+            anchors.left: parent.left
+            anchors.leftMargin: 20
+            spacing: 20
 
-            // Priority Dropdown
-            Rectangle {
-                x: 20
-                height: 66
-                width: 225
-                color: "transparent"
-
-                Text {
-                    height: 32
-                    width: 226
-                    color: "#878787"
-                    font.family: "Intel One Mono"
-                    font.pixelSize: 20
-                    font.weight: Font.DemiBold
-                    horizontalAlignment: Text.AlignLeft
-                    lineHeight: 32
-                    lineHeightMode: Text.FixedHeight
-                    text: "Priority"
-                    textFormat: Text.PlainText
-                    verticalAlignment: Text.AlignTop
-                    wrapMode: Text.Wrap
-                }
-
+            Column {
+                width: 220
+                spacing: 6
+                Text { text: "Priority"; color: "#878787"; font.family: "Intel One Mono"; font.pixelSize: 14; font.weight: Font.DemiBold }
                 Dropdown_1 {
-                    id: priorityDropdown
-                    y: 32
-                    height: 34
-                    width: 225
-                    _state: Dropdown_1.State_1.State_1_default
-                    clip: true
+                    id: dropdown_1
+                    width: 220; height: 36
                     model: ["Low", "Medium", "High"]
                     selectedText: "High"
                     selectedIndex: 2
                 }
             }
 
-            // Categories Dropdown
-            Rectangle {
-                x: 255
-                height: 66
-                width: 225
-                color: "transparent"
-
-                Text {
-                    height: 32
-                    width: 226
-                    color: "#878787"
-                    font.family: "Intel One Mono"
-                    font.pixelSize: 20
-                    font.weight: Font.DemiBold
-                    horizontalAlignment: Text.AlignLeft
-                    lineHeight: 32
-                    lineHeightMode: Text.FixedHeight
-                    text: "Categories"
-                    textFormat: Text.PlainText
-                    verticalAlignment: Text.AlignTop
-                    wrapMode: Text.Wrap
-                }
-
+            Column {
+                width: 220
+                spacing: 6
+                Text { text: "Categories"; color: "#878787"; font.family: "Intel One Mono"; font.pixelSize: 14; font.weight: Font.DemiBold }
                 Dropdown_1 {
-                    id: categoryDropdown
-                    y: 32
-                    height: 34
-                    width: 225
-                    _state: Dropdown_1.State_1.State_1_default
-                    clip: true
+                    id: dropdown_3
+                    width: 220; height: 36
                     model: {
                         var names = []
                         for (var i = 0; i < root.categoryList.length; i++) names.push(root.categoryList[i].name)
@@ -303,190 +226,102 @@ Item {
                     selectedIndex: 0
                 }
             }
+        }
 
-            // Amount Funded Input
-            Rectangle {
-                x: 20
-                y: 76
-                height: 66
-                width: 225
-                color: "transparent"
+        // --- Amount Funded & Save Goal row ---
+        Row {
+            id: row2
+            anchors.top: row1.bottom
+            anchors.topMargin: 14
+            anchors.left: parent.left
+            anchors.leftMargin: 20
+            spacing: 20
 
-                Text {
-                    height: 32
-                    width: 226
-                    color: "#878787"
-                    font.family: "Intel One Mono"
-                    font.pixelSize: 20
-                    font.weight: Font.DemiBold
-                    horizontalAlignment: Text.AlignLeft
-                    lineHeight: 32
-                    lineHeightMode: Text.FixedHeight
-                    text: "Amount Funded"
-                    textFormat: Text.PlainText
-                    verticalAlignment: Text.AlignTop
-                    wrapMode: Text.Wrap
-                }
-
+            Column {
+                width: 220
+                spacing: 6
+                Text { text: "Amount Funded"; color: "#878787"; font.family: "Intel One Mono"; font.pixelSize: 14; font.weight: Font.DemiBold }
                 Rectangle {
-                    y: 32
-                    height: 34
-                    width: 225
-                    color: "#e9e9e9"
-                    radius: 10
-
+                    width: 220; height: 36
+                    color: "#e9e9e9"; radius: 10
                     TextInput {
                         id: amountFundedInput
-                        anchors.fill: parent
-                        anchors.leftMargin: 15
-                        anchors.rightMargin: 15
+                        anchors.fill: parent; anchors.leftMargin: 14; anchors.rightMargin: 14
                         verticalAlignment: Text.AlignVCenter
-                        color: "#191919"
-                        font.family: "Roboto"
-                        font.pixelSize: 16
-                        font.weight: Font.Normal
-                        clip: true
-                        selectByMouse: true
+                        color: "#191919"; font.family: "Roboto"; font.pixelSize: 15
+                        clip: true; selectByMouse: true
                         inputMethodHints: Qt.ImhFormattedNumbersOnly
-
-                        Text {
-                            text: "0"
-                            color: "#8049454f"
-                            font: parent.font
-                            visible: !parent.text && !parent.activeFocus
-                            anchors.fill: parent
-                            verticalAlignment: Text.AlignVCenter
-                        }
+                        Text { text: "0"; color: "#aab0bb"; font: parent.font; visible: !parent.text && !parent.activeFocus; anchors.fill: parent; verticalAlignment: Text.AlignVCenter }
                     }
                 }
             }
 
-            // Save Goal Input
-            Rectangle {
-                x: 255
-                y: 76
-                height: 66
-                width: 225
-                color: "transparent"
-
-                Text {
-                    height: 32
-                    width: 226
-                    color: "#878787"
-                    font.family: "Intel One Mono"
-                    font.pixelSize: 20
-                    font.weight: Font.DemiBold
-                    horizontalAlignment: Text.AlignLeft
-                    lineHeight: 32
-                    lineHeightMode: Text.FixedHeight
-                    text: "Save Goal"
-                    textFormat: Text.PlainText
-                    verticalAlignment: Text.AlignTop
-                    wrapMode: Text.Wrap
-                }
-
+            Column {
+                width: 220
+                spacing: 6
+                Text { text: "Save Goal"; color: "#878787"; font.family: "Intel One Mono"; font.pixelSize: 14; font.weight: Font.DemiBold }
                 Rectangle {
-                    y: 32
-                    height: 34
-                    width: 225
-                    color: "#e9e9e9"
-                    radius: 10
-
+                    width: 220; height: 36
+                    color: "#e9e9e9"; radius: 10
                     TextInput {
                         id: saveGoalInput
-                        anchors.fill: parent
-                        anchors.leftMargin: 15
-                        anchors.rightMargin: 15
+                        anchors.fill: parent; anchors.leftMargin: 14; anchors.rightMargin: 14
                         verticalAlignment: Text.AlignVCenter
-                        color: "#191919"
-                        font.family: "Roboto"
-                        font.pixelSize: 16
-                        font.weight: Font.Normal
-                        clip: true
-                        selectByMouse: true
+                        color: "#191919"; font.family: "Roboto"; font.pixelSize: 15
+                        clip: true; selectByMouse: true
                         inputMethodHints: Qt.ImhFormattedNumbersOnly
-
-                        Text {
-                            text: "0"
-                            color: "#8049454f"
-                            font: parent.font
-                            visible: !parent.text && !parent.activeFocus
-                            anchors.fill: parent
-                            verticalAlignment: Text.AlignVCenter
-                        }
+                        Text { text: "0"; color: "#aab0bb"; font: parent.font; visible: !parent.text && !parent.activeFocus; anchors.fill: parent; verticalAlignment: Text.AlignVCenter }
                     }
                 }
             }
         }
 
-        // 4. Due Date Field
-        Rectangle {
+        // --- Due Date ---
+        Column {
             id: dueDateSection
-            y: 341
-            height: 74
-            width: 500
-            color: "transparent"
+            anchors.top: row2.bottom
+            anchors.topMargin: 14
+            anchors.left: parent.left
+            anchors.leftMargin: 20
+            anchors.right: parent.right
+            anchors.rightMargin: 20
+            spacing: 6
 
-            Text {
-                x: 20
-                height: 32
-                width: 461
-                color: "#878787"
-                font.family: "Intel One Mono"
-                font.pixelSize: 20
-                font.weight: Font.DemiBold
-                horizontalAlignment: Text.AlignLeft
-                lineHeight: 32
-                lineHeightMode: Text.FixedHeight
-                text: "Due Date"
-                textFormat: Text.PlainText
-                verticalAlignment: Text.AlignTop
-                wrapMode: Text.Wrap
-            }
-
+            Text { text: "Due Date"; color: "#878787"; font.family: "Intel One Mono"; font.pixelSize: 14; font.weight: Font.DemiBold }
             Date_Input_Field_1 {
                 id: date_Input_Field
-                x: 20
-                y: 32
+                width: parent.width
                 height: 42
-                width: 460
             }
         }
 
-        // 5. Footer Action Buttons
-        Image {
-            id: choice
-            y: 440
-            source: Qt.resolvedUrl("../../assets/choice_2.png")
+        // --- Footer Buttons ---
+        Row {
+            anchors.bottom: parent.bottom
+            anchors.bottomMargin: 16
+            anchors.right: parent.right
+            anchors.rightMargin: 20
+            spacing: 10
 
             UniversalButton_1 {
                 id: cancelButton
-                x: 305
-                y: 9
                 buttonText: "Cancel"
-                height: 35
-                width: 75
+                height: 36
+                width: 80
                 _state: UniversalButton_1.State_1.State_1_default
-
                 MouseArea {
                     anchors.fill: parent
                     cursorShape: Qt.PointingHandCursor
-                    onClicked: {
-                        root.cancelled()
-                        root.close()
-                    }
+                    onClicked: { root.cancelled(); root.close() }
                 }
             }
 
             UniversalButton_1 {
                 id: saveButton
-                x: 405
-                y: 9
                 buttonText: root.isEditMode ? "Save" : "Add"
-                height: 35
-                width: 75
+                height: 36
+                width: 80
                 _state: UniversalButton_1.State_1.State_1_selected
-
                 MouseArea {
                     anchors.fill: parent
                     cursorShape: Qt.PointingHandCursor
@@ -499,31 +334,22 @@ Item {
 
                         var target = parseFloat(saveGoalInput.text) || 0.0
                         if (target <= 0) {
-                            root.showError("Mục tiêu tiết kiệm phải > 0!")
+                            root.showError("Save Goal phải lớn hơn 0!")
                             return
                         }
 
                         var current = parseFloat(amountFundedInput.text) || 0.0
                         if (current > target) {
-                            root.showError("Số tiền đã góp không được > mục tiêu!")
+                            root.showError("Amount Funded không được lớn hơn Save Goal!")
                             return
                         }
 
-                        var priorityVal = priorityDropdown.selectedIndex
-                        var catId = (root.categoryList.length > 0 && categoryDropdown.selectedIndex < root.categoryList.length)
-                            ? root.categoryList[categoryDropdown.selectedIndex].id : 0
+                        var priorityVal = dropdown_1.selectedIndex
+                        var catId = (root.categoryList.length > 0 && dropdown_3.selectedIndex < root.categoryList.length)
+                            ? root.categoryList[dropdown_3.selectedIndex].id : 0
                         var dueDateStr = date_Input_Field.hasOwnProperty("text") ? date_Input_Field.text : ""
 
-                        root.accepted(
-                            root.isEditMode,
-                            root.currentSavingId,
-                            name,
-                            priorityVal,
-                            catId,
-                            current,
-                            target,
-                            dueDateStr
-                        )
+                        root.accepted(root.isEditMode, root.currentSavingId, name, priorityVal, catId, current, target, dueDateStr)
                         root.close()
                     }
                 }

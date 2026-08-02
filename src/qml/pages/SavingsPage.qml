@@ -135,7 +135,17 @@ Rectangle {
 
                     // Category filter dropdown
                     Dropdown_1 {
+                        id: categoryFilterDropdown
+                        Layout.preferredWidth: 200
+                        selectedText: "All Main Categories"
+                        selectedIndex: 0
 
+                        property var categoryOptionsFull: {
+                            var opts = [{id: 0, name: "All Main Categories"}]
+                            var cats = savingsController.categoryOptions
+                            for (var i = 0; i < cats.length; i++) opts.push(cats[i])
+                            return opts
+                        }
                         model: {
                             var names = []
                             for (var i = 0; i < categoryOptionsFull.length; i++) names.push(categoryOptionsFull[i].name)
@@ -176,7 +186,7 @@ Rectangle {
 
                     Item { Layout.fillWidth: true; Layout.preferredWidth: 260; Layout.fillHeight: true
                         Text { anchors.left: parent.left; anchors.verticalCenter: parent.verticalCenter; text: "SAVING"; font.family: "Inter"; font.pixelSize: 12; font.weight: Font.Bold; color: "#64748b" } }
-                    Item { Layout.preferredWidth: 100; Layout.fillHeight: true
+                    Item { Layout.preferredWidth: 80; Layout.fillHeight: true
                         Text { anchors.left: parent.left; anchors.verticalCenter: parent.verticalCenter; text: "PRIORITY"; font.family: "Inter"; font.pixelSize: 12; font.weight: Font.Bold; color: "#64748b" } }
                     Item { Layout.preferredWidth: 160; Layout.fillHeight: true
                         Text { anchors.left: parent.left; anchors.verticalCenter: parent.verticalCenter; text: "CATEGORY"; font.family: "Inter"; font.pixelSize: 12; font.weight: Font.Bold; color: "#64748b" } }
