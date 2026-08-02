@@ -8,6 +8,12 @@ Rectangle {
     color: "#f8fafc"
     clip: true
 
+    onVisibleChanged: {
+        if (visible) {
+            overviewController.refresh()
+        }
+    }
+
     // Navigate to a page by sidebar index
     function navigateTo(pageIndex) {
         if (typeof sidebarMenu !== "undefined") {

@@ -10,6 +10,12 @@ Rectangle {
     color: "#f8fafc"
     clip: true
 
+    onVisibleChanged: {
+        if (visible) {
+            reportsController.refresh()
+        }
+    }
+
     ScrollView {
         id: scrollView
         anchors.fill: parent
