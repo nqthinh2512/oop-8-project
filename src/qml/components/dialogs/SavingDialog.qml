@@ -9,6 +9,16 @@ Item {
 
     // --- Properties & Signals ---
     property var categoryList: []
+    // SỬA: luôn tự lọc bỏ mục "All Main Categories" (id === 0) ngay trong dialog,
+    // không phụ thuộc vào việc component cha (SavingsPage.qml) có lọc đúng hay chưa.
+    // Dialog Add/Edit không nên cho chọn "Tất cả danh mục" vì phải gán đúng 1 category cụ thể.
+    readonly property var realCategoryList: {
+        var real = []
+        for (var i = 0; i < categoryList.length; i++) {
+            if (categoryList[i].id !== 0) real.push(categoryList[i])
+        }
+        return real
+    }
     property bool isEditMode: false
     property int currentSavingId: -1
     property string errorMessage: ""
@@ -32,9 +42,9 @@ Item {
         dropdown_1.selectedIndex = 2
         dropdown_1.selectedText = "High"
 
-        if (root.categoryList.length > 0) {
+        if (root.realCategoryList.length > 0) {
             dropdown_3.selectedIndex = 0
-            dropdown_3.selectedText = root.categoryList[0].name
+            dropdown_3.selectedText = root.realCategoryList[0].name
         }
 
         var nextMonth = new Date()
@@ -59,10 +69,10 @@ Item {
         dropdown_1.selectedIndex = pIdx
         dropdown_1.selectedText = priorityLabels[pIdx] || "High"
 
-        for (var i = 0; i < root.categoryList.length; i++) {
-            if (root.categoryList[i].id === modelData.categoryId) {
+        for (var i = 0; i < root.realCategoryList.length; i++) {
+            if (root.realCategoryList[i].id === modelData.categoryId) {
                 dropdown_3.selectedIndex = i
-                dropdown_3.selectedText = root.categoryList[i].name
+                dropdown_3.selectedText = root.realCategoryList[i].name
                 break
             }
         }
@@ -217,12 +227,14 @@ Item {
                 Dropdown_1 {
                     id: dropdown_3
                     width: 220; height: 36
+                    // SỬA: dùng root.realCategoryList (đã lọc bỏ "All Main Categories")
+                    // thay vì root.categoryList thô
                     model: {
                         var names = []
-                        for (var i = 0; i < root.categoryList.length; i++) names.push(root.categoryList[i].name)
+                        for (var i = 0; i < root.realCategoryList.length; i++) names.push(root.realCategoryList[i].name)
                         return names
                     }
-                    selectedText: root.categoryList.length > 0 ? root.categoryList[0].name : "Select Category"
+                    selectedText: root.realCategoryList.length > 0 ? root.realCategoryList[0].name : "Select Category"
                     selectedIndex: 0
                 }
             }
@@ -345,8 +357,8 @@ Item {
                         }
 
                         var priorityVal = dropdown_1.selectedIndex
-                        var catId = (root.categoryList.length > 0 && dropdown_3.selectedIndex < root.categoryList.length)
-                            ? root.categoryList[dropdown_3.selectedIndex].id : 0
+                        var catId = (root.realCategoryList.length > 0 && dropdown_3.selectedIndex < root.realCategoryList.length)
+                            ? root.realCategoryList[dropdown_3.selectedIndex].id : 0
                         var dueDateStr = date_Input_Field.hasOwnProperty("text") ? date_Input_Field.text : ""
 
                         root.accepted(root.isEditMode, root.currentSavingId, name, priorityVal, catId, current, target, dueDateStr)

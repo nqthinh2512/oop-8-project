@@ -92,8 +92,17 @@ QVariantList SavingsController::categoryOptions() const
     const auto &allCats = DatabaseManager::instance().getAllCategories();
     QVariantList options;
 
+    QVariantMap allMap;
+    allMap["id"] = 0;
+    allMap["name"] = "All Main Categories";
+    options.append(allMap);
+
     for (const auto &c : allCats) {
-        if (c.getParentId() == Saving::parentCategory || c.getId() == Saving::parentCategory) {
+        // SỬA: chỉ lấy đúng các category CON của Saving (parentId == 5).
+        // Trước đây có thêm "|| c.getId() == Saving::parentCategory" khiến
+        // category nào có ID trùng số 5 (vd "Food & Dining", con của Expense)
+        // cũng bị lọt vào danh sách category của Savings do trùng số ngẫu nhiên.
+        if (c.getParentId() == Saving::parentCategory) {
             QVariantMap m;
             m["id"] = c.getId();
             m["name"] = c.getName();

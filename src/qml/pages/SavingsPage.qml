@@ -240,7 +240,16 @@ Rectangle {
     // =================================================================
     SavingDialog {
         id: savingDialogContent
-        categoryList: savingsController.categoryOptions
+        // SỬA: lọc bỏ "All Main Categories" (id === 0) trước khi đưa vào dialog Add/Edit,
+        // vì dialog cần bắt buộc chọn đúng 1 category cụ thể, không được chọn "Tất cả"
+        categoryList: {
+            var real = []
+            var all = savingsController.categoryOptions
+            for (var i = 0; i < all.length; i++) {
+                if (all[i].id !== 0) real.push(all[i])
+            }
+            return real
+        }
 
         onAccepted: (isEdit, id, name, priority, categoryId, current, target, dueDateStr) => {
             var ok
