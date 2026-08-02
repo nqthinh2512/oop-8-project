@@ -9,6 +9,7 @@ Item {
 
     property bool isEditMode: false
     property int editingCategoryId: -1
+    property bool trySave: false
 
     signal accepted(int id, string title, int parentId, bool active)
     signal rejected()
@@ -22,6 +23,7 @@ Item {
         editingCategoryId = -1
         dialogTitleText.text = "Add Category"
         textField.text = ""
+        trySave = false
         pageDropdown.selectedIndex = 0
         pageDropdown.selectedText = "Income"
         statusDropdown.selectedIndex = 0
@@ -34,6 +36,7 @@ Item {
         editingCategoryId = id
         dialogTitleText.text = "Edit Category"
         textField.text = currentTitle
+        trySave = false
 
         var parentNames = ["Income", "Expense", "Bill", "Budget", "Saving"]
         var pIdx = (currentParentId >= 1 && currentParentId <= 5) ? (currentParentId - 1) : 0
@@ -135,12 +138,15 @@ Item {
                 width: 460
                 color: "#e9e9e9"
                 radius: 10
+                border.color: (root.trySave && textField.text.trim() === "") ? "red" : "transparent"
+                border.width: (root.trySave && textField.text.trim() === "") ? 2 : 0
 
                 TextInput {
                     id: textField
                     anchors.fill: parent
                     anchors.leftMargin: 15
                     anchors.rightMargin: 15
+                    maximumLength: 30
                     verticalAlignment: Text.AlignVCenter
                     color: "#191919"
                     font.family: "Roboto"
@@ -282,6 +288,10 @@ Item {
                     anchors.fill: parent
                     cursorShape: Qt.PointingHandCursor
                     onClicked: {
+                        root.trySave = true
+                        if (textField.text.trim() === "") {
+                            return
+                        }
                         root.accepted(editingCategoryId, textField.text, pageDropdown.selectedIndex + 1, statusDropdown.selectedIndex === 0)
                         root.close()
                     }
