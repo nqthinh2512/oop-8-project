@@ -1,7 +1,3 @@
-// database_manager_saving.cpp
-// File này CHỈ chứa phần định nghĩa (implementation) của các hàm thuộc
-// SAVING SECTION đã khai báo trong database_manager.h
-
 #include "database_manager.h"
 #include <QFile>
 #include <QTextStream>
@@ -16,37 +12,49 @@ void DatabaseManager::loadSavingsFromCSV()
 
     QString fullPath = QCoreApplication::applicationDirPath() + "/data/savings.csv";
     QFile file(fullPath);
-    if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
-        return;
 
-    QTextStream in(&file);
-    while (!in.atEnd()) {
-        QString line = in.readLine();
-        if (line.trimmed().isEmpty())
-            continue;
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        qWarning() << "Không mở được file:" << fullPath << "- sẽ dùng dữ liệu mẫu tạm thời.";
+    } else {
+        QTextStream in(&file);
+        while (!in.atEnd()) {
+            QString line = in.readLine();
+            if (line.trimmed().isEmpty())
+                continue;
 
-        // Cấu trúc 1 dòng: id;name;dueDate;target;current;categoryId
-        QStringList f = line.split(';');
-        if (f.size() < 6)
-            continue;
+            // Cấu trúc 1 dòng mới: id;name;priority;categoryId;target;current;dueDate
+            // Hoặc hỗ trợ cấu trúc cũ 6 phần: id;name;dueDate;target;current;categoryId
+            QStringList f = line.split(';');
+            if (f.size() >= 7) {
+                int id            = f[0].toInt();
+                QString name      = f[1];
+                Priority p        = static_cast<Priority>(f[2].toInt());
+                int categoryId    = f[3].toInt();
+                double target     = f[4].toDouble();
+                double current    = f[5].toDouble();
+                QDate dueDate     = QDate::fromString(f[6], Qt::ISODate);
 
-        int id            = f[0].toInt();
-        QString name      = f[1];
-        QDate dueDate     = QDate::fromString(f[2], Qt::ISODate);
-        double target     = f[3].toDouble();
-        double current    = f[4].toDouble();
-        int categoryId    = f[5].toInt();
+                m_savings.append(Saving(id, name, p, dueDate, target, current, categoryId));
+            } else if (f.size() >= 6) {
+                int id            = f[0].toInt();
+                QString name      = f[1];
+                QDate dueDate     = QDate::fromString(f[2], Qt::ISODate);
+                double target     = f[3].toDouble();
+                double current    = f[4].toDouble();
+                int categoryId    = f[5].toInt();
 
-        m_savings.append(Saving(id, name, dueDate, target, current, categoryId));
+                m_savings.append(Saving(id, name, Priority::High, dueDate, target, current, categoryId));
+            }
+        }
+        file.close();
     }
-    file.close();
 
-    // khởi tạo dữ liệu __TẠM THỜI__ để test tính năng
+    // khởi tạo dữ liệu __TẠM THỜI__ để test tính năng nếu file rỗng hoặc không đọc được
     if (m_savings.isEmpty()) {
         QDate today = QDate::currentDate();
 
-        m_savings.append(Saving(1, "Emergency Fund", today.addMonths(6), 10000000.0, 4500000.0, 17));
-        m_savings.append(Saving(2, "Summer Vacation Fund", today.addMonths(3), 5000000.0, 2000000.0, 18));
+        m_savings.append(Saving(1, "Emergency Fund", Priority::High, today.addMonths(6), 20000000.0, 1000000.0, 17));
+        m_savings.append(Saving(2, "Summer Vacation Fund", Priority::Medium, today.addMonths(3), 5000000.0, 2000000.0, 18));
 
         saveSavingsToCSV();
     }
@@ -58,17 +66,20 @@ void DatabaseManager::saveSavingsToCSV() const
 {
     QString fullPath = QCoreApplication::applicationDirPath() + "/data/savings.csv";
     QFile file(fullPath);
-    if (!file.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Truncate))
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Truncate)) {
+        qWarning() << "Không ghi được file:" << fullPath;
         return;
+    }
 
     QTextStream out(&file);
     for (const Saving& s : m_savings) {
         out << s.getId() << ";"
             << s.getName() << ";"
-            << s.getDueDate().toString(Qt::ISODate) << ";"
+            << static_cast<int>(s.getPriority()) << ";"
+            << s.getCategoryId() << ";"
             << s.getTarget() << ";"
             << s.getCurrent() << ";"
-            << s.getCategoryId() << "\n";
+            << s.getDueDate().toString(Qt::ISODate) << "\n";
     }
     file.close();
     const_cast<DatabaseManager*>(this)->emit dataChanged();
@@ -82,11 +93,29 @@ int DatabaseManager::generateNextSavingId() const
     return maxId + 1;
 }
 
-void DatabaseManager::addSaving(const QString& name, const QDate& dueDate, double target)
+void DatabaseManager::addSaving(const QString& name, Priority priority, int categoryId, double target, double currentAmount, const QDate& dueDate)
 {
     int newId = generateNextSavingId();
-    m_savings.append(Saving(newId, name, dueDate, target, 0.0, Saving::parentCategory));
+    int catId = (categoryId == 0 ? Saving::parentCategory : categoryId);
+    m_savings.append(Saving(newId, name, priority, dueDate, target, currentAmount, catId));
     saveSavingsToCSV();
+}
+
+bool DatabaseManager::updateSaving(int savingId, const QString& name, Priority priority, int categoryId, double target, double currentAmount, const QDate& dueDate)
+{
+    for (Saving& s : m_savings) {
+        if (s.getId() == savingId) {
+            s.setName(name);
+            s.setPriority(priority);
+            if (categoryId != 0) s.setCategoryId(categoryId);
+            s.setTarget(target);
+            s.setCurrent(currentAmount);
+            s.setDueDate(dueDate);
+            saveSavingsToCSV();
+            return true;
+        }
+    }
+    return false;
 }
 
 bool DatabaseManager::contributeToSaving(int savingId, double amount)

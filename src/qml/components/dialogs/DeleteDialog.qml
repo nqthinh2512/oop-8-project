@@ -1,31 +1,56 @@
 import QtQuick
 import ".."
 
-
 Item {
     id: root
     anchors.fill: parent
     visible: false
     z: 999
 
-    signal accepted()
+    // --- Properties & Signals truyền dữ liệu ---
+    property int targetId: -1
+    property string itemName: ""
+
+    // Alias để có thể chỉnh sửa tiêu đề/thông báo trực tiếp từ bên ngoài nếu cần
+    property alias titleText: title_1.text
+    property alias messageText: label_1.text
+
+    signal accepted(int id)
     signal rejected()
 
+    // --- Các hàm điều khiển ---
     function open() { visible = true }
     function close() { visible = false }
 
-    // Dimmed background overlay
+    // Mở dialog với thông tin đối tượng cụ thể cần xóa
+    function openForDelete(id, name) {
+        targetId = id
+        itemName = name || ""
+
+        if (itemName !== "") {
+            label_1.text = "Are you really sure you want to delete \"" + itemName + "\"?"
+        } else {
+            label_1.text = "Are you really sure you want to delete this ?"
+        }
+
+        open()
+    }
+
+    // --- Dimmed background overlay ---
     Rectangle {
         anchors.fill: parent
         color: "#66000000"
 
         MouseArea {
             anchors.fill: parent
-            onClicked: root.close()
+            onClicked: {
+                root.rejected()
+                root.close()
+            }
         }
     }
 
-    // Centered Dialog Card
+    // --- Centered Dialog Card ---
     Rectangle {
         id: deleteDialog
         anchors.centerIn: parent
@@ -89,6 +114,7 @@ Item {
                 textFormat: Text.PlainText
                 verticalAlignment: Text.AlignTop
                 wrapMode: Text.Wrap
+                elide: Text.ElideRight
             }
         }
 
@@ -131,7 +157,7 @@ Item {
                     anchors.fill: parent
                     cursorShape: Qt.PointingHandCursor
                     onClicked: {
-                        root.accepted()
+                        root.accepted(root.targetId)
                         root.close()
                     }
                 }

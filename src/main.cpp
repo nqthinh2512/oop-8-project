@@ -1,4 +1,3 @@
-// src/main.cpp
 #include <QCoreApplication>
 #include <QDebug>
 #include <QGuiApplication>
@@ -6,13 +5,14 @@
 #include <QQmlContext>
 
 #include "backend/storage/database_manager.h"
+#include "frontend/budgets_controller.h"
 #include "frontend/categories_controller.h"
 #include "frontend/overview_controller.h"
 #include "frontend/reports_controller.h"
-
 #include "frontend/settings_controller.h"
 #include "frontend/transactions_controller.h"
 #include "frontend/bills_controller.h"
+#include "frontend/savings_controller.h"
 
 int main(int argc, char *argv[])
 {
@@ -31,8 +31,10 @@ int main(int argc, char *argv[])
     OverviewController overviewCtrl;
     ReportsController reportsCtrl;
     SettingsController settingsCtrl;
+    BudgetsController budgetsCtrl;
     TransactionsController transactionsCtrl;
     BillsController billsCtrl;
+    SavingsController savingsCtrl;
 
     QQmlApplicationEngine engine;
 
@@ -41,8 +43,10 @@ int main(int argc, char *argv[])
     engine.rootContext()->setContextProperty("overviewController", &overviewCtrl);
     engine.rootContext()->setContextProperty("reportsController", &reportsCtrl);
     engine.rootContext()->setContextProperty("settingsController", &settingsCtrl);
+    engine.rootContext()->setContextProperty("budgetsController", &budgetsCtrl);
     engine.rootContext()->setContextProperty("transactionsController", &transactionsCtrl);
     engine.rootContext()->setContextProperty("billsController", &billsCtrl);
+    engine.rootContext()->setContextProperty("savingsController", &savingsCtrl);
 
     engine.load(QUrl(QStringLiteral("qrc:/qt/qml/src/qml/Main.qml")));
 

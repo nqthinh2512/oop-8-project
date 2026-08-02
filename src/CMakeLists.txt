@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 3.16)
 
-project(FinanceDashboard VERSION 1.0 LANGUAGES CXX)
+# Sửa LANGUAGES CXX thành LANGUAGES C CXX để tương thích với Qt6 và Threads
+project(FinanceDashboard VERSION 1.0 LANGUAGES C CXX)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -15,7 +16,7 @@ qt_standard_project_setup(REQUIRES 6.10)
 # 1. Insert C++ backend and frontend here
 qt_add_executable(appFinanceDashboard
     main.cpp
-    
+
     # Backend Storage
     backend/storage/database_manager.h
     backend/storage/database_manager_bill.cpp
@@ -39,9 +40,10 @@ qt_add_executable(appFinanceDashboard
 
     backend/models/transaction.h
     backend/models/transaction.cpp
+
     backend/models/transaction_factory.h
     backend/models/transaction_factory.cpp
-    
+
     # Frontend Controllers
     frontend/overview_controller.h
     frontend/overview_controller.cpp

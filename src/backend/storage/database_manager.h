@@ -125,8 +125,10 @@ public:
     void saveSavingsToCSV() const;
     // API lấy danh sách hũ tiết kiệm cấp cho giao diện UI hiển thị
     const QVector<Saving>& getAllSavings() const { return m_savings; }
-    // Thêm hũ tiết kiệm mới từ UI (id được tự sinh, currentAmount bắt đầu = 0)
-    void addSaving(const QString& name, const QDate& dueDate, double target);
+    // Thêm hũ tiết kiệm mới từ UI (id được tự sinh)
+    void addSaving(const QString& name, Priority priority, int categoryId, double target, double currentAmount, const QDate& dueDate);
+    // Sửa hũ tiết kiệm
+    bool updateSaving(int savingId, const QString& name, Priority priority, int categoryId, double target, double currentAmount, const QDate& dueDate);
     // Góp tiền vào 1 hũ tiết kiệm theo id
     bool contributeToSaving(int savingId, double amount);
     // Xóa hũ tiết kiệm theo id

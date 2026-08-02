@@ -10,18 +10,61 @@ Rectangle {
     color: "#e9e9e9"
     radius: 8
 
+    property string text: ""
     property string selectedDate: ""
     signal dateSelected(string dateStr)
 
+    property bool _internalChange: false
+
+    onTextChanged: {
+        if (_internalChange) return
+        _internalChange = true
+        if (!text) {
+            dayInput.text = ""
+            monthInput.text = ""
+            yearInput.text = ""
+            selectedDate = ""
+        } else {
+            selectedDate = text
+            var parts = text.split("/")
+            if (parts.length === 3) {
+                dayInput.text = parts[0]
+                monthInput.text = parts[1]
+                yearInput.text = parts[2]
+            }
+        }
+        _internalChange = false
+    }
+
+    function updateTextFromInputs() {
+        if (_internalChange) return
+        _internalChange = true
+        var d = dayInput.text.trim()
+        var m = monthInput.text.trim()
+        var y = yearInput.text.trim()
+
+        var formatted = d + "/" + m + "/" + y
+        selectedDate = formatted
+        text = formatted
+        _internalChange = false
+    }
+
     // Helper to format date numbers to 2 digits
-    function pad(n) { return n < 10 ? "0" + n : "" + n }
+    function pad(n) {
+        var val = parseInt(n) || 0
+        return val < 10 ? "0" + val : "" + val
+    }
 
     // Set date programmatically or from calendar picker
     function setDate(d, m, y) {
+        _internalChange = true
         dayInput.text = pad(d)
         monthInput.text = pad(m)
         yearInput.text = y.toString()
-        selectedDate = dayInput.text + "/" + monthInput.text + "/" + yearInput.text
+        var formatted = dayInput.text + "/" + monthInput.text + "/" + yearInput.text
+        selectedDate = formatted
+        text = formatted
+        _internalChange = false
         dateSelected(selectedDate)
     }
 
@@ -74,6 +117,7 @@ Rectangle {
 
             onTextChanged: {
                 if (text.length === 2) monthInput.forceActiveFocus()
+                date_Input_Field.updateTextFromInputs()
                 updateDateFromInputs()
             }
         }
@@ -113,7 +157,7 @@ Rectangle {
 
             onTextChanged: {
                 if (text.length === 2) yearInput.forceActiveFocus()
-                updateDateFromInputs()
+                date_Input_Field.updateTextFromInputs()
             }
         }
 
@@ -149,7 +193,10 @@ Rectangle {
                 horizontalAlignment: Text.AlignHCenter
                 verticalAlignment: Text.AlignVCenter
             }
-            onTextChanged: updateDateFromInputs()
+
+            onTextChanged: {
+                date_Input_Field.updateTextFromInputs()
+            }
         }
     }
 
