@@ -68,6 +68,9 @@ qt_add_executable(appFinanceDashboard
 
     frontend/settings_controller.cpp
     frontend/settings_controller.h
+
+    frontend/session_controller.h
+    frontend/session_controller.cpp
 )
 
 # 2. REGISTER QML MODULE & ALL QML FILES AND ASSETS
@@ -88,6 +91,7 @@ qt_add_qml_module(appFinanceDashboard
         qml/pages/ReportsPage.qml
         qml/pages/SettingsPage.qml
         qml/pages/SettingsPage_1.qml
+        qml/pages/LoginPage.qml
 
         # Sidebar Components:
         qml/components/sidebar/Sidebar_menu_1.qml

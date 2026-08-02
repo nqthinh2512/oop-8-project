@@ -17,9 +17,11 @@ Window {
 
     visibility: Window.Maximized
 
+    // 1. MAIN DASHBOARD VIEW (Shown when logged in)
     RowLayout {
         anchors.fill: parent
         spacing: 0
+        visible: sessionController.isLoggedIn
 
         // 1. SIDEBAR NAVIGATION MENU
         Sidebar_menu_1 {
@@ -48,5 +50,9 @@ Window {
         }
     }
 
-   // DialogTestOverlay {} //Cái này chỉ để "preview" mấy cái dialog trông như thế nào thôi, nếu không cần nữa chỉ cần đóng comment nó lại.
+    // 2. LOGIN PAGE OVERLAY (Shown when logged out)
+    LoginPage {
+        anchors.fill: parent
+        visible: !sessionController.isLoggedIn
+    }
 }
