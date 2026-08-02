@@ -1,4 +1,5 @@
 #include "overview_controller.h"
+#include "../backend/models/transaction.h"
 #include <QLocale>
 
 OverviewController::OverviewController(QObject *parent)
@@ -205,6 +206,76 @@ QVariantMap OverviewController::topBudget() const {
     result["spentFormatted"] = formatVND(best->getSpent());
     result["limitFormatted"] = formatVND(best->getLimit());
     return result;
+}
+
+QVariantMap OverviewController::monthlyChartData() const {
+    QVariantMap res;
+    QDate today = QDate::currentDate();
+
+    QStringList months;
+    QVector<double> incomeTotals(6, 0.0);
+    QVector<double> expenseTotals(6, 0.0);
+
+    QVector<QDate> monthDates;
+    for (int i = 5; i >= 0; --i) {
+        QDate d = today.addMonths(-i);
+        months.append(d.toString("MMM"));
+        monthDates.append(d);
+    }
+
+    const auto& transactions = DatabaseManager::instance().getAllTransactions();
+    for (const Transaction* t : transactions) {
+        if (!t) continue;
+        QDate td = t->getDateTime().date();
+        for (int i = 0; i < 6; ++i) {
+            if (td.year() == monthDates[i].year() && td.month() == monthDates[i].month()) {
+                if (t->getSignedAmount() > 0) {
+                    incomeTotals[i] += t->getAmount();
+                } else if (t->getSignedAmount() < 0) {
+                    expenseTotals[i] += t->getAmount();
+                }
+                break;
+            }
+        }
+    }
+
+    double maxVal = 0.0;
+    for (int i = 0; i < 6; ++i) {
+        if (incomeTotals[i] > maxVal) maxVal = incomeTotals[i];
+        if (expenseTotals[i] > maxVal) maxVal = expenseTotals[i];
+    }
+
+    if (maxVal <= 0.0) {
+        maxVal = 10000000.0;
+    }
+
+    double scale = (maxVal > 5000000.0) ? std::ceil(maxVal / 5000000.0) * 5000000.0 : std::ceil(maxVal / 1000000.0) * 1000000.0;
+
+    QVariantList incomeRatios;
+    QVariantList expenseRatios;
+    for (int i = 0; i < 6; ++i) {
+        incomeRatios.append(incomeTotals[i] / scale);
+        expenseRatios.append(expenseTotals[i] / scale);
+    }
+
+    auto fmtShort = [](double val) -> QString {
+        if (val >= 1000000.0) return QString::number(val / 1000000.0, 'f', (fmod(val, 1000000.0) == 0 ? 0 : 1)) + "M";
+        if (val >= 1000.0) return QString::number(val / 1000.0, 'f', 0) + "K";
+        return QString::number(val, 'f', 0);
+    };
+
+    QStringList yTicks;
+    yTicks.append(fmtShort(scale));
+    yTicks.append(fmtShort(scale * 0.75));
+    yTicks.append(fmtShort(scale * 0.50));
+    yTicks.append(fmtShort(scale * 0.25));
+    yTicks.append("0");
+
+    res["months"] = months;
+    res["incomeRatios"] = incomeRatios;
+    res["expenseRatios"] = expenseRatios;
+    res["yTicks"] = yTicks;
+    return res;
 }
 
 void OverviewController::refresh() {

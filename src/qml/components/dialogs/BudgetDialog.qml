@@ -29,7 +29,7 @@ Item {
 
         // Reset dữ liệu ô nhập
         textField.text = ""
-        supporting_text.text = "0"
+        supporting_text.text = ""
         supporting_text_1.text = ""
 
         // Reset Priority về Medium
@@ -62,10 +62,12 @@ Item {
         title_1.text = "Edit Budget"
         saveButton.buttonText = "Save"
 
-        // Nap dữ liệu cần sửa
+        // Nạp dữ liệu cần sửa
         textField.text = modelData.name || ""
-        supporting_text.text = modelData.spentText ? modelData.spentText.replace(/[^0-9.]/g, '') : "0"
-        supporting_text_1.text = modelData.limitText ? modelData.limitText.replace(/[^0-9.]/g, '') : ""
+        var rawSpent = modelData.spentText ? modelData.spentText.replace(/[^0-9]/g, '') : "0"
+        supporting_text.text = rawSpent.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+        var rawLimit = modelData.limitText ? modelData.limitText.replace(/[^0-9]/g, '') : ""
+        supporting_text_1.text = rawLimit.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
 
         // Priority: modelData.priority là int (0=Low,1=Medium,2=High)
         var priorityLabels = ["Low", "Medium", "High"]
@@ -364,9 +366,21 @@ Item {
                         selectByMouse: true
                         enabled: !root.isEditMode
                         inputMethodHints: Qt.ImhFormattedNumbersOnly
+                        onTextChanged: {
+                            if (activeFocus) {
+                                var raw = text.replace(/[^0-9]/g, "")
+                                var formatted = raw.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                                if (text !== formatted) {
+                                    var oldLen = text.length
+                                    var pos = cursorPosition
+                                    text = formatted
+                                    cursorPosition = Math.min(formatted.length, Math.max(0, pos + (formatted.length - oldLen)))
+                                }
+                            }
+                        }
 
                         Text {
-                            text: "0.0"
+                            text: "0"
                             color: "#8049454f"
                             font: parent.font
                             visible: !parent.text && !parent.activeFocus
@@ -424,9 +438,21 @@ Item {
                         clip: true
                         selectByMouse: true
                         inputMethodHints: Qt.ImhFormattedNumbersOnly
+                        onTextChanged: {
+                            if (activeFocus) {
+                                var raw = text.replace(/[^0-9]/g, "")
+                                var formatted = raw.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                                if (text !== formatted) {
+                                    var oldLen = text.length
+                                    var pos = cursorPosition
+                                    text = formatted
+                                    cursorPosition = Math.min(formatted.length, Math.max(0, pos + (formatted.length - oldLen)))
+                                }
+                            }
+                        }
 
                         Text {
-                            text: "1000.0"
+                            text: "1,000,000"
                             color: "#8049454f"
                             font: parent.font
                             visible: !parent.text && !parent.activeFocus
@@ -593,8 +619,8 @@ Item {
                         // vì Dropdown_1 không có property "selectedCategoryId" =====
                         var catId = (root.categoryList.length > 0 && dropdown_3.selectedIndex < root.categoryList.length)
                             ? root.categoryList[dropdown_3.selectedIndex].id : 0
-                        var spent = parseFloat(supporting_text.text) || 0.0
-                        var limit = parseFloat(supporting_text_1.text) || 0.0
+                        var spent = parseFloat(supporting_text.text.replace(/,/g, '')) || 0.0
+                        var limit = parseFloat(supporting_text_1.text.replace(/,/g, '')) || 0.0
                         var startStr = date_Input_Field.hasOwnProperty("text") ? date_Input_Field.text : ""
                         var endStr = date_Input_Field_1.hasOwnProperty("text") ? date_Input_Field_1.text : ""
 

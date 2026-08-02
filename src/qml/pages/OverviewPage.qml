@@ -219,7 +219,7 @@ Rectangle {
                                     font.family: "Inter"
                                     font.pixelSize: 13
                                     color: "#94a3b8"
-                                    text: "Last Month"
+                                    text: "Last 6 Months"
                                 }
                             }
 
@@ -267,7 +267,8 @@ Rectangle {
                                         ctx.strokeStyle = "#f1f5f9";
                                         ctx.lineWidth = 1;
 
-                                        var yTicks = ["20M", "15M", "10M", "5M", "0"];
+                                        var chartData = overviewController.monthlyChartData;
+                                        var yTicks = (chartData && chartData.yTicks) ? chartData.yTicks : ["20M", "15M", "10M", "5M", "0"];
                                         for (var i = 0; i < yTicks.length; i++) {
                                             var ratio = i / (yTicks.length - 1);
                                             var y = padT + ratio * chartH;
@@ -283,9 +284,9 @@ Rectangle {
                                         }
 
                                         // X-Axis Month Labels & Bars
-                                        var months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun"];
-                                        var incomeRatios = [0.65, 0.50, 0.80, 0.55, 0.85, 0.70];
-                                        var expenseRatios = [0.40, 0.55, 0.45, 0.60, 0.35, 0.50];
+                                        var months = (chartData && chartData.months) ? chartData.months : ["Jan", "Feb", "Mar", "Apr", "May", "Jun"];
+                                        var incomeRatios = (chartData && chartData.incomeRatios) ? chartData.incomeRatios : [0, 0, 0, 0, 0, 0];
+                                        var expenseRatios = (chartData && chartData.expenseRatios) ? chartData.expenseRatios : [0, 0, 0, 0, 0, 0];
 
                                         var count = months.length;
                                         var groupWidth = chartW / count;
