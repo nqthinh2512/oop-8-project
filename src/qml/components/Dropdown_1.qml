@@ -9,9 +9,9 @@ Rectangle {
 
     // ===== Exposed API Properties =====
     property int _state: Dropdown_1.State_1.State_1_default
-    property string selectedText: "Select Choice"
     property int selectedIndex: 0
     property var model: []
+    property string selectedText: (model && selectedIndex >= 0 && selectedIndex < model.length) ? model[selectedIndex] : "Select Choice"
     property alias dropdownBorderWidth: dropdown.border.width
     property bool menuOpen: false
 

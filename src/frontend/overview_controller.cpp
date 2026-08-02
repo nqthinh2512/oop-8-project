@@ -88,9 +88,17 @@ QVariantList OverviewController::recentTransactions() const {
         const Transaction* t = transactions[i];
         if (!t) continue;
 
+        QString note = t->getNote();
+        if (note.startsWith("[TYPE:")) {
+            int closeIdx = note.indexOf("]");
+            if (closeIdx != -1) note = note.mid(closeIdx + 1);
+        }
+        int sepIdx = note.indexOf("||");
+        if (sepIdx != -1) note = note.left(sepIdx);
+
         QVariantMap item;
         item["id"] = t->getId();
-        item["note"] = t->getNote();
+        item["note"] = note;
         item["categoryName"] = getCatName(t->getCategoryId());
         item["amount"] = t->getAmount();
         item["signedAmount"] = t->getSignedAmount();

@@ -10,6 +10,14 @@ Rectangle {
     color: "#f8fafc"
     clip: true
 
+    onVisibleChanged: {
+        if (!visible) {
+            toolbarDropdown.menuOpen = false
+            searchBar.text = ""
+            categoriesController.resetFilters()
+        }
+    }
+
     CategoryDialog {
         id: categoryDialog
 
@@ -100,13 +108,37 @@ Rectangle {
                         }
                     }
 
-                    // Consolidated Category Group Filter Dropdown (Replaces horizontal button clutter)
+                    // Status Filter Buttons
+                    RowLayout {
+                        spacing: 6
+
+                        UniversalButton_1 {
+                            buttonText: "All"
+                            _state: categoriesController.statusFilter === 0 ? UniversalButton_1.State_1.State_1_selected : UniversalButton_1.State_1.State_1_default
+                            onClicked: categoriesController.statusFilter = 0
+                        }
+
+                        UniversalButton_1 {
+                            buttonText: "Active"
+                            _state: categoriesController.statusFilter === 1 ? UniversalButton_1.State_1.State_1_selected : UniversalButton_1.State_1.State_1_default
+                            onClicked: categoriesController.statusFilter = 1
+                        }
+
+                        UniversalButton_1 {
+                            buttonText: "Inactive"
+                            _state: categoriesController.statusFilter === 2 ? UniversalButton_1.State_1.State_1_selected : UniversalButton_1.State_1.State_1_default
+                            onClicked: categoriesController.statusFilter = 2
+                        }
+                    }
+
+                    Rectangle { Layout.preferredWidth: 1; Layout.preferredHeight: 24; color: "#cbd5e1" }
+
+                    // Consolidated Category Group Filter Dropdown
                     Dropdown_1 {
                         id: toolbarDropdown
-                        Layout.preferredWidth: 220
+                        Layout.preferredWidth: 200
                         model: ["All Categories", "Income (Parent 1)", "Expense (Parent 2)", "Bill (Parent 3)", "Budget (Parent 4)", "Saving (Parent 5)"]
-                        selectedText: "All Categories"
-                        selectedIndex: 0
+                        selectedIndex: categoriesController.parentFilter
 
                         onSelected: (idx, val) => {
                             categoriesController.parentFilter = idx
@@ -235,7 +267,7 @@ Rectangle {
                     width: listView.width
                     mainCategoryName: modelData.parentName
                     categoryName: modelData.name
-                    totalAmountText: "0 VND"
+                    totalAmountText: modelData.totalAmountFormatted
                     status_1: modelData.active ? CategoryRow_1.Status.Status_active : CategoryRow_1.Status.Status_inactive
 
                     onEditClicked: {
