@@ -21,11 +21,7 @@ int main(int argc, char *argv[])
 
     // Initialize Database & load data from CSVs
     DatabaseManager &db = DatabaseManager::instance();
-    db.loadCategoriesFromCSV();
-    db.loadTransactionsFromCSV();
-    db.loadBillsFromCSV();
-    db.loadBudgetsFromCSV();
-    db.loadSavingsFromCSV();
+    // DAOs automatically load data from CSV on creation
 
     // Instantiate Controllers for your pages
     CategoriesController categoriesCtrl;

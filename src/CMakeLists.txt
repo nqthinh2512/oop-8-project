@@ -17,14 +17,21 @@ qt_standard_project_setup(REQUIRES 6.10)
 qt_add_executable(appFinanceDashboard
     main.cpp
 
-    # Backend Storage
+    # Backend Storage & DAO
+    backend/dao/ibase_dao.h
+    backend/dao/category_dao.h
+    backend/dao/category_dao.cpp
+    backend/dao/transaction_dao.h
+    backend/dao/transaction_dao.cpp
+    backend/dao/bill_dao.h
+    backend/dao/bill_dao.cpp
+    backend/dao/budget_dao.h
+    backend/dao/budget_dao.cpp
+    backend/dao/saving_dao.h
+    backend/dao/saving_dao.cpp
+
     backend/storage/database_manager.h
-    backend/storage/database_manager_bill.cpp
-    backend/storage/database_manager_budget.cpp
-    backend/storage/database_manager_category.cpp
-    backend/storage/database_manager_export.cpp
-    backend/storage/database_manager_saving.cpp
-    backend/storage/database_manager_transaction.cpp
+    backend/storage/database_manager.cpp
 
     # Backend Model
     backend/models/category.h

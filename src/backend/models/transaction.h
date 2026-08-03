@@ -26,6 +26,7 @@ public:
     QDateTime getDateTime() const { return dateTime; }
 
     // Setters
+    void setId(int newId) { id = newId; }
     void setCategoryId(int n_categoryId) { categoryId = n_categoryId; }
 
     // cái virtual function này biến class thành abstract class nên.. đừng có xóa, thanks.

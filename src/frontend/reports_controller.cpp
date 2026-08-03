@@ -21,7 +21,7 @@ static bool isCurrentPeriod(const QDate& itemDate, const QDate& today) {
 
 QString ReportsController::monthlyIncomeFormatted() const {
     double total = 0.0;
-    const auto& transactions = DatabaseManager::instance().getAllTransactions();
+    const auto& transactions = DatabaseManager::instance().transactionDAO()->getAll();
     QDate today = QDate::currentDate();
 
     for (const Transaction* t : transactions) {
@@ -36,7 +36,7 @@ QString ReportsController::monthlyIncomeFormatted() const {
 
 QString ReportsController::monthlyExpenseFormatted() const {
     double total = 0.0;
-    const auto& transactions = DatabaseManager::instance().getAllTransactions();
+    const auto& transactions = DatabaseManager::instance().transactionDAO()->getAll();
     QDate today = QDate::currentDate();
 
     for (const Transaction* t : transactions) {
@@ -51,7 +51,7 @@ QString ReportsController::monthlyExpenseFormatted() const {
 
 QString ReportsController::netWorthFormatted() const {
     double balance = 0.0;
-    const auto& transactions = DatabaseManager::instance().getAllTransactions();
+    const auto& transactions = DatabaseManager::instance().transactionDAO()->getAll();
     for (const Transaction* t : transactions) {
         if (t) balance += t->getSignedAmount();
     }
@@ -61,7 +61,7 @@ QString ReportsController::netWorthFormatted() const {
 QString ReportsController::savingsRateFormatted() const {
     double income = 0.0;
     double expense = 0.0;
-    const auto& transactions = DatabaseManager::instance().getAllTransactions();
+    const auto& transactions = DatabaseManager::instance().transactionDAO()->getAll();
     QDate today = QDate::currentDate();
 
     for (const Transaction* t : transactions) {
@@ -86,7 +86,7 @@ QVariantMap ReportsController::billsSnapshot() const {
     double overdue = 0.0;
     double paid = 0.0;
 
-    const auto& bills = DatabaseManager::instance().getAllBills();
+    const auto& bills = DatabaseManager::instance().billDAO()->getAll();
     QDate today = QDate::currentDate();
 
     for (const Bill& b : bills) {
@@ -110,7 +110,7 @@ QVariantMap ReportsController::budgetsSnapshot() const {
     double spent = 0.0;
     double limit = 0.0;
 
-    const auto& budgets = DatabaseManager::instance().getAllBudgets();
+    const auto& budgets = DatabaseManager::instance().budgetDAO()->getAll();
     for (const Budget& b : budgets) {
         spent += b.getSpent();
         limit += b.getLimit();
@@ -129,7 +129,7 @@ QVariantMap ReportsController::savingsSnapshot() const {
     double saved = 0.0;
     double target = 0.0;
 
-    const auto& savings = DatabaseManager::instance().getAllSavings();
+    const auto& savings = DatabaseManager::instance().savingDAO()->getAll();
     for (const Saving& s : savings) {
         saved += s.getCurrent();
         target += s.getTarget();
@@ -145,8 +145,8 @@ QVariantMap ReportsController::savingsSnapshot() const {
 
 QVariantList ReportsController::categoryExpenseReport() const {
     QVariantList result;
-    const auto& transactions = DatabaseManager::instance().getAllTransactions();
-    const auto& categories = DatabaseManager::instance().getAllCategories();
+    const auto& transactions = DatabaseManager::instance().transactionDAO()->getAll();
+    const auto& categories = DatabaseManager::instance().categoryDAO()->getAll();
 
     QMap<int, QString> catNames;
     for (const auto& c : categories) {
@@ -214,8 +214,8 @@ QVariantList ReportsController::categoryExpenseReport() const {
 
 QVariantList ReportsController::categoryIncomeReport() const {
     QVariantList result;
-    const auto& transactions = DatabaseManager::instance().getAllTransactions();
-    const auto& categories = DatabaseManager::instance().getAllCategories();
+    const auto& transactions = DatabaseManager::instance().transactionDAO()->getAll();
+    const auto& categories = DatabaseManager::instance().categoryDAO()->getAll();
 
     QMap<int, QString> catNames;
     for (const auto& c : categories) {
@@ -296,7 +296,7 @@ QVariantMap ReportsController::monthlyChartData() const {
         monthDates.append(d);
     }
 
-    const auto& transactions = DatabaseManager::instance().getAllTransactions();
+    const auto& transactions = DatabaseManager::instance().transactionDAO()->getAll();
     for (const Transaction* t : transactions) {
         if (!t) continue;
         QDate td = t->getDateTime().date();
@@ -364,7 +364,7 @@ QVariantMap ReportsController::netWorthChartData() const {
     }
 
     QVector<double> nwTotals(6, 0.0);
-    const auto& transactions = DatabaseManager::instance().getAllTransactions();
+    const auto& transactions = DatabaseManager::instance().transactionDAO()->getAll();
 
     for (int i = 0; i < 6; ++i) {
         QDate monthEnd(monthDates[i].year(), monthDates[i].month(), monthDates[i].daysInMonth());
@@ -414,5 +414,5 @@ void ReportsController::refresh() {
 }
 
 bool ReportsController::exportToCSV(const QString &filePath) {
-    return DatabaseManager::instance().exportTransactionsToCSV(filePath);
+    return DatabaseManager::instance().transactionDAO()->exportToCSV(filePath);
 }
