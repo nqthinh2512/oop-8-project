@@ -40,19 +40,20 @@ void DatabaseManager::loadTransactionsFromCSV() {
             if (line.isEmpty()) continue;
 
             QStringList fields = line.split(",");
-            if (fields.size() >= 6) {
+            if (fields.size() >= 7) {
                 QString type = fields[0];
                 int id = fields[1].toInt();
-                double amount = fields[2].toDouble();
-                QDateTime dt = QDateTime::fromString(fields[3], Qt::ISODate);
+                QString title = fields[2];
+                double amount = fields[3].toDouble();
+                QDateTime dt = QDateTime::fromString(fields[4], Qt::ISODate);
                 if (!dt.isValid()) dt = QDateTime::currentDateTime();
-                QString note = fields[4];
-                int catId = fields[5].toInt();
+                QString method = fields[5];
+                int catId = fields[6].toInt();
 
                 if (type == "Income") {
-                    m_transactions.append(new Income(id, amount, dt, note, catId));
+                    m_transactions.append(new Income(id, title, amount, dt, method, catId));
                 } else {
-                    m_transactions.append(new Expense(id, amount, dt, note, catId));
+                    m_transactions.append(new Expense(id, title, amount, dt, method, catId));
                 }
             }
         }
@@ -67,14 +68,14 @@ void DatabaseManager::loadTransactionsFromCSV() {
         QDateTime now = QDateTime::currentDateTime();
 
         // 1. Thu nhập (Income)
-        m_transactions.append(new Income(id++, 15000000.0, now.addDays(-15), "Monthly Salary", 1)); // Salary
-        m_transactions.append(new Income(id++, 3500000.0, now.addDays(-5), "Freelance Web Design", 2)); // Freelance
+        m_transactions.append(new Income(id++, "Monthly Salary", 15000000.0, now.addDays(-15), "Bank Transfer", 1)); // Salary
+        m_transactions.append(new Income(id++, "Freelance Web Design", 3500000.0, now.addDays(-5), "Bank Transfer", 2)); // Freelance
 
         // 2. Chi tiêu (Expense)
-        m_transactions.append(new Expense(id++, 3500000.0, now.addDays(-10), "Monthly Apartment Rent", 6)); // Housing & Rent
-        m_transactions.append(new Expense(id++, 850000.0, now.addDays(-3), "Weekly Grocery & Dining", 5)); // Food & Dining
-        m_transactions.append(new Expense(id++, 250000.0, now.addDays(-2), "Fiber Internet Service", 8)); // Utilities & Services
-        m_transactions.append(new Expense(id++, 200000.0, now.addDays(-1), "Fuel & Transportation", 7)); // Transportation
+        m_transactions.append(new Expense(id++, "Monthly Apartment Rent", 3500000.0, now.addDays(-10), "Cash", 6)); // Housing & Rent
+        m_transactions.append(new Expense(id++, "Weekly Grocery & Dining", 850000.0, now.addDays(-3), "Cash", 5)); // Food & Dining
+        m_transactions.append(new Expense(id++, "Fiber Internet Service", 250000.0, now.addDays(-2), "Credit Card", 8)); // Utilities & Services
+        m_transactions.append(new Expense(id++, "Fuel & Transportation", 200000.0, now.addDays(-1), "Cash", 7)); // Transportation
 
         saveTransactionsToCSV();
     }
@@ -82,7 +83,7 @@ void DatabaseManager::loadTransactionsFromCSV() {
     qDebug() << "Đã tải" << m_transactions.size() << "giao dịch từ transactions.csv vào RAM.";
 }
 
-//  ghi file csv : Ghi type, id, amount, date, note, categoryId
+//  ghi file csv : Ghi type, id, title, amount, dateTime, method, categoryId
 void DatabaseManager::saveTransactionsToCSV() const {
     QString dirPath = DatabaseManager::getDataDirectoryPath();
     QDir dir(dirPath);
@@ -98,16 +99,17 @@ void DatabaseManager::saveTransactionsToCSV() const {
     }
 
     QTextStream out(&file);
-    out << "type,id,amount,dateTime,note,categoryId\n";
+    out << "type,id,title,amount,dateTime,method,categoryId\n";
 
     for (const Transaction* t : m_transactions) {
         if (!t) continue;
         QString type = (dynamic_cast<const Income*>(t) != nullptr) ? "Income" : "Expense";
         out << type << ","
             << t->getId() << ","
+            << t->getTitle() << ","
             << QString::number(t->getAmount(), 'f', 2) << ","
             << t->getDateTime().toString(Qt::ISODate) << ","
-            << t->getNote() << ","
+            << t->getMethod() << ","
             << t->getCategoryId() << "\n";
     }
     file.close();

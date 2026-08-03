@@ -119,15 +119,16 @@ bool DatabaseManager::exportTransactionsToCSV(const QString& targetFilePath) con
     }
 
     QTextStream out(&file);
-    out << "type,id,amount,dateTime,note,categoryId\n";
+    out << "type,id,title,amount,dateTime,method,categoryId\n";
     for (const Transaction* t : m_transactions) {
         if (!t) continue;
         QString type = (dynamic_cast<const Income*>(t) != nullptr) ? "Income" : "Expense";
         out << type << ","
             << t->getId() << ","
+            << t->getTitle() << ","
             << QString::number(t->getAmount(), 'f', 2) << ","
             << t->getDateTime().toString(Qt::ISODate) << ","
-            << t->getNote() << ","
+            << t->getMethod() << ","
             << t->getCategoryId() << "\n";
     }
     file.close();
