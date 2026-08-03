@@ -49,11 +49,11 @@ static QString formatVND(double amount) {
 }
 
 QVariantList CategoriesController::categoriesList() const {
-    const QVector<Category>& categories = DatabaseManager::instance().getAllCategories();
-    const auto& transactions = DatabaseManager::instance().getAllTransactions();
-    const auto& bills = DatabaseManager::instance().getAllBills();
-    const auto& budgets = DatabaseManager::instance().getAllBudgets();
-    const auto& savings = DatabaseManager::instance().getAllSavings();
+    const QVector<Category>& categories = DatabaseManager::instance().categoryDAO()->getAll();
+    const auto& transactions = DatabaseManager::instance().transactionDAO()->getAll();
+    const auto& bills = DatabaseManager::instance().billDAO()->getAll();
+    const auto& budgets = DatabaseManager::instance().budgetDAO()->getAll();
+    const auto& savings = DatabaseManager::instance().savingDAO()->getAll();
 
     QMap<int, double> categorySums;
     for (const auto* t : transactions) {
@@ -129,38 +129,77 @@ QVariantList CategoriesController::categoriesList() const {
 
 bool CategoriesController::addCategory(const QString &name, int parentId, bool active) {
     if (name.trimmed().isEmpty()) return false;
-    DatabaseManager::instance().addUserCustomCategory(name.trimmed(), parentId, active);
+    Category cat(0, parentId, name.trimmed());
+    cat.setActive(active);
+    DatabaseManager::instance().categoryDAO()->add(cat);
     emit categoriesChanged();
     return true;
 }
 
 bool CategoriesController::updateCategory(int id, const QString &name, int newParentId, bool active) {
     if (name.trimmed().isEmpty()) return false;
-    DatabaseManager::instance().updateCategory(id, name.trimmed(), newParentId, active);
+    Category cat(id, newParentId, name.trimmed());
+    cat.setActive(active);
+    DatabaseManager::instance().categoryDAO()->update(id, cat);
     emit categoriesChanged();
     return true;
 }
 
 bool CategoriesController::updateCategoryParent(int id, int newParentId) {
-    DatabaseManager::instance().updateCategoryParent(id, newParentId);
+    for (const Category& cat : DatabaseManager::instance().categoryDAO()->getAll()) {
+        if (cat.getId() == id) {
+            Category updatedCat = cat;
+            updatedCat.setParentId(newParentId);
+            DatabaseManager::instance().categoryDAO()->update(id, updatedCat);
+            break;
+        }
+    }
     emit categoriesChanged();
     return true;
 }
 
 bool CategoriesController::removeCategory(int id) {
-    DatabaseManager::instance().removeCategory(id);
+    DatabaseManager::instance().categoryDAO()->remove(id);
     emit categoriesChanged();
     return true;
 }
 
 bool CategoriesController::migrateAndRemoveCategory(int sourceId, int targetId) {
-    DatabaseManager::instance().migrateAndRemoveCategory(sourceId, targetId);
+    for (const Transaction* t : DatabaseManager::instance().transactionDAO()->getAll()) {
+        if (t->getCategoryId() == sourceId) {
+            Transaction* updatedT = const_cast<Transaction*>(t);
+            updatedT->setCategoryId(targetId);
+            DatabaseManager::instance().transactionDAO()->update(t->getId(), updatedT);
+        }
+    }
+    for (const Bill& b : DatabaseManager::instance().billDAO()->getAll()) {
+        if (b.getCategoryId() == sourceId) {
+            Bill updatedB = b;
+            updatedB.setCategoryId(targetId);
+            DatabaseManager::instance().billDAO()->update(b.getId(), updatedB);
+        }
+    }
+    for (const Budget& b : DatabaseManager::instance().budgetDAO()->getAll()) {
+        if (b.getCategoryId() == sourceId) {
+            Budget updatedB = b;
+            updatedB.setCategoryId(targetId);
+            DatabaseManager::instance().budgetDAO()->update(b.getId(), updatedB);
+        }
+    }
+    for (const Saving& s : DatabaseManager::instance().savingDAO()->getAll()) {
+        if (s.getCategoryId() == sourceId) {
+            Saving updatedS = s;
+            updatedS.setCategoryId(targetId);
+            DatabaseManager::instance().savingDAO()->update(s.getId(), updatedS);
+        }
+    }
+    DatabaseManager::instance().categoryDAO()->remove(sourceId);
     emit categoriesChanged();
     return true;
 }
 
 bool CategoriesController::deactivateCategory(int id) {
-    DatabaseManager::instance().deactivateCategory(id);
+    DatabaseManager::instance().categoryDAO()->deactivate(id);
     emit categoriesChanged();
     return true;
 }
@@ -178,5 +217,5 @@ void CategoriesController::refresh() {
 }
 
 bool CategoriesController::exportToCSV(const QString &filePath) {
-    return DatabaseManager::instance().exportCategoriesToCSV(filePath);
+    return DatabaseManager::instance().categoryDAO()->exportToCSV(filePath);
 }

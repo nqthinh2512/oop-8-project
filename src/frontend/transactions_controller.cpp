@@ -60,7 +60,7 @@ QVariant TransactionListModel::data(const QModelIndex &index, int role) const
     }
     case CategoryRole: {
         if (t->getCategoryId() == 0) return "Uncategorized";
-        for (const auto& cat : DatabaseManager::instance().getAllCategories()) {
+        for (const auto& cat : DatabaseManager::instance().categoryDAO()->getAll()) {
             if (cat.getId() == t->getCategoryId()) {
                 return cat.getName();
             }
@@ -154,7 +154,7 @@ void TransactionsController::loadTransactions()
 
 void TransactionsController::applyFilter()
 {
-    const QVector<Transaction*>& all = DatabaseManager::instance().getAllTransactions();
+    const QVector<Transaction*>& all = DatabaseManager::instance().transactionDAO()->getAll();
     QVector<Transaction*> filtered;
 
     QString searchLower = m_searchKeyword.toLower();
@@ -204,7 +204,7 @@ void TransactionsController::addTransaction(int typeIndex, const QString& title,
     QDateTime dt(date, QTime::currentTime());
 
     int maxId = 0;
-    for (const auto* t : DatabaseManager::instance().getAllTransactions()) {
+    for (const auto* t : DatabaseManager::instance().transactionDAO()->getAll()) {
         if (t && t->getId() > maxId) maxId = t->getId();
     }
     int id = maxId + 1;
@@ -216,7 +216,8 @@ void TransactionsController::addTransaction(int typeIndex, const QString& title,
 
     Transaction* newTx = TransactionFactory::createTransaction(typeIndex, id, amount, dt, fullNote, categoryId);
 
-    DatabaseManager::instance().addTransaction(newTx);
+    DatabaseManager::instance().transactionDAO()->add(newTx);
+    DatabaseManager::instance().triggerDataChanged();
     loadTransactions(); // Reload from DB and apply filters
 }
 
@@ -233,17 +234,19 @@ void TransactionsController::updateTransaction(int id, int typeIndex, const QStr
 
     Transaction* newTx = TransactionFactory::createTransaction(typeIndex, id, amount, dt, fullNote, categoryId);
 
-    DatabaseManager::instance().updateTransaction(id, newTx);
+    DatabaseManager::instance().transactionDAO()->update(id, newTx);
+    DatabaseManager::instance().triggerDataChanged();
     loadTransactions();
 }
 
 void TransactionsController::deleteTransaction(int id)
 {
-    DatabaseManager::instance().deleteTransaction(id);
+    DatabaseManager::instance().transactionDAO()->remove(id);
+    DatabaseManager::instance().triggerDataChanged();
     loadTransactions();
 }
 
 bool TransactionsController::exportToCSV(const QString& filePath)
 {
-    return DatabaseManager::instance().exportTransactionsToCSV(filePath);
+    return DatabaseManager::instance().transactionDAO()->exportToCSV(filePath);
 }

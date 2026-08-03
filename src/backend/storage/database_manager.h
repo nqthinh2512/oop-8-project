@@ -61,63 +61,13 @@ public:
     SavingDAO* savingDAO() const { return m_savingDAO.data(); }
     TransactionDAO* transactionDAO() const { return m_transactionDAO.data(); }
 
+    void triggerDataChanged() { emit dataChanged(); }
+
 signals:
     void dataChanged();
 
 public:
-    //=============================CATEGORY SECTION================================
-    void loadCategoriesFromCSV();
-    void saveCategoriesToCSV() const;
-    const QVector<Category>& getAllCategories() const;
-    void addUserCustomCategory(const QString& name, int parentId, bool active = true);
-    void updateCategory(int id, const QString& name, int newParentId, bool active);
-    void updateCategoryParent(int id, int newParentId);
-    void removeCategory(int id);
-    void migrateAndRemoveCategory(int sourceCatId, int targetCatId);
-    void deactivateCategory(int id);
-
-    //=============================BILL SECTION==================================
-    void loadBillsFromCSV();
-    void saveBillsToCSV() const;
-    const QVector<Bill>& getAllBills() const;
-    void addBill(const Bill& b);
-    void updateBill(int id, const Bill& b);
-    void deleteBill(int id);
-
-    //=============================BUDGET SECTION==================================
-    void loadBudgetsFromCSV();
-    void saveBudgetsToCSV() const;
-    const QVector<Budget>& getAllBudgets() const;
-    void addBudget(const QString& name, Priority priority, int categoryId,
-                   double limit, const QDate& startDate, const QDate& endDate);
-    bool updateBudget(int budgetId, const QString& name, Priority priority, int categoryId,
-                      double limit, const QDate& startDate, const QDate& endDate);
-    bool deleteBudget(int budgetId);
-    void addExpenseToBudget(int categoryId, double amount);
-
-    //=============================SAVING SECTION==================================
-    void loadSavingsFromCSV();
-    void saveSavingsToCSV() const;
-    const QVector<Saving>& getAllSavings() const;
-    void addSaving(const QString& name, Priority priority, int categoryId, double target, double currentAmount, const QDate& dueDate);
-    bool updateSaving(int savingId, const QString& name, Priority priority, int categoryId, double target, double currentAmount, const QDate& dueDate);
-    bool contributeToSaving(int savingId, double amount);
-    bool deleteSaving(int savingId);
-
-    //==========================TRANSACTION SECTION=================================
-    void loadTransactionsFromCSV();
-    void saveTransactionsToCSV() const;
-    const QVector<Transaction*>& getAllTransactions() const;
-    void addTransaction(Transaction* transaction);
-    bool updateTransaction(int id, Transaction* newTransaction);
-    bool deleteTransaction(int id);
-
     //=============================EXPORT SECTION==================================
-    bool exportCategoriesToCSV(const QString& targetFilePath) const;
-    bool exportBillsToCSV(const QString& targetFilePath) const;
-    bool exportBudgetsToCSV(const QString& targetFilePath) const;
-    bool exportSavingsToCSV(const QString& targetFilePath) const;
-    bool exportTransactionsToCSV(const QString& targetFilePath) const;
     bool exportAllToCSV(const QString& targetFolderPath) const;
 };
 

@@ -9,7 +9,7 @@ OverviewController::OverviewController(QObject *parent)
 
 double OverviewController::totalIncome() const {
     double income = 0.0;
-    const auto& transactions = DatabaseManager::instance().getAllTransactions();
+    const auto& transactions = DatabaseManager::instance().transactionDAO()->getAll();
     QDate today = QDate::currentDate();
 
     for (const Transaction* t : transactions) {
@@ -27,7 +27,7 @@ double OverviewController::totalIncome() const {
 
 double OverviewController::totalExpense() const {
     double expense = 0.0;
-    const auto& transactions = DatabaseManager::instance().getAllTransactions();
+    const auto& transactions = DatabaseManager::instance().transactionDAO()->getAll();
     QDate today = QDate::currentDate();
 
     for (const Transaction* t : transactions) {
@@ -45,7 +45,7 @@ double OverviewController::totalExpense() const {
 
 double OverviewController::netBalance() const {
     double balance = 0.0;
-    const auto& transactions = DatabaseManager::instance().getAllTransactions();
+    const auto& transactions = DatabaseManager::instance().transactionDAO()->getAll();
     for (const Transaction* t : transactions) {
         if (t) balance += t->getSignedAmount();
     }
@@ -71,8 +71,8 @@ QString OverviewController::netBalanceFormatted() const {
 
 QVariantList OverviewController::recentTransactions() const {
     QVariantList list;
-    const auto& transactions = DatabaseManager::instance().getAllTransactions();
-    const auto& categories = DatabaseManager::instance().getAllCategories();
+    const auto& transactions = DatabaseManager::instance().transactionDAO()->getAll();
+    const auto& categories = DatabaseManager::instance().categoryDAO()->getAll();
 
     // Map categoryId to category name
     auto getCatName = [&categories](int catId) -> QString {
@@ -113,8 +113,8 @@ QVariantList OverviewController::recentTransactions() const {
 
 QVariantList OverviewController::upcomingBills() const {
     QVariantList list;
-    const auto& bills = DatabaseManager::instance().getAllBills();
-    const auto& categories = DatabaseManager::instance().getAllCategories();
+    const auto& bills = DatabaseManager::instance().billDAO()->getAll();
+    const auto& categories = DatabaseManager::instance().categoryDAO()->getAll();
 
     auto getCatName = [&categories](int catId) -> QString {
         for (const auto& c : categories) {
@@ -149,7 +149,7 @@ QVariantList OverviewController::upcomingBills() const {
 }
 
 QVariantMap OverviewController::topSaving() const {
-    const auto& savings = DatabaseManager::instance().getAllSavings();
+    const auto& savings = DatabaseManager::instance().savingDAO()->getAll();
     QVariantMap result;
 
     if (savings.isEmpty()) {
@@ -183,7 +183,7 @@ QVariantMap OverviewController::topSaving() const {
 }
 
 QVariantMap OverviewController::topBudget() const {
-    const auto& budgets = DatabaseManager::instance().getAllBudgets();
+    const auto& budgets = DatabaseManager::instance().budgetDAO()->getAll();
     QVariantMap result;
 
     if (budgets.isEmpty()) {
@@ -231,7 +231,7 @@ QVariantMap OverviewController::monthlyChartData() const {
         monthDates.append(d);
     }
 
-    const auto& transactions = DatabaseManager::instance().getAllTransactions();
+    const auto& transactions = DatabaseManager::instance().transactionDAO()->getAll();
     for (const Transaction* t : transactions) {
         if (!t) continue;
         QDate td = t->getDateTime().date();
