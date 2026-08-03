@@ -10,6 +10,14 @@ Rectangle {
     clip: true
     color: "#f8fafc"
 
+    FolderDialog {
+        id: exportFolderDialog
+        title: "Select Folder to Export All CSV Data"
+        onAccepted: {
+            settingsController.exportAllToCSV(selectedFolder.toString())
+        }
+    }
+
     property bool isEditing: settingsController.isEditing
 
     // Profile Data (Current Input State)

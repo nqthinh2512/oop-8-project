@@ -7,7 +7,11 @@
 #include <QDebug>
 
 static QString resolveLocalPath(const QString& path) {
-    if (path.startsWith("file:///")) {
+    QUrl url(path);
+    if (url.isValid() && url.isLocalFile()) {
+        return url.toLocalFile();
+    }
+    if (path.startsWith("file:", Qt::CaseInsensitive)) {
         return QUrl(path).toLocalFile();
     }
     return path;

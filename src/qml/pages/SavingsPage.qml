@@ -9,6 +9,18 @@ Rectangle {
     color: "#f8fafc"
     clip: true
 
+    FileDialog {
+        id: exportFileDialog
+        title: "Export Savings to CSV"
+        fileMode: FileDialog.SaveFile
+        nameFilters: ["CSV Files (*.csv)", "All Files (*)"]
+        defaultSuffix: "csv"
+        currentFile: "savings_export.csv"
+        onAccepted: {
+            savingsController.exportToCSV(selectedFile.toString())
+        }
+    }
+
     // savingsController đã được main.cpp bơm sẵn vào QML qua context property
 
     ColumnLayout {
