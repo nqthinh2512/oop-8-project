@@ -317,10 +317,10 @@ Rectangle {
                         billDialog.reset()
                         billDialog.isEditMode = true
                         billDialog.billId = model.tId
-                        billDialog.billTitle = model.tName
                         
                         var rawAmount = model.tAmount.replace(/[^0-9]/g, '')
-                        billDialog.billAmount = rawAmount.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                        var formattedAmount = rawAmount.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                        billDialog.setFieldsForEdit(model.tName, formattedAmount)
                         
                         billDialog.setCategoryName(model.tCat)
                         billDialog.setDateStr(model.tDate)

@@ -52,6 +52,15 @@ Item {
         }
     }
 
+    function setFieldsForEdit(title, amount, method) {
+        transactionTitle = title;
+        transactionAmount = amount;
+        transactionMethod = method;
+        if (typeof textField !== "undefined" && textField) textField.text = title;
+        if (typeof supporting_text !== "undefined" && supporting_text) supporting_text.text = amount;
+        if (typeof supporting_text_1 !== "undefined" && supporting_text_1) supporting_text_1.text = method;
+    }
+
     function open() { visible = true }
     function close() { visible = false }
 
@@ -64,11 +73,15 @@ Item {
         transactionTypeIndex = -1;
         transactionTypeText = "Select Type";
         isValidating = false;
-        dateField.clear();
+        if (dateField) dateField.clear();
         
         transactionCategoryId = 0;
         dropdown_3.selectedIndex = -1;
         dropdown_3.selectedText = "Select Category";
+
+        if (typeof textField !== "undefined" && textField) textField.text = "";
+        if (typeof supporting_text !== "undefined" && supporting_text) supporting_text.text = "";
+        if (typeof supporting_text_1 !== "undefined" && supporting_text_1) supporting_text_1.text = "";
     }
 
     // Dimmed background overlay
@@ -78,7 +91,10 @@ Item {
 
         MouseArea {
             anchors.fill: parent
-            onClicked: root.close()
+            onClicked: {
+                root.reset()
+                root.close()
+            }
         }
     }
 
@@ -232,10 +248,11 @@ Item {
                     selectedText: root.isEditMode ? transactionTypeText : "Select Type"
                     selectedIndex: root.isEditMode ? transactionTypeIndex : -1
                     onSelected: function(index, value) {
-                        // Reset category when type changes
-                        root.transactionCategoryId = 0
-                        dropdown_3.selectedIndex = -1
-                        dropdown_3.selectedText = "Select Category"
+                        if (!root.isEditMode) {
+                            root.transactionCategoryId = 0
+                            dropdown_3.selectedIndex = -1
+                            dropdown_3.selectedText = "Select Category"
+                        }
                     }
                 }
             }
@@ -487,6 +504,7 @@ Item {
                     anchors.fill: parent
                     cursorShape: Qt.PointingHandCursor
                     onClicked: {
+                        root.reset()
                         root.rejected()
                         root.close()
                     }
