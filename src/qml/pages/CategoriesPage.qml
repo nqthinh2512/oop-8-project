@@ -11,18 +11,6 @@ Rectangle {
     color: "#f8fafc"
     clip: true
 
-    FileDialog {
-        id: exportFileDialog
-        title: "Export Categories to CSV"
-        fileMode: FileDialog.SaveFile
-        nameFilters: ["CSV Files (*.csv)", "All Files (*)"]
-        defaultSuffix: "csv"
-        currentFile: "categories_export.csv"
-        onAccepted: {
-            categoriesController.exportToCSV(selectedFile.toString())
-        }
-    }
-
     onVisibleChanged: {
         if (!visible) {
             toolbarDropdown.menuOpen = false

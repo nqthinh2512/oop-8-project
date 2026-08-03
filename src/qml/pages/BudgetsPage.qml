@@ -9,18 +9,6 @@ Rectangle {
     color: "#f8fafc"
     clip: true
 
-    FileDialog {
-        id: exportFileDialog
-        title: "Export Budgets to CSV"
-        fileMode: FileDialog.SaveFile
-        nameFilters: ["CSV Files (*.csv)", "All Files (*)"]
-        defaultSuffix: "csv"
-        currentFile: "budgets_export.csv"
-        onAccepted: {
-            budgetsController.exportToCSV(selectedFile.toString())
-        }
-    }
-
     // budgetsController đã được main.cpp bơm sẵn vào QML qua context property — KHÔNG cần khai báo lại ở đây
 
     ColumnLayout {

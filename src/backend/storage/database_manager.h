@@ -76,11 +76,16 @@ public:
 
     // Đường dẫn thư mục chứa dữ liệu CSV (tự động phát hiện src/data khi dev)
     static QString getDataDirectoryPath() {
-        QDir devDir(QCoreApplication::applicationDirPath() + "/../../data");
-        if (devDir.exists()) {
-            return devDir.absolutePath();
+        static QString cachedPath;
+        if (cachedPath.isEmpty()) {
+            QDir devDir(QCoreApplication::applicationDirPath() + "/../../data");
+            if (devDir.exists()) {
+                cachedPath = devDir.absolutePath();
+            } else {
+                cachedPath = QCoreApplication::applicationDirPath() + "/data";
+            }
         }
-        return QCoreApplication::applicationDirPath() + "/data";
+        return cachedPath;
     }
 
 signals:

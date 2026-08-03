@@ -10,18 +10,6 @@ Rectangle {
     color: "#f8fafc"
     clip: true
 
-    FileDialog {
-        id: exportFileDialog
-        title: "Export Transactions to CSV"
-        fileMode: FileDialog.SaveFile
-        nameFilters: ["CSV Files (*.csv)", "All Files (*)"]
-        defaultSuffix: "csv"
-        currentFile: "transactions_export.csv"
-        onAccepted: {
-            transactionsController.exportToCSV(selectedFile.toString())
-        }
-    }
-
     ColumnLayout {
         anchors.fill: parent
         anchors.margins: 24
