@@ -11,6 +11,18 @@ Rectangle {
     color: "#f8fafc"
     clip: true
 
+    FileDialog {
+        id: exportFileDialog
+        title: "Export Reports Data to CSV"
+        fileMode: FileDialog.SaveFile
+        nameFilters: ["CSV Files (*.csv)", "All Files (*)"]
+        defaultSuffix: "csv"
+        currentFile: "reports_export.csv"
+        onAccepted: {
+            reportsController.exportToCSV(selectedFile.toString())
+        }
+    }
+
     onVisibleChanged: {
         if (visible) {
             reportsController.refresh()
