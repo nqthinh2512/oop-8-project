@@ -47,6 +47,7 @@ public:
     void setPriority(Priority n_priority);
     void setCategoryId(int n_categoryId);
     void setLimit(double n_limit);
+    void setSpent(double n_spent);
     void setStartDate(const QDate& n_startDate);
     void setEndDate(const QDate& n_endDate);
 

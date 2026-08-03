@@ -230,7 +230,7 @@ Rectangle {
         onAccepted: (isEdit, id, name, priority, categoryId, spent, limit, startDateStr, endDateStr) => {
             var ok
             if (isEdit)
-                ok = budgetsController.updateBudget(id, name, priority, categoryId, limit, startDateStr, endDateStr)
+                ok = budgetsController.updateBudget(id, name, priority, categoryId, limit, spent, startDateStr, endDateStr)
             else
                 ok = budgetsController.addBudget(name, priority, categoryId, limit, spent, startDateStr, endDateStr)
 

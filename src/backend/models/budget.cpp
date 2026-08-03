@@ -36,6 +36,13 @@ void Budget::setLimit(double n_limit)
     limitAmount = n_limit;
 }
 
+void Budget::setSpent(double n_spent)
+{
+    if (n_spent < 0)
+        return;
+    spentAmount = n_spent;
+}
+
 void Budget::setStartDate(const QDate& n_startDate)
 {
     startDate = n_startDate;
