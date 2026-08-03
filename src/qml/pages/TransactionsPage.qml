@@ -89,11 +89,6 @@ Rectangle {
                             _state: transactionsController.filterType === 1 ? UniversalButton_1.State_1.State_1_selected : UniversalButton_1.State_1.State_1_default
                             onClicked: transactionsController.filterType = 1
                         }
-                        UniversalButton_1 {
-                            buttonText: "Transfer"
-                            _state: transactionsController.filterType === 2 ? UniversalButton_1.State_1.State_1_selected : UniversalButton_1.State_1.State_1_default
-                            onClicked: transactionsController.filterType = 2
-                        }
                     }
 
                     // Vertical Separator Line
@@ -296,7 +291,6 @@ Rectangle {
                         transactionDialog.transactionTypeIndex = model.tType
                         if (model.tType === 0) transactionDialog.transactionTypeText = "Income"
                         else if (model.tType === 1) transactionDialog.transactionTypeText = "Expense"
-                        else if (model.tType === 2) transactionDialog.transactionTypeText = "Transfer"
                         
                         transactionDialog.open()
                     }

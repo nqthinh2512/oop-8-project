@@ -31,7 +31,8 @@ Item {
 
     function setCategoryName(catName) {
         var allCats = categoriesController.categoriesList;
-        var list = allCats.filter(function(c) { return c.parentId === 1 || c.parentId === 2; });
+        var targetParent = root.transactionTypeIndex + 1; // 1 for Income, 2 for Expense
+        var list = allCats.filter(function(c) { return c.parentId === targetParent; });
         for (var i = 0; i < list.length; i++) {
             if (list[i].name === catName) {
                 dropdown_3.selectedIndex = i;
@@ -44,6 +45,10 @@ Item {
             dropdown_3.selectedIndex = 0;
             dropdown_3.selectedText = list[0].name;
             transactionCategoryId = list[0].id;
+        } else {
+            dropdown_3.selectedIndex = -1;
+            dropdown_3.selectedText = "Select Category";
+            transactionCategoryId = 0;
         }
     }
 
@@ -56,21 +61,14 @@ Item {
         transactionTitle = "";
         transactionAmount = "";
         transactionMethod = "";
-        transactionTypeIndex = 0;
-        transactionTypeText = "Income";
+        transactionTypeIndex = -1;
+        transactionTypeText = "Select Type";
         isValidating = false;
         dateField.clear();
         
-        var allCats = categoriesController.categoriesList;
-        var list = allCats.filter(function(c) { return c.parentId === 1 || c.parentId === 2; });
-        if (list.length > 0) {
-            dropdown_3.selectedIndex = 0;
-            dropdown_3.selectedText = list[0].name;
-            transactionCategoryId = list[0].id;
-        } else {
-            transactionCategoryId = 0;
-            dropdown_3.selectedText = "Select Category";
-        }
+        transactionCategoryId = 0;
+        dropdown_3.selectedIndex = -1;
+        dropdown_3.selectedText = "Select Category";
     }
 
     // Dimmed background overlay
@@ -230,8 +228,15 @@ Item {
                     width: 225
                     _state: Dropdown_1.State_1.State_1_default
                     clip: true
-                    model: ["Income", "Expense", "Transfer"]
-                    selectedText: "Income" // Default
+                    model: ["Income", "Expense"]
+                    selectedText: root.isEditMode ? transactionTypeText : "Select Type"
+                    selectedIndex: root.isEditMode ? transactionTypeIndex : -1
+                    onSelected: function(index, value) {
+                        // Reset category when type changes
+                        root.transactionCategoryId = 0
+                        dropdown_3.selectedIndex = -1
+                        dropdown_3.selectedText = "Select Category"
+                    }
                 }
             }
 
@@ -268,10 +273,16 @@ Item {
                     _state: Dropdown_1.State_1.State_1_default
                     clip: true
                     
+                    enabled: root.transactionTypeIndex !== -1
+                    opacity: enabled ? 1.0 : 0.5
+                    
                     property var allCats: categoriesController.categoriesList
-                    property var catList: allCats.filter(function(c) { return c.parentId === 1 || c.parentId === 2; })
+                    property var catList: {
+                        if (root.transactionTypeIndex === -1) return [];
+                        var targetParent = root.transactionTypeIndex + 1; // 1 for Income, 2 for Expense
+                        return allCats.filter(function(c) { return c.parentId === targetParent; })
+                    }
                     model: catList.map(function(c) { return c.name; })
-                    selectedText: catList.length > 0 ? catList[0].name : "Select Category"
                     
                     onSelected: function(index, value) {
                         if (index >= 0 && index < catList.length) {
@@ -496,7 +507,7 @@ Item {
                     cursorShape: Qt.PointingHandCursor
                     onClicked: {
                         root.isValidating = true
-                        if (root.transactionTitle.trim() === "" || root.transactionAmount.trim() === "" || root.transactionMethod.trim() === "" || root.dateField.selectedDate.trim() === "") {
+                        if (root.transactionTitle.trim() === "" || root.transactionAmount.trim() === "" || root.transactionMethod.trim() === "" || root.dateField.selectedDate.trim() === "" || root.transactionCategoryId === 0 || root.transactionTypeIndex === -1) {
                             return
                         }
                         root.accepted()
