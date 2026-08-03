@@ -35,6 +35,8 @@ public:
     void setCurrent(double n_current);
     void setDueDate(const QDate& n_dueDate);
 
+    void setId(int newId) { id = newId; }
+
     // Nghiệp vụ - logic viết trong saving.cpp
     void contribute(double amount);      // Góp tiền vào hũ
     double getProgressPercent() const;   // % đã đạt so với mục tiêu (0-100)

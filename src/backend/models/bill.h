@@ -28,7 +28,8 @@ public:
     QDate getDueDate() const {return dueDate;}
     bool checkPaid() const {return isPaid;} //parentcategory mng có thể lấy trực tiếp được, không cần tới getter
 
-    //setter, để tránh lỗi đè cùng ID, đừng viết hàm setId.
+    //setter
+    void setId(int newId) { id = newId; }
     void setCategoryId(int n_categoryId) { categoryId = n_categoryId; }
 
 };

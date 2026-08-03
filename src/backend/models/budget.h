@@ -50,6 +50,8 @@ public:
     void setStartDate(const QDate& n_startDate);
     void setEndDate(const QDate& n_endDate);
 
+    void setId(int newId) { id = newId; }
+
     // Nghiệp vụ - logic viết trong budget.cpp
     void addExpense(double amount);            // ghi nhận 1 khoản chi vào ngân sách
     double getProgressPercent() const;          // % đã tiêu so với limit (có thể >100%)
