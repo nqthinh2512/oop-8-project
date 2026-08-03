@@ -18,7 +18,12 @@ QDate parseDateStr(const QString &str) {
 }
 }
 
-SavingsController::SavingsController(QObject *parent) : QObject(parent) {}
+SavingsController::SavingsController(QObject *parent) : QObject(parent) {
+    connect(&DatabaseManager::instance(), &DatabaseManager::dataChanged, this, [this]() {
+        m_listDirty = true;
+        emit savingsListChanged();
+    });
+}
 
 QVariantList SavingsController::savingsList() const
 {
@@ -41,7 +46,7 @@ QVariantList SavingsController::savingsList() const
         if (m_categoryFilter != 0 && s.getCategoryId() != m_categoryFilter)
             continue;
 
-        QString categoryName = "General";
+        QString categoryName = (s.getCategoryId() == 0) ? "Uncategorized" : "General";
         for (const auto &c : allCategories) {
             if (c.getId() == s.getCategoryId()) {
                 categoryName = c.getName();

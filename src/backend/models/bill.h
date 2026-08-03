@@ -29,6 +29,7 @@ public:
     bool checkPaid() const {return isPaid;} //parentcategory mng có thể lấy trực tiếp được, không cần tới getter
 
     //setter, để tránh lỗi đè cùng ID, đừng viết hàm setId.
+    void setCategoryId(int n_categoryId) { categoryId = n_categoryId; }
 
 };
 

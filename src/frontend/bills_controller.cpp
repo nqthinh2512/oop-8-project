@@ -8,6 +8,7 @@ BillsController::BillsController(QObject *parent)
       m_totalPaid(0.0), m_totalOnTime(0.0), m_totalOverdue(0.0),
       m_filterType(-1), m_categoryIdFilter(0)
 {
+    connect(&DatabaseManager::instance(), &DatabaseManager::dataChanged, this, &BillsController::loadBills);
     loadBills();
 }
 
@@ -95,14 +96,13 @@ QVariant BillsController::data(const QModelIndex &index, int role) const
     case AmountRole: return QLocale::system().toString(b->getAmount(), 'f', 0);
     case CategoryRole: {
         int catId = b->getCategoryId();
-        QString catName = "Unknown";
+        if (catId == 0) return "Uncategorized";
         for (const auto& cat : DatabaseManager::instance().getAllCategories()) {
             if (cat.getId() == catId) {
-                catName = cat.getName();
-                break;
+                return cat.getName();
             }
         }
-        return catName;
+        return "Uncategorized";
     }
     case DateRole: return b->getDueDate().toString("dd/MM/yyyy");
     case StatusRole: return status;

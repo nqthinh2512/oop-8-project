@@ -79,7 +79,7 @@ QVariantList OverviewController::recentTransactions() const {
         for (const auto& c : categories) {
             if (c.getId() == catId) return c.getName();
         }
-        return "General";
+        return "Uncategorized";
     };
 
     // Take the most recent 5 transactions
@@ -120,7 +120,7 @@ QVariantList OverviewController::upcomingBills() const {
         for (const auto& c : categories) {
             if (c.getId() == catId) return c.getName();
         }
-        return "General";
+        return "Uncategorized";
     };
 
     // Collect unpaid bills, sorted by due date (soonest first)

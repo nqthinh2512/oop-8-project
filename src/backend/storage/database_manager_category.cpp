@@ -158,15 +158,47 @@ void DatabaseManager::removeCategory(int id) {
 }
 
 void DatabaseManager::migrateAndRemoveCategory(int sourceCatId, int targetCatId) {
-    // 1. Re-assign linked budgets
+    // 1. Re-assign linked transactions (Income & Expense)
+    bool txChanged = false;
+    for (Transaction* t : m_transactions) {
+        if (t && t->getCategoryId() == sourceCatId) {
+            t->setCategoryId(targetCatId);
+            txChanged = true;
+        }
+    }
+    if (txChanged) saveTransactionsToCSV();
+
+    // 2. Re-assign linked bills
+    bool billsChanged = false;
+    for (Bill& b : m_bills) {
+        if (b.getCategoryId() == sourceCatId) {
+            b.setCategoryId(targetCatId);
+            billsChanged = true;
+        }
+    }
+    if (billsChanged) saveBillsToCSV();
+
+    // 3. Re-assign linked budgets
+    bool budgetsChanged = false;
     for (Budget& b : m_budgets) {
         if (b.getCategoryId() == sourceCatId) {
             b.setCategoryId(targetCatId);
+            budgetsChanged = true;
         }
     }
-    saveBudgetsToCSV();
+    if (budgetsChanged) saveBudgetsToCSV();
 
-    // 2. Remove category
+    // 4. Re-assign linked savings
+    bool savingsChanged = false;
+    for (Saving& s : m_savings) {
+        if (s.getCategoryId() == sourceCatId) {
+            s.setCategoryId(targetCatId);
+            savingsChanged = true;
+        }
+    }
+    if (savingsChanged) saveSavingsToCSV();
+
+    // 5. Remove source category
     removeCategory(sourceCatId);
 }
 

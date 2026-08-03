@@ -59,24 +59,13 @@ QVariant TransactionListModel::data(const QModelIndex &index, int role) const
         return formatted + " VND";
     }
     case CategoryRole: {
-        // Find category name by ID
-        QString catName = "Unknown";
+        if (t->getCategoryId() == 0) return "Uncategorized";
         for (const auto& cat : DatabaseManager::instance().getAllCategories()) {
             if (cat.getId() == t->getCategoryId()) {
-                catName = cat.getName();
-                break;
+                return cat.getName();
             }
         }
-        // Fallback for dummy data
-        if (catName == "Unknown") {
-            if (t->getCategoryId() == 1) catName = "Salary";
-            else if (t->getCategoryId() == 2) catName = "Freelance";
-            else if (t->getCategoryId() == 5) catName = "Food & Dining";
-            else if (t->getCategoryId() == 6) catName = "Housing & Rent";
-            else if (t->getCategoryId() == 7) catName = "Transportation";
-            else if (t->getCategoryId() == 8) catName = "Utilities";
-        }
-        return catName;
+        return "Uncategorized";
     }
     case MethodRole: {
         QString note = t->getNote();
@@ -127,6 +116,7 @@ TransactionsController::TransactionsController(QObject *parent)
       m_searchKeyword(""),
       m_categoryIdFilter(0)
 {
+    connect(&DatabaseManager::instance(), &DatabaseManager::dataChanged, this, &TransactionsController::loadTransactions);
     loadTransactions();
 }
 

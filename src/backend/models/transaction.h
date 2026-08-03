@@ -25,6 +25,9 @@ public:
     double getAmount() const { return amount; }
     QDateTime getDateTime() const { return dateTime; }
 
+    // Setters
+    void setCategoryId(int n_categoryId) { categoryId = n_categoryId; }
+
     // cái virtual function này biến class thành abstract class nên.. đừng có xóa, thanks.
     // đồng thời thỏa mãn cái requierment polymorphism
     virtual double getSignedAmount() const = 0;

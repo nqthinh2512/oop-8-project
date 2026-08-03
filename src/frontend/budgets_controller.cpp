@@ -8,7 +8,12 @@ QString formatVnd(double amount) {
 }
 }
 
-BudgetsController::BudgetsController(QObject *parent) : QObject(parent) {}
+BudgetsController::BudgetsController(QObject *parent) : QObject(parent) {
+    connect(&DatabaseManager::instance(), &DatabaseManager::dataChanged, this, [this]() {
+        m_listDirty = true;
+        emit budgetsListChanged();
+    });
+}
 
 QVariantList BudgetsController::budgetsList() const
 {
@@ -29,7 +34,7 @@ QVariantList BudgetsController::budgetsList() const
         if (m_categoryFilter != 0 && b.getCategoryId() != m_categoryFilter)
             continue;
 
-        QString categoryName = "Category";
+        QString categoryName = (b.getCategoryId() == 0) ? "Uncategorized" : "Category";
         for (const auto &c : allCategories) {
             if (c.getId() == b.getCategoryId()) { categoryName = c.getName(); break; }
         }
