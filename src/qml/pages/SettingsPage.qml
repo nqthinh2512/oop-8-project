@@ -2,6 +2,7 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 import QtQuick.Dialogs
+import QtCore
 
 Rectangle {
     id: settingsPage
@@ -13,8 +14,11 @@ Rectangle {
     FolderDialog {
         id: exportFolderDialog
         title: "Select Folder to Export All CSV Data"
+        currentFolder: StandardPaths.standardLocations(StandardPaths.DocumentsLocation)[0]
         onAccepted: {
-            settingsController.exportAllToCSV(selectedFolder.toString())
+            var dateStr = new Date().toISOString().replace(/[:\-\.]/g, "").substring(0, 14);
+            var targetDir = selectedFolder.toString() + "/Finance_Export_" + dateStr;
+            settingsController.exportAllToCSV(targetDir)
         }
     }
 

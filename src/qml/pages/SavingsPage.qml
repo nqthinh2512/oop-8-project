@@ -2,6 +2,7 @@ import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls
 import QtQuick.Dialogs
+import QtCore
 
 Rectangle {
     id: savingsPage
@@ -15,7 +16,8 @@ Rectangle {
         fileMode: FileDialog.SaveFile
         nameFilters: ["CSV Files (*.csv)", "All Files (*)"]
         defaultSuffix: "csv"
-        currentFile: "savings_export.csv"
+        currentFolder: StandardPaths.standardLocations(StandardPaths.DocumentsLocation)[0]
+        currentFile: "file:///" + StandardPaths.writableLocation(StandardPaths.DocumentsLocation) + "/savings_export.csv"
         onAccepted: {
             savingsController.exportToCSV(selectedFile.toString())
         }
