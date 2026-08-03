@@ -3,7 +3,7 @@ import QtQuick.Layouts
 import QtQuick.Shapes
 
 Rectangle {
-    enum Type { Type_income, Type_expense, Type_transfer }
+    enum Type { Type_income, Type_expense }
 
     id: transactionRow
 
@@ -36,14 +36,6 @@ Rectangle {
                 bg: "#dcfce7",
                 arrow: "↙",
                 circleBg: "#dcfce7"
-            }
-        } else if (type_1 === TransactionRow_1.Type.Type_transfer) {
-            return {
-                label: "Transfer",
-                color: "#ca8a04",
-                bg: "#fef9c3",
-                arrow: "↗",
-                circleBg: "#fef9c3"
             }
         }
         return {

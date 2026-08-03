@@ -209,7 +209,7 @@ void TransactionsController::addTransaction(int typeIndex, const QString& title,
     }
     int id = maxId + 1;
 
-    // Since we don't have a subclass for Transfer or a specific field for Account/Method in the base Transaction class,
+    // Since we don't have a specific field for Account/Method in the base Transaction class,
     // we encode the type and method into the Note field as a workaround:
     // Format: "[TYPE:X]Title||Method"
     QString fullNote = QString("[TYPE:%1]%2||%3").arg(typeIndex).arg(title).arg(method.isEmpty() ? "Cash/Bank" : method);

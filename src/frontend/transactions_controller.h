@@ -78,7 +78,7 @@ private:
     void applyFilter();
 
     TransactionListModel* m_model;
-    int m_filterType; // -1: All, 0: Income, 1: Expense, 2: Transfer
+    int m_filterType; // -1: All, 0: Income, 1: Expense
     QString m_searchKeyword;
     int m_categoryIdFilter; // 0: All
 };

@@ -2,6 +2,7 @@ import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls
 import QtQuick.Dialogs
+import QtCore
 import "../components/dialogs"
 
 Rectangle {
@@ -16,7 +17,8 @@ Rectangle {
         fileMode: FileDialog.SaveFile
         nameFilters: ["CSV Files (*.csv)", "All Files (*)"]
         defaultSuffix: "csv"
-        currentFile: "transactions_export.csv"
+        currentFolder: StandardPaths.standardLocations(StandardPaths.DocumentsLocation)[0]
+        currentFile: "file:///" + StandardPaths.writableLocation(StandardPaths.DocumentsLocation) + "/transactions_export.csv"
         onAccepted: {
             transactionsController.exportToCSV(selectedFile.toString())
         }
@@ -100,11 +102,6 @@ Rectangle {
                             buttonText: "Expense"
                             _state: transactionsController.filterType === 1 ? UniversalButton_1.State_1.State_1_selected : UniversalButton_1.State_1.State_1_default
                             onClicked: transactionsController.filterType = 1
-                        }
-                        UniversalButton_1 {
-                            buttonText: "Transfer"
-                            _state: transactionsController.filterType === 2 ? UniversalButton_1.State_1.State_1_selected : UniversalButton_1.State_1.State_1_default
-                            onClicked: transactionsController.filterType = 2
                         }
                     }
 
@@ -308,7 +305,6 @@ Rectangle {
                         transactionDialog.transactionTypeIndex = model.tType
                         if (model.tType === 0) transactionDialog.transactionTypeText = "Income"
                         else if (model.tType === 1) transactionDialog.transactionTypeText = "Expense"
-                        else if (model.tType === 2) transactionDialog.transactionTypeText = "Transfer"
                         
                         transactionDialog.open()
                     }
