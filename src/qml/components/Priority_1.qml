@@ -2,7 +2,7 @@ import QtQuick
 import QtQuick.Layouts
 
 Item {
-    enum Priority_1 { Priority_1_high, Priority_1_medium, Priority_1_low }
+    enum Priority_1 { Priority_1_low, Priority_1_medium, Priority_1_high}
 
     id: root
 
