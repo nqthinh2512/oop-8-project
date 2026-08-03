@@ -296,7 +296,7 @@ QVariantMap ReportsController::monthlyChartData() const {
         monthDates.append(d);
     }
 
-    const auto& transactions = DatabaseManager::instance().getAllTransactions();
+    const auto& transactions = DatabaseManager::instance().transactionDAO()->getAll();
     for (const Transaction* t : transactions) {
         if (!t) continue;
         QDate td = t->getDateTime().date();
@@ -364,7 +364,7 @@ QVariantMap ReportsController::netWorthChartData() const {
     }
 
     QVector<double> nwTotals(6, 0.0);
-    const auto& transactions = DatabaseManager::instance().getAllTransactions();
+    const auto& transactions = DatabaseManager::instance().transactionDAO()->getAll();
 
     for (int i = 0; i < 6; ++i) {
         QDate monthEnd(monthDates[i].year(), monthDates[i].month(), monthDates[i].daysInMonth());
@@ -414,5 +414,5 @@ void ReportsController::refresh() {
 }
 
 bool ReportsController::exportToCSV(const QString &filePath) {
-    return DatabaseManager::instance().exportTransactionsToCSV(filePath);
+    return DatabaseManager::instance().transactionDAO()->exportToCSV(filePath);
 }

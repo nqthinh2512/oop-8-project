@@ -14,12 +14,11 @@
 #include "../models/saving.h"
 #include "../models/transaction.h"
 
-// Forward declarations
-class CategoryDAO;
-class BillDAO;
-class BudgetDAO;
-class SavingDAO;
-class TransactionDAO;
+#include "../dao/category_dao.h"
+#include "../dao/bill_dao.h"
+#include "../dao/budget_dao.h"
+#include "../dao/saving_dao.h"
+#include "../dao/transaction_dao.h"
 
 class DatabaseManager : public QObject {
     Q_OBJECT

@@ -291,5 +291,5 @@ void OverviewController::refresh() {
 }
 
 bool OverviewController::exportToCSV(const QString &filePath) {
-    return DatabaseManager::instance().exportTransactionsToCSV(filePath);
+    return DatabaseManager::instance().transactionDAO()->exportToCSV(filePath);
 }
