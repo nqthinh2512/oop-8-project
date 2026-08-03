@@ -176,3 +176,7 @@ void CategoriesController::resetFilters() {
 void CategoriesController::refresh() {
     emit categoriesChanged();
 }
+
+bool CategoriesController::exportToCSV(const QString &filePath) {
+    return DatabaseManager::instance().exportCategoriesToCSV(filePath);
+}

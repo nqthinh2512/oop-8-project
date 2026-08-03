@@ -42,6 +42,7 @@ public:
     QVariantMap monthlyChartData() const;
 
     Q_INVOKABLE void refresh();
+    Q_INVOKABLE bool exportToCSV(const QString &filePath);
 
 signals:
     void dataChanged();

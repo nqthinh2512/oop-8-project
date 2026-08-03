@@ -178,3 +178,8 @@ void BudgetsController::refresh()
     emit totalsChanged();
     emit categoriesChanged();
 }
+
+bool BudgetsController::exportToCSV(const QString &filePath)
+{
+    return DatabaseManager::instance().exportBudgetsToCSV(filePath);
+}

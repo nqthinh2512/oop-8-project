@@ -289,3 +289,7 @@ QVariantMap OverviewController::monthlyChartData() const {
 void OverviewController::refresh() {
     emit dataChanged();
 }
+
+bool OverviewController::exportToCSV(const QString &filePath) {
+    return DatabaseManager::instance().exportTransactionsToCSV(filePath);
+}

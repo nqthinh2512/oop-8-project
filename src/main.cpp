@@ -5,15 +5,15 @@
 #include <QQmlContext>
 
 #include "backend/storage/database_manager.h"
+#include "frontend/bills_controller.h"
 #include "frontend/budgets_controller.h"
 #include "frontend/categories_controller.h"
 #include "frontend/overview_controller.h"
 #include "frontend/reports_controller.h"
-#include "frontend/settings_controller.h"
-#include "frontend/transactions_controller.h"
-#include "frontend/bills_controller.h"
 #include "frontend/savings_controller.h"
 #include "frontend/session_controller.h"
+#include "frontend/settings_controller.h"
+#include "frontend/transactions_controller.h"
 
 int main(int argc, char *argv[])
 {

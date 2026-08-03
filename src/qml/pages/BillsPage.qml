@@ -1,12 +1,25 @@
 import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls
+import QtQuick.Dialogs
 
 Rectangle {
     id: billsPage
 
     color: "#f8fafc"
     clip: true
+
+    FileDialog {
+        id: exportFileDialog
+        title: "Export Bills to CSV"
+        fileMode: FileDialog.SaveFile
+        nameFilters: ["CSV Files (*.csv)", "All Files (*)"]
+        defaultSuffix: "csv"
+        currentFile: "bills_export.csv"
+        onAccepted: {
+            billsController.exportToCSV(selectedFile.toString())
+        }
+    }
 
     ColumnLayout {
         anchors.fill: parent
@@ -143,6 +156,11 @@ Rectangle {
 
                     Item {
                         Layout.fillWidth: true
+                    }
+
+                    UniversalButton_1 {
+                        buttonText: "Export CSV"
+                        onClicked: exportFileDialog.open()
                     }
 
                     UniversalButton_1 {

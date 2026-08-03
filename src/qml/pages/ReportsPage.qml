@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls
+import QtQuick.Dialogs
 
 import "../components"
 
@@ -9,6 +10,18 @@ Rectangle {
 
     color: "#f8fafc"
     clip: true
+
+    FileDialog {
+        id: exportFileDialog
+        title: "Export Reports Data to CSV"
+        fileMode: FileDialog.SaveFile
+        nameFilters: ["CSV Files (*.csv)", "All Files (*)"]
+        defaultSuffix: "csv"
+        currentFile: "reports_export.csv"
+        onAccepted: {
+            reportsController.exportToCSV(selectedFile.toString())
+        }
+    }
 
     onVisibleChanged: {
         if (visible) {
@@ -40,12 +53,23 @@ Rectangle {
                     Layout.fillWidth: true
                     spacing: 16
 
-                    Text {
-                        text: "Reports"
-                        font.family: "Inter"
-                        font.pixelSize: 32
-                        font.weight: Font.Bold
-                        color: "#0f172a"
+                    RowLayout {
+                        Layout.fillWidth: true
+
+                        Text {
+                            text: "Reports"
+                            font.family: "Inter"
+                            font.pixelSize: 32
+                            font.weight: Font.Bold
+                            color: "#0f172a"
+                        }
+
+                        Item { Layout.fillWidth: true }
+
+                        UniversalButton_1 {
+                            buttonText: "Export CSV"
+                            onClicked: exportFileDialog.open()
+                        }
                     }
 
                     Rectangle {

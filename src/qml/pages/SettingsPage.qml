@@ -10,6 +10,14 @@ Rectangle {
     clip: true
     color: "#f8fafc"
 
+    FolderDialog {
+        id: exportFolderDialog
+        title: "Select Folder to Export All CSV Files"
+        onAccepted: {
+            settingsController.exportAllToCSV(selectedFolder.toString())
+        }
+    }
+
     property bool isEditing: settingsController.isEditing
 
     // Profile Data (Current Input State)
@@ -673,6 +681,54 @@ Rectangle {
                 }
             }
             
+            // =================================================================
+            // DATA EXPORT CARD
+            // =================================================================
+            Rectangle {
+                Layout.fillWidth: true
+                Layout.preferredHeight: exportCol.implicitHeight + 48
+                radius: 12
+                color: "white"
+                border.color: "#e2e8f0"
+                border.width: 1
+
+                ColumnLayout {
+                    id: exportCol
+                    anchors.left: parent.left
+                    anchors.right: parent.right
+                    anchors.top: parent.top
+                    anchors.margins: 24
+                    spacing: 16
+
+                    Text {
+                        text: "Data Export & Backup"
+                        font.family: "Inter"
+                        font.pixelSize: 22
+                        font.weight: Font.Bold
+                        color: "#0f172a"
+                    }
+
+                    RowLayout {
+                        Layout.fillWidth: true
+
+                        Text {
+                            Layout.fillWidth: true
+                            text: "Export all your financial records (categories, transactions, bills, budgets, savings) to CSV files."
+                            font.family: "Inter"
+                            font.pixelSize: 14
+                            color: "#64748b"
+                            elide: Text.ElideRight
+                        }
+
+                        UniversalButton_1 {
+                            buttonText: "Export All Data (CSV)"
+                            _state: UniversalButton_1.State_1.State_1_selected
+                            onClicked: exportFolderDialog.open()
+                        }
+                    }
+                }
+            }
+
             // =================================================================
             // ACCOUNT CARD (Logout)
             // =================================================================

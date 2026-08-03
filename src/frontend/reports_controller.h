@@ -48,6 +48,7 @@ public:
     QVariantMap netWorthChartData() const;
 
     Q_INVOKABLE void refresh();
+    Q_INVOKABLE bool exportToCSV(const QString &filePath);
 
 signals:
     void reportChanged();

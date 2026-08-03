@@ -42,6 +42,7 @@ public:
     Q_INVOKABLE bool deactivateCategory(int id);
     Q_INVOKABLE void resetFilters();
     Q_INVOKABLE void refresh();
+    Q_INVOKABLE bool exportToCSV(const QString &filePath);
 
 signals:
     void categoriesChanged();

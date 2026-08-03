@@ -199,3 +199,8 @@ void BillsController::togglePaidStatus(int id)
         }
     }
 }
+
+bool BillsController::exportToCSV(const QString& filePath)
+{
+    return DatabaseManager::instance().exportBillsToCSV(filePath);
+}

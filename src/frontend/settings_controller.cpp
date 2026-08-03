@@ -101,6 +101,8 @@ void SettingsController::loadAvatar()
     }
 }
 
+#include "../backend/storage/database_manager.h"
+
 void SettingsController::persistAvatar() const
 {
     QString dirPath = QCoreApplication::applicationDirPath() + "/data";
@@ -116,4 +118,9 @@ void SettingsController::persistAvatar() const
     out << m_avatarImagePath << "\n";
     out << m_avatarColor << "\n";
     file.close();
+}
+
+bool SettingsController::exportAllToCSV(const QString &folderPath)
+{
+    return DatabaseManager::instance().exportAllToCSV(folderPath);
 }

@@ -212,3 +212,8 @@ void SavingsController::refresh()
     emit savingsListChanged();
     emit totalsChanged();
 }
+
+bool SavingsController::exportToCSV(const QString &filePath)
+{
+    return DatabaseManager::instance().exportSavingsToCSV(filePath);
+}

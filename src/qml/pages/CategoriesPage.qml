@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls
+import QtQuick.Dialogs
 import "../components/dialogs"
 import "../components"
 
@@ -9,6 +10,18 @@ Rectangle {
 
     color: "#f8fafc"
     clip: true
+
+    FileDialog {
+        id: exportFileDialog
+        title: "Export Categories to CSV"
+        fileMode: FileDialog.SaveFile
+        nameFilters: ["CSV Files (*.csv)", "All Files (*)"]
+        defaultSuffix: "csv"
+        currentFile: "categories_export.csv"
+        onAccepted: {
+            categoriesController.exportToCSV(selectedFile.toString())
+        }
+    }
 
     onVisibleChanged: {
         if (!visible) {
@@ -147,6 +160,11 @@ Rectangle {
 
                     Item {
                         Layout.fillWidth: true
+                    }
+
+                    UniversalButton_1 {
+                        buttonText: "Export CSV"
+                        onClicked: exportFileDialog.open()
                     }
 
                     UniversalButton_1 {

@@ -1,12 +1,25 @@
 import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls
+import QtQuick.Dialogs
 
 Rectangle {
     id: budgetsPage
 
     color: "#f8fafc"
     clip: true
+
+    FileDialog {
+        id: exportFileDialog
+        title: "Export Budgets to CSV"
+        fileMode: FileDialog.SaveFile
+        nameFilters: ["CSV Files (*.csv)", "All Files (*)"]
+        defaultSuffix: "csv"
+        currentFile: "budgets_export.csv"
+        onAccepted: {
+            budgetsController.exportToCSV(selectedFile.toString())
+        }
+    }
 
     // budgetsController đã được main.cpp bơm sẵn vào QML qua context property — KHÔNG cần khai báo lại ở đây
 
@@ -129,6 +142,11 @@ Rectangle {
                     }
 
                     Item { Layout.fillWidth: true }
+
+                    UniversalButton_1 {
+                        buttonText: "Export CSV"
+                        onClicked: exportFileDialog.open()
+                    }
 
                     UniversalButton_1 {
                         buttonText: "+Add Budget"

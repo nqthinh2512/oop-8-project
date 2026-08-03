@@ -50,6 +50,7 @@ public:
     Q_INVOKABLE void setAvatarImage(const QString &filePath);
     // Picks one of the built-in colored-initials presets, clearing any custom image.
     Q_INVOKABLE void setAvatarPreset(const QString &colorHex);
+    Q_INVOKABLE bool exportAllToCSV(const QString &folderPath);
 
 signals:
     void isEditingChanged();

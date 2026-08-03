@@ -412,3 +412,7 @@ QVariantMap ReportsController::netWorthChartData() const {
 void ReportsController::refresh() {
     emit reportChanged();
 }
+
+bool ReportsController::exportToCSV(const QString &filePath) {
+    return DatabaseManager::instance().exportTransactionsToCSV(filePath);
+}

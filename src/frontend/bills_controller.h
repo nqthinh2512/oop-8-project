@@ -50,7 +50,8 @@ public:
     Q_INVOKABLE void addBill(const QString& title, double amount, const QString& dateStr, int categoryId);
     Q_INVOKABLE void updateBill(int id, const QString& title, double amount, const QString& dateStr, int categoryId);
     Q_INVOKABLE void deleteBill(int id);
-    Q_INVOKABLE void togglePaidStatus(int id); 
+    Q_INVOKABLE void togglePaidStatus(int id);
+    Q_INVOKABLE bool exportToCSV(const QString& filePath);
 
 signals:
     void statsChanged();

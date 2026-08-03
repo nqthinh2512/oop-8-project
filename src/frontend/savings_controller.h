@@ -55,6 +55,7 @@ public:
                                   const QString &dueDateStr);
     Q_INVOKABLE bool removeSaving(int id);
     Q_INVOKABLE void refresh();
+    Q_INVOKABLE bool exportToCSV(const QString &filePath);
 
 signals:
     void savingsListChanged();

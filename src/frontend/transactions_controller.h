@@ -66,6 +66,7 @@ public:
     Q_INVOKABLE void addTransaction(int typeIndex, const QString& title, double amount, const QString& dateStr, int categoryId, const QString& method);
     Q_INVOKABLE void updateTransaction(int id, int typeIndex, const QString& title, double amount, const QString& dateStr, int categoryId, const QString& method);
     Q_INVOKABLE void deleteTransaction(int id);
+    Q_INVOKABLE bool exportToCSV(const QString& filePath);
 
 signals:
     void filterTypeChanged();

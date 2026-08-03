@@ -252,3 +252,8 @@ void TransactionsController::deleteTransaction(int id)
     DatabaseManager::instance().deleteTransaction(id);
     loadTransactions();
 }
+
+bool TransactionsController::exportToCSV(const QString& filePath)
+{
+    return DatabaseManager::instance().exportTransactionsToCSV(filePath);
+}

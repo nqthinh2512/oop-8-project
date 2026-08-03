@@ -134,8 +134,6 @@ public:
     // Xóa hũ tiết kiệm theo id
     bool deleteSaving(int savingId);
 
-
-
     //==========================TRANSACTION SECTION=================================
     void loadTransactionsFromCSV();
     void saveTransactionsToCSV() const;
@@ -143,6 +141,14 @@ public:
     void addTransaction(Transaction* transaction);
     bool updateTransaction(int id, Transaction* newTransaction);
     bool deleteTransaction(int id);
+
+    //=============================EXPORT SECTION==================================
+    bool exportCategoriesToCSV(const QString& targetFilePath) const;
+    bool exportBillsToCSV(const QString& targetFilePath) const;
+    bool exportBudgetsToCSV(const QString& targetFilePath) const;
+    bool exportSavingsToCSV(const QString& targetFilePath) const;
+    bool exportTransactionsToCSV(const QString& targetFilePath) const;
+    bool exportAllToCSV(const QString& targetFolderPath) const;
 };
 
 #endif // DATABASE_MANAGER_H
