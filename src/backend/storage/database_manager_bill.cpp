@@ -19,7 +19,7 @@ int DatabaseManager::generateNextBillId() const {
 void DatabaseManager::loadBillsFromCSV() {
     m_bills.clear();
 
-    QString dirPath = QCoreApplication::applicationDirPath() + "/data";
+    QString dirPath = DatabaseManager::getDataDirectoryPath();
     QDir dir(dirPath);
     if (!dir.exists()) {
         dir.mkpath(".");
@@ -76,7 +76,7 @@ void DatabaseManager::loadBillsFromCSV() {
 
 // ghi file csv: Ghi id, name, amount, dueDate, categoryId, isPaid
 void DatabaseManager::saveBillsToCSV() const {
-    QString dirPath = QCoreApplication::applicationDirPath() + "/data";
+    QString dirPath = DatabaseManager::getDataDirectoryPath();
     QDir dir(dirPath);
     if (!dir.exists()) {
         dir.mkpath(".");

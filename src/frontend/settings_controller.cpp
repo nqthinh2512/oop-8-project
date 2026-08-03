@@ -75,7 +75,7 @@ void SettingsController::setAvatarPreset(const QString &colorHex)
 
 void SettingsController::loadAvatar()
 {
-    QString dirPath = QCoreApplication::applicationDirPath() + "/data";
+    QString dirPath = DatabaseManager::getDataDirectoryPath();
     QString fullPath = dirPath + "/avatar.txt";
 
     QFile file(fullPath);
@@ -105,7 +105,7 @@ void SettingsController::loadAvatar()
 
 void SettingsController::persistAvatar() const
 {
-    QString dirPath = QCoreApplication::applicationDirPath() + "/data";
+    QString dirPath = DatabaseManager::getDataDirectoryPath();
     QDir dir(dirPath);
     if (!dir.exists()) dir.mkpath(".");
 

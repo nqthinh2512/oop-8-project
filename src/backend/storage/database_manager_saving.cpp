@@ -10,7 +10,7 @@ void DatabaseManager::loadSavingsFromCSV()
 {
     m_savings.clear();
 
-    QString fullPath = QCoreApplication::applicationDirPath() + "/data/savings.csv";
+    QString fullPath = DatabaseManager::getDataDirectoryPath() + "/savings.csv";
     QFile file(fullPath);
 
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
@@ -64,7 +64,7 @@ void DatabaseManager::loadSavingsFromCSV()
 
 void DatabaseManager::saveSavingsToCSV() const
 {
-    QString fullPath = QCoreApplication::applicationDirPath() + "/data/savings.csv";
+    QString fullPath = DatabaseManager::getDataDirectoryPath() + "/savings.csv";
     QFile file(fullPath);
     if (!file.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Truncate)) {
         qWarning() << "Không ghi được file:" << fullPath;

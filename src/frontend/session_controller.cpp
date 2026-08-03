@@ -1,4 +1,5 @@
 #include "session_controller.h"
+#include "../backend/storage/database_manager.h"
 #include <QCoreApplication>
 #include <QDir>
 #include <QFile>
@@ -14,7 +15,7 @@ SessionController::SessionController(QObject *parent)
 
 void SessionController::loadCredentials()
 {
-    QString dirPath = QCoreApplication::applicationDirPath() + "/data";
+    QString dirPath = DatabaseManager::getDataDirectoryPath();
     QDir dir(dirPath);
     if (!dir.exists()) dir.mkpath(".");
 
@@ -55,7 +56,7 @@ void SessionController::loadCredentials()
 
 void SessionController::tryAutoLogin()
 {
-    QString dirPath = QCoreApplication::applicationDirPath() + "/data";
+    QString dirPath = DatabaseManager::getDataDirectoryPath();
     QFile file(dirPath + "/session.txt");
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
         return;
@@ -74,7 +75,7 @@ void SessionController::tryAutoLogin()
 
 void SessionController::persistRememberedSession(const QString &username, bool remember)
 {
-    QString dirPath = QCoreApplication::applicationDirPath() + "/data";
+    QString dirPath = DatabaseManager::getDataDirectoryPath();
     QDir dir(dirPath);
     if (!dir.exists()) dir.mkpath(".");
 

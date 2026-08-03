@@ -1,0 +1,9 @@
+id,name,amount,dueDate,categoryId,isPaid
+1,Electricity Bill,650000.00,2026-08-13,11,0
+2,Water Supply Bill,180000.00,2026-08-08,12,0
+3,High-Speed Internet,250000.00,2026-08-01,13,1
+4,Netflix Subscription,250000.00,2026-07-19,13,1
+5,Credit Card Bill,1250000.00,2026-07-29,11,0
+6,Gym Membership,500000.00,2026-08-01,11,0
+7,Car Insurance,850000.00,2026-07-24,12,0
+8,Phone Bill,150000.00,2026-08-02,13,0

@@ -20,7 +20,7 @@ void DatabaseManager::loadTransactionsFromCSV() {
     qDeleteAll(m_transactions);
     m_transactions.clear();
 
-    QString dirPath = QCoreApplication::applicationDirPath() + "/data";
+    QString dirPath = DatabaseManager::getDataDirectoryPath();
     QDir dir(dirPath);
     if (!dir.exists()) {
         dir.mkpath(".");
@@ -84,7 +84,7 @@ void DatabaseManager::loadTransactionsFromCSV() {
 
 //  ghi file csv : Ghi type, id, amount, date, note, categoryId
 void DatabaseManager::saveTransactionsToCSV() const {
-    QString dirPath = QCoreApplication::applicationDirPath() + "/data";
+    QString dirPath = DatabaseManager::getDataDirectoryPath();
     QDir dir(dirPath);
     if (!dir.exists()) {
         dir.mkpath(".");

@@ -20,7 +20,7 @@ int DatabaseManager::generateNextCategoryId() const {
 void DatabaseManager::loadCategoriesFromCSV() {
     m_categories.clear();
 
-    QString dirPath = QCoreApplication::applicationDirPath() + "/data";
+    QString dirPath = DatabaseManager::getDataDirectoryPath();
     QDir dir(dirPath);
     if (!dir.exists()) {
         dir.mkpath(".");
@@ -92,7 +92,7 @@ void DatabaseManager::loadCategoriesFromCSV() {
 
 // 🎯 GHI FILE CSV: Ghi id, name, parentId, active
 void DatabaseManager::saveCategoriesToCSV() const {
-    QString dirPath = QCoreApplication::applicationDirPath() + "/data";
+    QString dirPath = DatabaseManager::getDataDirectoryPath();
     QDir dir(dirPath);
     if (!dir.exists()) {
         dir.mkpath(".");

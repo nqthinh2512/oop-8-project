@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QString>
+#include "../backend/storage/database_manager.h"
 
 class SettingsController : public QObject {
     Q_OBJECT

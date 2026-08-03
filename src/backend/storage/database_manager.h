@@ -12,6 +12,7 @@
 #include <QVector>
 #include <QString>
 #include <QCoreApplication>
+#include <QDir>
 #include "../models/category.h"
 #include "../models/bill.h"
 #include "../models/budget.h"
@@ -72,6 +73,15 @@ public:
     // Ngăn chặn sao chép dữ liệu database
     DatabaseManager(const DatabaseManager&) = delete;
     DatabaseManager& operator=(const DatabaseManager&) = delete;
+
+    // Đường dẫn thư mục chứa dữ liệu CSV (tự động phát hiện src/data khi dev)
+    static QString getDataDirectoryPath() {
+        QDir devDir(QCoreApplication::applicationDirPath() + "/../../data");
+        if (devDir.exists()) {
+            return devDir.absolutePath();
+        }
+        return QCoreApplication::applicationDirPath() + "/data";
+    }
 
 signals:
     void dataChanged();
