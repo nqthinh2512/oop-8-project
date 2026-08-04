@@ -101,23 +101,22 @@ void SettingsController::loadAvatar()
     }
 }
 
-#include "../backend/storage/database_manager.h"
-
 void SettingsController::persistAvatar() const
 {
     QString dirPath = DatabaseManager::getDataDirectoryPath();
     QDir dir(dirPath);
-    if (!dir.exists()) dir.mkpath(".");
-
-    QFile file(dirPath + "/avatar.txt");
-    if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
-        return;
+    if (!dir.exists()) {
+        dir.mkpath(".");
     }
 
-    QTextStream out(&file);
-    out << m_avatarImagePath << "\n";
-    out << m_avatarColor << "\n";
-    file.close();
+    QString fullPath = dirPath + "/avatar.txt";
+    QFile file(fullPath);
+    if (file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+        QTextStream out(&file);
+        out << m_avatarImagePath << "\n";
+        out << m_avatarColor << "\n";
+        file.close();
+    }
 }
 
 bool SettingsController::exportAllToCSV(const QString &folderPath)

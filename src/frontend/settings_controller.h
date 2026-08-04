@@ -46,11 +46,10 @@ public:
     Q_INVOKABLE void toggleEdit();
     Q_INVOKABLE void cancelEdit();
     Q_INVOKABLE void saveChanges(const QString &newName, const QString &newEmail, const QString &newContact);
-
-    // Sets a custom uploaded image as the avatar (from the FileDialog).
+    
     Q_INVOKABLE void setAvatarImage(const QString &filePath);
-    // Picks one of the built-in colored-initials presets, clearing any custom image.
     Q_INVOKABLE void setAvatarPreset(const QString &colorHex);
+
     Q_INVOKABLE bool exportAllToCSV(const QString &folderPath);
 
 signals:
