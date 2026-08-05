@@ -94,7 +94,7 @@ QVariantList SavingsController::savingsList() const
                 double monthsLeft = daysLeft / 30.0;
                 if (monthsLeft < 1.0) monthsLeft = 1.0; // If less than a month, just show the full remaining
                 double monthlyNeeded = remaining / monthsLeft;
-                plannerText = "~ " + formatVnd(monthlyNeeded) + " / month";
+                plannerText = "Need: " + formatVnd(monthlyNeeded) + " / mo";
             } else {
                 plannerText = "Overdue!";
             }
