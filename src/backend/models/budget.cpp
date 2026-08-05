@@ -57,9 +57,10 @@ void Budget::setEndDate(const QDate& n_endDate)
 // (hàm này sẽ được gọi khi có 1 Transaction mới thuộc category của budget)
 void Budget::addExpense(double amount)
 {
-    if (amount <= 0)
-        return;
     spentAmount += amount;
+    if (spentAmount < 0) {
+        spentAmount = 0;
+    }
     // Cố tình KHÔNG chặn spentAmount vượt limitAmount ở đây,
     // vì thực tế người dùng có thể tiêu vượt ngân sách -> cần biết để cảnh báo (Over)
 }
