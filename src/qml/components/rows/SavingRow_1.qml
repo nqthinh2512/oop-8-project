@@ -81,13 +81,13 @@ Rectangle {
 
         // 4. PROGRESS
         Item {
-            Layout.preferredWidth: 240
+            Layout.preferredWidth: 260
             Layout.fillHeight: true
 
             ProgressInfo_1 {
                 anchors.left: parent.left
                 anchors.right: parent.right
-                anchors.rightMargin: 60
+                anchors.rightMargin: 30
                 anchors.verticalCenter: parent.verticalCenter
                 spentText: savingRow.savedText
                 limitText: savingRow.goalText
@@ -98,7 +98,7 @@ Rectangle {
 
         // 5. DUE DATE & PLANNER
         Item {
-            Layout.preferredWidth: 220
+            Layout.preferredWidth: 200
             Layout.fillHeight: true
 
             Column {

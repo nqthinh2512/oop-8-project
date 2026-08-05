@@ -205,9 +205,9 @@ Rectangle {
                         Text { anchors.left: parent.left; anchors.verticalCenter: parent.verticalCenter; text: "PRIORITY"; font.family: "Inter"; font.pixelSize: 12; font.weight: Font.Bold; color: "#64748b" } }
                     Item { Layout.preferredWidth: 160; Layout.fillHeight: true
                         Text { anchors.left: parent.left; anchors.verticalCenter: parent.verticalCenter; text: "CATEGORY"; font.family: "Inter"; font.pixelSize: 12; font.weight: Font.Bold; color: "#64748b" } }
-                    Item { Layout.preferredWidth: 240; Layout.fillHeight: true
+                    Item { Layout.preferredWidth: 260; Layout.fillHeight: true
                         Text { anchors.left: parent.left; anchors.verticalCenter: parent.verticalCenter; text: "PROGRESS"; font.family: "Inter"; font.pixelSize: 12; font.weight: Font.Bold; color: "#64748b" } }
-                    Item { Layout.preferredWidth: 220; Layout.fillHeight: true
+                    Item { Layout.preferredWidth: 200; Layout.fillHeight: true
                         Text { anchors.left: parent.left; anchors.verticalCenter: parent.verticalCenter; text: "DUE DATE"; font.family: "Inter"; font.pixelSize: 12; font.weight: Font.Bold; color: "#64748b" } }
                     Item { Layout.preferredWidth: 100; Layout.fillHeight: true
                         Text { anchors.right: parent.right; anchors.rightMargin: 8; anchors.verticalCenter: parent.verticalCenter; text: "ACTIONS"; font.family: "Inter"; font.pixelSize: 12; font.weight: Font.Bold; color: "#64748b" } }
