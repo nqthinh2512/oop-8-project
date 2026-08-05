@@ -127,8 +127,20 @@ QVariantList CategoriesController::categoriesList() const {
     return list;
 }
 
+bool CategoriesController::isCategoryNameExists(const QString &name, int parentId, int excludeId) const {
+    QString trimmed = name.trimmed();
+    if (trimmed.isEmpty()) return false;
+    for (const Category& c : DatabaseManager::instance().categoryDAO()->getAll()) {
+        if (c.getId() != excludeId && c.getParentId() == parentId && c.getName().compare(trimmed, Qt::CaseInsensitive) == 0) {
+            return true;
+        }
+    }
+    return false;
+}
+
 bool CategoriesController::addCategory(const QString &name, int parentId, bool active) {
     if (name.trimmed().isEmpty()) return false;
+    if (isCategoryNameExists(name, parentId, 0)) return false;
     Category cat(0, parentId, name.trimmed());
     cat.setActive(active);
     DatabaseManager::instance().categoryDAO()->add(cat);
@@ -138,11 +150,17 @@ bool CategoriesController::addCategory(const QString &name, int parentId, bool a
 
 bool CategoriesController::updateCategory(int id, const QString &name, int newParentId, bool active) {
     if (name.trimmed().isEmpty()) return false;
-    Category cat(id, newParentId, name.trimmed());
-    cat.setActive(active);
-    DatabaseManager::instance().categoryDAO()->update(id, cat);
-    emit categoriesChanged();
-    return true;
+    for (const Category& existing : DatabaseManager::instance().categoryDAO()->getAll()) {
+        if (existing.getId() == id) {
+            if (isCategoryNameExists(name, existing.getParentId(), id)) return false;
+            Category cat(id, existing.getParentId(), name.trimmed());
+            cat.setActive(active);
+            DatabaseManager::instance().categoryDAO()->update(id, cat);
+            emit categoriesChanged();
+            return true;
+        }
+    }
+    return false;
 }
 
 bool CategoriesController::updateCategoryParent(int id, int newParentId) {
