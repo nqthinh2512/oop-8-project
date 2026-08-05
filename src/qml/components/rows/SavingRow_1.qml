@@ -13,6 +13,7 @@ Rectangle {
     property real progressFraction: 0.67
     property string progressSubText: "67% saved"
     property string dueDateText: "31/12/2012"
+    property string plannerText: ""
 
     signal editClicked()
     signal deleteClicked()
@@ -86,7 +87,7 @@ Rectangle {
             ProgressInfo_1 {
                 anchors.left: parent.left
                 anchors.right: parent.right
-                anchors.rightMargin: 16
+                anchors.rightMargin: 60
                 anchors.verticalCenter: parent.verticalCenter
                 spentText: savingRow.savedText
                 limitText: savingRow.goalText
@@ -95,20 +96,34 @@ Rectangle {
             }
         }
 
-        // 5. DUE DATE
+        // 5. DUE DATE & PLANNER
         Item {
             Layout.preferredWidth: 180
             Layout.fillHeight: true
 
-            Text {
+            Column {
                 anchors.left: parent.left
                 anchors.verticalCenter: parent.verticalCenter
-                color: "#64748b"
-                font.family: "Intel One Mono"
-                font.pixelSize: 14
-                font.weight: Font.Normal
-                text: savingRow.dueDateText
-                elide: Text.ElideRight
+                spacing: 4
+
+                Text {
+                    color: "#64748b"
+                    font.family: "Intel One Mono"
+                    font.pixelSize: 14
+                    font.weight: Font.Normal
+                    text: savingRow.dueDateText
+                    elide: Text.ElideRight
+                }
+
+                Text {
+                    color: "#2563eb" // Blue color for planner
+                    font.family: "Inter"
+                    font.pixelSize: 12
+                    font.weight: Font.Medium
+                    text: savingRow.plannerText
+                    elide: Text.ElideRight
+                    visible: text !== ""
+                }
             }
         }
 
