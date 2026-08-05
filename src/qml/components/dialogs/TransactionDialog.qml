@@ -219,6 +219,7 @@ Item {
                 height: 66
                 width: 225
                 color: "transparent"
+                z: 2
 
                 Text {
                     id: type
@@ -243,7 +244,6 @@ Item {
                     height: 34
                     width: 225
                     _state: Dropdown_1.State_1.State_1_default
-                    clip: true
                     model: ["Income", "Expense"]
                     selectedText: root.isEditMode ? transactionTypeText : "Select Type"
                     selectedIndex: root.isEditMode ? transactionTypeIndex : -1
@@ -264,6 +264,7 @@ Item {
                 height: 66
                 width: 225
                 color: "transparent"
+                z: 2
 
                 Text {
                     id: categories
@@ -288,7 +289,6 @@ Item {
                     height: 34
                     width: 225
                     _state: Dropdown_1.State_1.State_1_default
-                    clip: true
                     
                     enabled: root.transactionTypeIndex !== -1
                     opacity: enabled ? 1.0 : 0.5
