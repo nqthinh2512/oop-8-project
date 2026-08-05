@@ -157,7 +157,7 @@ bool BudgetsController::addBudget(const QString &name, int priority, int categor
 }
 
 bool BudgetsController::updateBudget(int id, const QString &name, int priority, int categoryId,
-                                     double limit, const QString &startDateStr, const QString &endDateStr)
+                                     double limit, double spent, const QString &startDateStr, const QString &endDateStr)
 {
     if (name.trimmed().isEmpty() || limit <= 0) return false;
 
@@ -173,6 +173,7 @@ bool BudgetsController::updateBudget(int id, const QString &name, int priority, 
             updatedB.setPriority(static_cast<Priority>(priority));
             updatedB.setCategoryId(categoryId);
             updatedB.setLimit(limit);
+            updatedB.setSpent(spent);
             updatedB.setStartDate(start);
             updatedB.setEndDate(end);
             ok = DatabaseManager::instance().budgetDAO()->update(id, updatedB);

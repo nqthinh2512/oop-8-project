@@ -57,6 +57,30 @@ bool CategoryDAO::remove(int id) {
     return false;
 }
 
+static QStringList parseCSVLine(const QString& line) {
+    QStringList fields;
+    QString current;
+    bool inQuotes = false;
+    for (int i = 0; i < line.length(); ++i) {
+        QChar c = line[i];
+        if (c == '"') {
+            if (inQuotes && i + 1 < line.length() && line[i + 1] == '"') {
+                current += '"';
+                i++;
+            } else {
+                inQuotes = !inQuotes;
+            }
+        } else if (c == ',' && !inQuotes) {
+            fields.append(current.trimmed());
+            current.clear();
+        } else {
+            current += c;
+        }
+    }
+    fields.append(current.trimmed());
+    return fields;
+}
+
 void CategoryDAO::loadFromCSV() {
     m_categories.clear();
 
@@ -79,7 +103,7 @@ void CategoryDAO::loadFromCSV() {
             QString line = in.readLine().trimmed();
             if (line.isEmpty()) continue;
 
-            QStringList fields = line.split(",");
+            QStringList fields = parseCSVLine(line);
             if (fields.size() >= 3) {
                 int id = fields[0].toInt();
                 QString name = fields[1];
@@ -144,8 +168,9 @@ void CategoryDAO::saveToCSV() const {
     out << "id,name,parentId,active\n";
 
     for (const Category& cat : m_categories) {
-        out << cat.getId() << ","
-            << cat.getName() << ","
+        QString escapedName = QString(cat.getName()).replace("\"", "\"\"");
+        out << cat.getId() << ",\""
+            << escapedName << "\","
             << cat.getParentId() << ","
             << (cat.isActive() ? 1 : 0) << "\n";
     }
@@ -184,8 +209,9 @@ bool CategoryDAO::exportToCSV(const QString& targetFilePath) const {
     out << "id,name,parentId,active\n";
 
     for (const Category& cat : m_categories) {
-        out << cat.getId() << ","
-            << cat.getName() << ","
+        QString escapedName = QString(cat.getName()).replace("\"", "\"\"");
+        out << cat.getId() << ",\""
+            << escapedName << "\","
             << cat.getParentId() << ","
             << (cat.isActive() ? 1 : 0) << "\n";
     }

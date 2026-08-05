@@ -165,6 +165,17 @@ Item {
                     }
                 }
             }
+
+            Text {
+                id: duplicateWarningText
+                x: 20
+                y: 76
+                text: "Category name already exists under this section"
+                color: "#ef4444"
+                font.family: "Roboto"
+                font.pixelSize: 12
+                visible: root.trySave && categoriesController.isCategoryNameExists(textField.text, pageDropdown.selectedIndex + 1, root.isEditMode ? root.editingCategoryId : 0)
+            }
         }
 
         // 3. Page & Status Dropdown Row
@@ -208,6 +219,8 @@ Item {
                     model: ["Income", "Expense", "Bill", "Budget", "Saving"]
                     selectedText: "Income"
                     selectedIndex: 0
+                    enabled: !root.isEditMode
+                    opacity: enabled ? 1.0 : 0.6
                     z: 10
                 }
             }
@@ -290,6 +303,9 @@ Item {
                     onClicked: {
                         root.trySave = true
                         if (textField.text.trim() === "") {
+                            return
+                        }
+                        if (categoriesController.isCategoryNameExists(textField.text, pageDropdown.selectedIndex + 1, root.isEditMode ? root.editingCategoryId : 0)) {
                             return
                         }
                         root.accepted(editingCategoryId, textField.text, pageDropdown.selectedIndex + 1, statusDropdown.selectedIndex === 0)

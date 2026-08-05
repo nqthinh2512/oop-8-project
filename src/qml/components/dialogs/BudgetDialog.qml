@@ -364,7 +364,7 @@ Item {
                         font.weight: Font.Normal
                         clip: true
                         selectByMouse: true
-                        enabled: !root.isEditMode
+                        enabled: true
                         inputMethodHints: Qt.ImhFormattedNumbersOnly
                         onTextChanged: {
                             if (activeFocus) {

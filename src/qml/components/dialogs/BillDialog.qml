@@ -43,6 +43,13 @@ Item {
         }
     }
 
+    function setFieldsForEdit(title, amount) {
+        billTitle = title;
+        billAmount = amount;
+        if (typeof titleField !== "undefined" && titleField) titleField.text = title;
+        if (typeof amountField !== "undefined" && amountField) amountField.text = amount;
+    }
+
     function open() { visible = true }
     function close() { visible = false }
 
@@ -52,8 +59,11 @@ Item {
         billTitle = "";
         billAmount = "";
         isValidating = false;
-        dateField.clear();
+        if (dateField) dateField.clear();
         
+        if (typeof titleField !== "undefined" && titleField) titleField.text = "";
+        if (typeof amountField !== "undefined" && amountField) amountField.text = "";
+
         var allCats = categoriesController.categoriesList;
         var list = allCats.filter(function(c) { return c.parentId === 3; });
         if (list.length > 0) {
@@ -73,7 +83,10 @@ Item {
 
         MouseArea {
             anchors.fill: parent
-            onClicked: root.close()
+            onClicked: {
+                root.reset()
+                root.close()
+            }
         }
     }
 
@@ -367,6 +380,7 @@ Item {
                     anchors.fill: parent
                     cursorShape: Qt.PointingHandCursor
                     onClicked: {
+                        root.reset()
                         root.rejected()
                         root.close()
                     }

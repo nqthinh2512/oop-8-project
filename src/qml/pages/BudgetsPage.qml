@@ -101,8 +101,7 @@ Rectangle {
                         UniversalButton_1 {
                             buttonText: "High"
                             _state: budgetsController.priorityFilter === 2 ? UniversalButton_1.State_1.State_1_selected : UniversalButton_1.State_1.State_1_default
-                            onClicked: budgetsController.priorityFilter = 2
-                        }
+                            onClicked: budgetsController.priorityFilter = 2                        }
                         UniversalButton_1 {
                             buttonText: "Medium"
                             _state: budgetsController.priorityFilter === 1 ? UniversalButton_1.State_1.State_1_selected : UniversalButton_1.State_1.State_1_default
@@ -230,7 +229,7 @@ Rectangle {
         onAccepted: (isEdit, id, name, priority, categoryId, spent, limit, startDateStr, endDateStr) => {
             var ok
             if (isEdit)
-                ok = budgetsController.updateBudget(id, name, priority, categoryId, limit, startDateStr, endDateStr)
+                ok = budgetsController.updateBudget(id, name, priority, categoryId, limit, spent, startDateStr, endDateStr)
             else
                 ok = budgetsController.addBudget(name, priority, categoryId, limit, spent, startDateStr, endDateStr)
 

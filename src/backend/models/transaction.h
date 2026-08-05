@@ -8,26 +8,32 @@
 class Transaction {
 private:
     int id;                 // Mã định danh duy nhất
+    QString title;          // Tên/tiêu đề giao dịch (Ví dụ: "Mua cơm trưa")
     double amount;          // Số tiền (Ví dụ: 50000)
     int categoryId;         // Danh mục ID (Ăn uống, Di chuyển...)
     QDateTime dateTime;     // Thời gian giao dịch
-    QString note;           // Ghi chú (Ví dụ: "Mua cơm trưa")
+    QString method;         // Phương thức thanh toán (Ví dụ: "Cash", "Bank Transfer")
 
 public:
     Transaction();
-    Transaction(int n_id, double n_amount, const QDateTime& n_date=QDateTime::currentDateTime(), const QString& n_note="", int n_categoryid=0);
+    Transaction(int n_id, const QString& n_title, double n_amount, const QDateTime& n_date=QDateTime::currentDateTime(), const QString& n_method="", int n_categoryid=0);
     virtual ~Transaction() = default;
 
     // Getters
     int getId() const { return id; }
+    QString getTitle() const { return title; }
     int getCategoryId() const { return categoryId; }
-    QString getNote() const { return note; }
+    QString getMethod() const { return method; }
+    QString getNote() const { return title; }
     double getAmount() const { return amount; }
     QDateTime getDateTime() const { return dateTime; }
 
     // Setters
     void setId(int newId) { id = newId; }
+    void setTitle(const QString& n_title) { title = n_title; }
     void setCategoryId(int n_categoryId) { categoryId = n_categoryId; }
+    void setMethod(const QString& n_method) { method = n_method; }
+    void setNote(const QString& n_note) { title = n_note; }
 
     // cái virtual function này biến class thành abstract class nên.. đừng có xóa, thanks.
     // đồng thời thỏa mãn cái requierment polymorphism
@@ -39,7 +45,7 @@ class Income : public Transaction {
 public:
     static const int parentCategory = 1; // 1 chỉ định danh mục Thu nhập
 
-    Income(int n_id, double n_amount, const QDateTime& n_date=QDateTime::currentDateTime(), const QString& n_note="", int n_categoryid=0);
+    Income(int n_id, const QString& n_title, double n_amount, const QDateTime& n_date=QDateTime::currentDateTime(), const QString& n_method="", int n_categoryid=0);
 
     // Ghi đè hàm ảo
     double getSignedAmount() const override;
@@ -50,7 +56,7 @@ class Expense : public Transaction {
 public:
     static const int parentCategory = 2; // 2 chỉ định danh mục Chi tiêu
 
-    Expense(int n_id, double n_amount, const QDateTime& n_date=QDateTime::currentDateTime(), const QString& n_note="", int n_categoryid=0);
+    Expense(int n_id, const QString& n_title, double n_amount, const QDateTime& n_date=QDateTime::currentDateTime(), const QString& n_method="", int n_categoryid=0);
 
     // Ghi đè hàm ảo
     double getSignedAmount() const override;
