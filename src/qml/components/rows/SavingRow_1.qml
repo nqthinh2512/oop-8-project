@@ -81,7 +81,7 @@ Rectangle {
 
         // 4. PROGRESS
         Item {
-            Layout.preferredWidth: 280
+            Layout.preferredWidth: 240
             Layout.fillHeight: true
 
             ProgressInfo_1 {
@@ -98,7 +98,7 @@ Rectangle {
 
         // 5. DUE DATE & PLANNER
         Item {
-            Layout.preferredWidth: 180
+            Layout.preferredWidth: 220
             Layout.fillHeight: true
 
             Column {
