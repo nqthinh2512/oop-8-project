@@ -96,7 +96,7 @@ QVariantList SavingsController::savingsList() const
                 double monthlyNeeded = remaining / monthsLeft;
                 // Round up to nearest 1,000 to avoid weird numbers (số lẻ)
                 monthlyNeeded = std::ceil(monthlyNeeded / 1000.0) * 1000.0;
-                plannerText = "Need: " + formatVnd(monthlyNeeded) + " / mo";
+                plannerText = "Need: " + formatVnd(monthlyNeeded) + " / month";
             } else {
                 plannerText = "Overdue!";
             }
