@@ -84,6 +84,25 @@ QVariantList SavingsController::savingsList() const
         m["dDate"] = s.getDueDate().toString("dd/MM/yyyy");
         m["dueDateText"] = s.getDueDate().toString("dd/MM/yyyy");
 
+        // Auto-Planner logic
+        QString plannerText = "";
+        double remaining = target - current;
+        if (remaining > 0.0) {
+            int daysLeft = QDate::currentDate().daysTo(s.getDueDate());
+            if (daysLeft > 0) {
+                // Estimate months (rough approx)
+                double monthsLeft = daysLeft / 30.0;
+                if (monthsLeft < 1.0) monthsLeft = 1.0; // If less than a month, just show the full remaining
+                double monthlyNeeded = remaining / monthsLeft;
+                plannerText = "~ " + formatVnd(monthlyNeeded) + " / month";
+            } else {
+                plannerText = "Overdue!";
+            }
+        } else {
+            plannerText = "Goal Reached!";
+        }
+        m["plannerText"] = plannerText;
+
         list.append(m);
     }
 

@@ -73,7 +73,9 @@ QVariantList BudgetsController::categoryOptions() const
     QVariantList list;
     const auto &allCategories = DatabaseManager::instance().categoryDAO()->getAll();
     for (const auto &c : allCategories) {
-        if (c.getParentId() != 4) continue; // chỉ lấy danh mục con thuộc gốc "Budget"
+        // SỬA: chỉ lấy danh mục con thuộc gốc "Expense" (parentId = 2) vì Ngân sách dùng để quản lý Chi tiêu
+        if (c.getParentId() != 2) continue; 
+
         QVariantMap m;
         m["id"] = c.getId();
         m["name"] = c.getName();
