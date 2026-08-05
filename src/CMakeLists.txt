@@ -13,11 +13,15 @@ find_package(Qt6 REQUIRED COMPONENTS Quick)
 
 qt_standard_project_setup(REQUIRES 6.10)
 
+set(CMAKE_AUTOMOC ON)
+set(CMAKE_AUTORCC ON)
+set(CMAKE_AUTOUIC ON)
+
 # 1. Insert C++ backend and frontend here
 qt_add_executable(appFinanceDashboard
     main.cpp
 
-    # Backend Storage & DAO
+    # Backend DAO (new architecture — each DAO handles its own CSV I/O)
     backend/dao/ibase_dao.h
     backend/dao/category_dao.h
     backend/dao/category_dao.cpp
@@ -30,8 +34,14 @@ qt_add_executable(appFinanceDashboard
     backend/dao/saving_dao.h
     backend/dao/saving_dao.cpp
 
+    # Backend Storage (thin manager — delegates to DAOs)
     backend/storage/database_manager.h
     backend/storage/database_manager.cpp
+
+    # NOTE: The old database_manager_category.cpp, database_manager_bill.cpp,
+    # database_manager_budget.cpp, database_manager_saving.cpp, database_manager_transaction.cpp
+    # and database_manager_export.cpp are OBSOLETE — their functionality is now in the DAO classes.
+    # Do NOT add them back or the build will fail with "no declaration matches" errors.
 
     # Backend Model
     backend/models/category.h
