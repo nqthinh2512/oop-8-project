@@ -1,6 +1,8 @@
 import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls
+import QtQuick.Dialogs
+import QtCore
 import "../components/dialogs"
 
 Rectangle {
@@ -8,6 +10,19 @@ Rectangle {
 
     color: "#f8fafc"
     clip: true
+
+    FileDialog {
+        id: exportFileDialog
+        title: "Export Transactions to CSV"
+        fileMode: FileDialog.SaveFile
+        nameFilters: ["CSV Files (*.csv)", "All Files (*)"]
+        defaultSuffix: "csv"
+        currentFolder: StandardPaths.standardLocations(StandardPaths.DocumentsLocation)[0]
+        currentFile: "file:///" + StandardPaths.writableLocation(StandardPaths.DocumentsLocation) + "/transactions_export.csv"
+        onAccepted: {
+            transactionsController.exportToCSV(selectedFile.toString())
+        }
+    }
 
     ColumnLayout {
         anchors.fill: parent
@@ -88,11 +103,6 @@ Rectangle {
                             _state: transactionsController.filterType === 1 ? UniversalButton_1.State_1.State_1_selected : UniversalButton_1.State_1.State_1_default
                             onClicked: transactionsController.filterType = 1
                         }
-                        UniversalButton_1 {
-                            buttonText: "Transfer"
-                            _state: transactionsController.filterType === 2 ? UniversalButton_1.State_1.State_1_selected : UniversalButton_1.State_1.State_1_default
-                            onClicked: transactionsController.filterType = 2
-                        }
                     }
 
                     // Vertical Separator Line
@@ -123,6 +133,12 @@ Rectangle {
                     // Flexible Spacer pushing Add button to right
                     Item {
                         Layout.fillWidth: true
+                    }
+
+                    // Export CSV Button
+                    UniversalButton_1 {
+                        buttonText: "Export CSV"
+                        onClicked: exportFileDialog.open()
                     }
 
                     // Add Transaction Button
@@ -278,18 +294,18 @@ Rectangle {
                         transactionDialog.transactionId = model.tId
                         transactionDialog.transactionTitle = model.tName
                         
-                        // Extract only numeric digits from amount
-                        var rawAmount = model.tAmount.replace(/[^0-9]/g, '')
-                        transactionDialog.transactionAmount = rawAmount
-                        
-                        transactionDialog.transactionMethod = model.tMethod
-                        transactionDialog.setCategoryName(model.tCat)
-                        transactionDialog.setDateStr(model.tDate)
-                        
+                        // Set Type FIRST so category filter uses the correct parentId (1=Income, 2=Expense)
                         transactionDialog.transactionTypeIndex = model.tType
                         if (model.tType === 0) transactionDialog.transactionTypeText = "Income"
                         else if (model.tType === 1) transactionDialog.transactionTypeText = "Expense"
-                        else if (model.tType === 2) transactionDialog.transactionTypeText = "Transfer"
+                        
+                        // Set Category SECOND
+                        transactionDialog.setCategoryName(model.tCat)
+                        
+                        var rawAmount = model.tAmount.replace(/[^0-9]/g, '')
+                        var formattedAmount = rawAmount.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                        transactionDialog.setFieldsForEdit(model.tName, formattedAmount, model.tMethod)
+                        transactionDialog.setDateStr(model.tDate)
                         
                         transactionDialog.open()
                     }
@@ -306,17 +322,15 @@ Rectangle {
         }
     }
 
-    // Add Transaction Dialog Overlay
+    // Add/Edit Transaction Dialog Overlay
     TransactionDialog {
         id: transactionDialog
         anchors.fill: parent
 
         onAccepted: {
-            var dateStr = transactionDialog.dateField ? transactionDialog.dateField.selectedDate : "01/01/2026"
-            
-            // To get a date string, we need to expose selectedDate from the dialog or parse it.
-            // Wait, we didn't expose dateField. Let's use a dummy date for now, or assume the UI will be fully wired later.
-            // Or better, let's expose dateField.
+            var dateStr = (transactionDialog.dateField && transactionDialog.dateField.selectedDate !== "") 
+                          ? transactionDialog.dateField.selectedDate 
+                          : "01/01/2026"
             
             if (isEditMode) {
                 transactionsController.updateTransaction(

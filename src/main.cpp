@@ -5,14 +5,15 @@
 #include <QQmlContext>
 
 #include "backend/storage/database_manager.h"
+#include "frontend/bills_controller.h"
 #include "frontend/budgets_controller.h"
 #include "frontend/categories_controller.h"
 #include "frontend/overview_controller.h"
 #include "frontend/reports_controller.h"
+#include "frontend/savings_controller.h"
+#include "frontend/session_controller.h"
 #include "frontend/settings_controller.h"
 #include "frontend/transactions_controller.h"
-#include "frontend/bills_controller.h"
-#include "frontend/savings_controller.h"
 
 int main(int argc, char *argv[])
 {
@@ -20,11 +21,7 @@ int main(int argc, char *argv[])
 
     // Initialize Database & load data from CSVs
     DatabaseManager &db = DatabaseManager::instance();
-    db.loadCategoriesFromCSV();
-    db.loadTransactionsFromCSV();
-    db.loadBillsFromCSV();
-    db.loadBudgetsFromCSV();
-    db.loadSavingsFromCSV();
+    // DAOs automatically load data from CSV on creation
 
     // Instantiate Controllers for your pages
     CategoriesController categoriesCtrl;
@@ -35,6 +32,7 @@ int main(int argc, char *argv[])
     TransactionsController transactionsCtrl;
     BillsController billsCtrl;
     SavingsController savingsCtrl;
+    SessionController sessionCtrl;
 
     QQmlApplicationEngine engine;
 
@@ -47,6 +45,7 @@ int main(int argc, char *argv[])
     engine.rootContext()->setContextProperty("transactionsController", &transactionsCtrl);
     engine.rootContext()->setContextProperty("billsController", &billsCtrl);
     engine.rootContext()->setContextProperty("savingsController", &savingsCtrl);
+    engine.rootContext()->setContextProperty("sessionController", &sessionCtrl);
 
     engine.load(QUrl(QStringLiteral("qrc:/qt/qml/src/qml/Main.qml")));
 

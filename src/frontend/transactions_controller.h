@@ -66,6 +66,7 @@ public:
     Q_INVOKABLE void addTransaction(int typeIndex, const QString& title, double amount, const QString& dateStr, int categoryId, const QString& method);
     Q_INVOKABLE void updateTransaction(int id, int typeIndex, const QString& title, double amount, const QString& dateStr, int categoryId, const QString& method);
     Q_INVOKABLE void deleteTransaction(int id);
+    Q_INVOKABLE bool exportToCSV(const QString& filePath);
 
 signals:
     void filterTypeChanged();
@@ -77,7 +78,7 @@ private:
     void applyFilter();
 
     TransactionListModel* m_model;
-    int m_filterType; // -1: All, 0: Income, 1: Expense, 2: Transfer
+    int m_filterType; // -1: All, 0: Income, 1: Expense
     QString m_searchKeyword;
     int m_categoryIdFilter; // 0: All
 };

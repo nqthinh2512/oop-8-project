@@ -8,8 +8,8 @@
 class TransactionFactory {
 public:
     // Factory method to create Transaction objects
-    // typeIndex: 0 for Income, 1 for Expense, 2 for Transfer (mapped to Expense for now)
-    static Transaction* createTransaction(int typeIndex, int id, double amount, const QDateTime& dt, const QString& note, int categoryId);
+    // typeIndex: 0 for Income, 1 for Expense
+    static Transaction* createTransaction(int typeIndex, int id, const QString& title, double amount, const QDateTime& dt, const QString& method, int categoryId);
 };
 
 #endif // TRANSACTION_FACTORY_H

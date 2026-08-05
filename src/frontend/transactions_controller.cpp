@@ -32,57 +32,31 @@ QVariant TransactionListModel::data(const QModelIndex &index, int role) const
     case IdRole:
         return t->getId();
     case TypeRole: {
-        int typeIndex = 1; 
-        if (dynamic_cast<const Income*>(t) != nullptr) typeIndex = 0;
-        QString note = t->getNote();
-        if (note.startsWith("[TYPE:")) {
-            int closeIdx = note.indexOf("]");
-            if (closeIdx != -1) {
-                typeIndex = note.mid(6, closeIdx - 6).toInt();
-            }
-        }
-        return typeIndex;
+        return (dynamic_cast<const Income*>(t) != nullptr) ? 0 : 1;
     }
     case TitleRole: {
-        QString note = t->getNote();
-        if (note.startsWith("[TYPE:")) {
-            int closeIdx = note.indexOf("]");
-            if (closeIdx != -1) note = note.mid(closeIdx + 1);
+        if (!t->getTitle().isEmpty()) return t->getTitle();
+        if (t->getCategoryId() == 0) return "Uncategorized";
+        for (const auto& cat : DatabaseManager::instance().categoryDAO()->getAll()) {
+            if (cat.getId() == t->getCategoryId()) return cat.getName();
         }
-        int sepIdx = note.indexOf("||");
-        if (sepIdx != -1) return note.left(sepIdx);
-        return note; 
+        return "Uncategorized";
+    }
+    case CategoryRole: {
+        if (t->getCategoryId() == 0) return "Uncategorized";
+        for (const auto& cat : DatabaseManager::instance().categoryDAO()->getAll()) {
+            if (cat.getId() == t->getCategoryId()) {
+                return cat.getName();
+            }
+        }
+        return "Uncategorized";
     }
     case AmountRole: {
-        // Format amount with commas (e.g. 25,000,000 VND)
         QString formatted = QLocale(QLocale::English).toString(t->getAmount(), 'f', 0);
         return formatted + " VND";
     }
-    case CategoryRole: {
-        // Find category name by ID
-        QString catName = "Unknown";
-        for (const auto& cat : DatabaseManager::instance().getAllCategories()) {
-            if (cat.getId() == t->getCategoryId()) {
-                catName = cat.getName();
-                break;
-            }
-        }
-        // Fallback for dummy data
-        if (catName == "Unknown") {
-            if (t->getCategoryId() == 1) catName = "Salary";
-            else if (t->getCategoryId() == 2) catName = "Freelance";
-            else if (t->getCategoryId() == 5) catName = "Food & Dining";
-            else if (t->getCategoryId() == 6) catName = "Housing & Rent";
-            else if (t->getCategoryId() == 7) catName = "Transportation";
-            else if (t->getCategoryId() == 8) catName = "Utilities";
-        }
-        return catName;
-    }
     case MethodRole: {
-        QString note = t->getNote();
-        int sepIdx = note.indexOf("||");
-        if (sepIdx != -1) return note.mid(sepIdx + 2);
-        return "Cash/Bank"; 
+        return t->getMethod().isEmpty() ? "Cash/Bank" : t->getMethod();
     }
     case DateRole:
         return t->getDateTime().toString("dd/MM/yyyy");
@@ -127,6 +101,7 @@ TransactionsController::TransactionsController(QObject *parent)
       m_searchKeyword(""),
       m_categoryIdFilter(0)
 {
+    connect(&DatabaseManager::instance(), &DatabaseManager::dataChanged, this, &TransactionsController::loadTransactions);
     loadTransactions();
 }
 
@@ -164,7 +139,7 @@ void TransactionsController::loadTransactions()
 
 void TransactionsController::applyFilter()
 {
-    const QVector<Transaction*>& all = DatabaseManager::instance().getAllTransactions();
+    const QVector<Transaction*>& all = DatabaseManager::instance().transactionDAO()->getAll();
     QVector<Transaction*> filtered;
 
     QString searchLower = m_searchKeyword.toLower();
@@ -172,30 +147,32 @@ void TransactionsController::applyFilter()
     for (Transaction* t : all) {
         if (!t) continue;
 
-        // 1. Filter by Type
-        int tType = 1;
-        if (dynamic_cast<const Income*>(t) != nullptr) tType = 0;
-        QString note = t->getNote();
-        if (note.startsWith("[TYPE:")) {
-            int closeIdx = note.indexOf("]");
-            if (closeIdx != -1) tType = note.mid(6, closeIdx - 6).toInt();
-        }
+        // 1. Filter by Type (0 = Income, 1 = Expense)
+        int tType = (dynamic_cast<const Income*>(t) != nullptr) ? 0 : 1;
 
         if (m_filterType != -1 && m_filterType != tType) {
-            continue; // Skip if type doesn't match and we are not showing 'All'
+            continue;
         }
 
-        // 2. Filter by Keyword (Title/Note)
-        if (!searchLower.isEmpty()) {
-            if (!t->getNote().toLower().contains(searchLower)) {
-                // Should also check category name here, but keeping it simple for now
-                continue;
-            }
-        }
-
-        // 3. Filter by Category ID
+        // 2. Filter by Category ID
         if (m_categoryIdFilter > 0 && t->getCategoryId() != m_categoryIdFilter) {
             continue;
+        }
+
+        // 3. Filter by Keyword (Title / Category Name / Method / Amount)
+        if (!searchLower.isEmpty()) {
+            QString catName = "Uncategorized";
+            for (const auto& cat : DatabaseManager::instance().categoryDAO()->getAll()) {
+                if (cat.getId() == t->getCategoryId()) {
+                    catName = cat.getName();
+                    break;
+                }
+            }
+            bool matches = t->getTitle().toLower().contains(searchLower) ||
+                           catName.toLower().contains(searchLower) ||
+                           t->getMethod().toLower().contains(searchLower) ||
+                           QString::number(t->getAmount(), 'f', 0).contains(searchLower);
+            if (!matches) continue;
         }
 
         filtered.append(t);
@@ -206,7 +183,6 @@ void TransactionsController::applyFilter()
 
 void TransactionsController::addTransaction(int typeIndex, const QString& title, double amount, const QString& dateStr, int categoryId, const QString& method)
 {
-    // Parse date (DD/MM/YYYY)
     QDate date = QDate::fromString(dateStr, "dd/MM/yyyy");
     if (!date.isValid()) {
         date = QDate::currentDate();
@@ -214,20 +190,18 @@ void TransactionsController::addTransaction(int typeIndex, const QString& title,
     QDateTime dt(date, QTime::currentTime());
 
     int maxId = 0;
-    for (const auto* t : DatabaseManager::instance().getAllTransactions()) {
+    for (const auto* t : DatabaseManager::instance().transactionDAO()->getAll()) {
         if (t && t->getId() > maxId) maxId = t->getId();
     }
     int id = maxId + 1;
 
-    // Since we don't have a subclass for Transfer or a specific field for Account/Method in the base Transaction class,
-    // we encode the type and method into the Note field as a workaround:
-    // Format: "[TYPE:X]Title||Method"
-    QString fullNote = QString("[TYPE:%1]%2||%3").arg(typeIndex).arg(title).arg(method.isEmpty() ? "Cash/Bank" : method);
+    QString cleanMethod = method.isEmpty() ? "Cash/Bank" : method;
+    QString cleanTitle = title.isEmpty() ? "Transaction" : title;
+    Transaction* newTx = TransactionFactory::createTransaction(typeIndex, id, cleanTitle, amount, dt, cleanMethod, categoryId);
 
-    Transaction* newTx = TransactionFactory::createTransaction(typeIndex, id, amount, dt, fullNote, categoryId);
-
-    DatabaseManager::instance().addTransaction(newTx);
-    loadTransactions(); // Reload from DB and apply filters
+    DatabaseManager::instance().transactionDAO()->add(newTx);
+    DatabaseManager::instance().triggerDataChanged();
+    loadTransactions();
 }
 
 void TransactionsController::updateTransaction(int id, int typeIndex, const QString& title, double amount, const QString& dateStr, int categoryId, const QString& method)
@@ -238,17 +212,23 @@ void TransactionsController::updateTransaction(int id, int typeIndex, const QStr
     }
     QDateTime dt(date, QTime::currentTime());
 
-    // Encode the type and method into the Note field as a workaround:
-    QString fullNote = QString("[TYPE:%1]%2||%3").arg(typeIndex).arg(title).arg(method.isEmpty() ? "Cash/Bank" : method);
+    QString cleanMethod = method.isEmpty() ? "Cash/Bank" : method;
+    QString cleanTitle = title.isEmpty() ? "Transaction" : title;
+    Transaction* newTx = TransactionFactory::createTransaction(typeIndex, id, cleanTitle, amount, dt, cleanMethod, categoryId);
 
-    Transaction* newTx = TransactionFactory::createTransaction(typeIndex, id, amount, dt, fullNote, categoryId);
-
-    DatabaseManager::instance().updateTransaction(id, newTx);
+    DatabaseManager::instance().transactionDAO()->update(id, newTx);
+    DatabaseManager::instance().triggerDataChanged();
     loadTransactions();
 }
 
 void TransactionsController::deleteTransaction(int id)
 {
-    DatabaseManager::instance().deleteTransaction(id);
+    DatabaseManager::instance().transactionDAO()->remove(id);
+    DatabaseManager::instance().triggerDataChanged();
     loadTransactions();
+}
+
+bool TransactionsController::exportToCSV(const QString& filePath)
+{
+    return DatabaseManager::instance().transactionDAO()->exportToCSV(filePath);
 }

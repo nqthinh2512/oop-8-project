@@ -22,6 +22,7 @@ class OverviewController : public QObject {
     Q_PROPERTY(QVariantList upcomingBills READ upcomingBills NOTIFY dataChanged)
     Q_PROPERTY(QVariantMap topSaving READ topSaving NOTIFY dataChanged)
     Q_PROPERTY(QVariantMap topBudget READ topBudget NOTIFY dataChanged)
+    Q_PROPERTY(QVariantMap monthlyChartData READ monthlyChartData NOTIFY dataChanged)
 
 public:
     explicit OverviewController(QObject *parent = nullptr);
@@ -38,8 +39,10 @@ public:
     QVariantList upcomingBills() const;
     QVariantMap topSaving() const;
     QVariantMap topBudget() const;
+    QVariantMap monthlyChartData() const;
 
     Q_INVOKABLE void refresh();
+    Q_INVOKABLE bool exportToCSV(const QString &filePath);
 
 signals:
     void dataChanged();

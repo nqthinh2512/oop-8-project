@@ -8,7 +8,7 @@ private:
     int id;
     int parentId;
     QString name;        // Tên danh mục (Ăn uống, Học phí...)
-    bool active;         // Trạng thái (Active = true, Inactive = false)
+    bool active = true;  // Trạng thái hoạt động
 
 public:
     Category();
@@ -25,7 +25,9 @@ public:
     bool isActive() const { return active; }
 
     // Setters
+    void setId(int newId) { id = newId; }
     void setParentId(int newParentId) { parentId = newParentId; }
+    void setName(const QString& newName) { name = newName; }
     void setActive(bool newActive) { active = newActive; }
 
     static QString parentCategoryName(int parentId);

@@ -15,7 +15,7 @@ void DatabaseManager::loadBudgetsFromCSV()
 {
     m_budgets.clear();
 
-    QString fullPath = QCoreApplication::applicationDirPath() + "/data/budgets.csv";
+    QString fullPath = DatabaseManager::getDataDirectoryPath() + "/budgets.csv";
     QFile file(fullPath);
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
         return; // file chưa tồn tại (lần chạy đầu) -> giữ m_budgets rỗng
@@ -61,7 +61,7 @@ void DatabaseManager::loadBudgetsFromCSV()
 
 void DatabaseManager::saveBudgetsToCSV() const
 {
-    QString fullPath = QCoreApplication::applicationDirPath() + "/data/budgets.csv";
+    QString fullPath = DatabaseManager::getDataDirectoryPath() + "/budgets.csv";
     QFile file(fullPath);
     if (!file.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Truncate))
         return;
@@ -78,6 +78,7 @@ void DatabaseManager::saveBudgetsToCSV() const
             << b.getEndDate().toString(Qt::ISODate) << "\n";
     }
     file.close();
+    const_cast<DatabaseManager*>(this)->emit dataChanged();
 }
 
 int DatabaseManager::generateNextBudgetId() const

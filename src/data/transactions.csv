@@ -1,1 +1,7 @@
-id,amount,categoryId,dateTime,note
+type,id,title,amount,dateTime,method,categoryId
+Income,1,Monthly Salary,15000000.00,2026-07-19T01:57:27,Bank Transfer,1
+Income,2,Freelance Web Design,3500000.00,2026-07-29T01:57:27,Bank Transfer,2
+Expense,3,Monthly Apartment Rent,3500000.00,2026-07-24T01:57:27,Cash,6
+Expense,4,Weekly Grocery & Dining,850000.00,2026-07-31T01:57:27,Cash,5
+Expense,5,Fiber Internet Service,250000.00,2026-08-01T01:57:27,Credit Card,8
+Expense,6,Fuel & Transportation,200000.00,2026-08-02T01:57:27,Cash,7

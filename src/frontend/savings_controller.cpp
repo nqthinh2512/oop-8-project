@@ -18,14 +18,19 @@ QDate parseDateStr(const QString &str) {
 }
 }
 
-SavingsController::SavingsController(QObject *parent) : QObject(parent) {}
+SavingsController::SavingsController(QObject *parent) : QObject(parent) {
+    connect(&DatabaseManager::instance(), &DatabaseManager::dataChanged, this, [this]() {
+        m_listDirty = true;
+        emit savingsListChanged();
+    });
+}
 
 QVariantList SavingsController::savingsList() const
 {
     if (!m_listDirty) return m_cachedList;
 
-    const auto &allSavings = DatabaseManager::instance().getAllSavings();
-    const auto &allCategories = DatabaseManager::instance().getAllCategories();
+    const auto &allSavings = DatabaseManager::instance().savingDAO()->getAll();
+    const auto &allCategories = DatabaseManager::instance().categoryDAO()->getAll();
 
     QVariantList list;
     for (const auto &s : allSavings) {
@@ -41,7 +46,7 @@ QVariantList SavingsController::savingsList() const
         if (m_categoryFilter != 0 && s.getCategoryId() != m_categoryFilter)
             continue;
 
-        QString categoryName = "General";
+        QString categoryName = (s.getCategoryId() == 0) ? "Uncategorized" : "General";
         for (const auto &c : allCategories) {
             if (c.getId() == s.getCategoryId()) {
                 categoryName = c.getName();
@@ -89,7 +94,7 @@ QVariantList SavingsController::savingsList() const
 
 QVariantList SavingsController::categoryOptions() const
 {
-    const auto &allCats = DatabaseManager::instance().getAllCategories();
+    const auto &allCats = DatabaseManager::instance().categoryDAO()->getAll();
     QVariantList options;
 
     QVariantMap allMap;
@@ -145,7 +150,7 @@ void SavingsController::setCategoryFilter(int filter)
 QString SavingsController::totalSavedText() const
 {
     double total = 0.0;
-    for (const auto &s : DatabaseManager::instance().getAllSavings()) {
+    for (const auto &s : DatabaseManager::instance().savingDAO()->getAll()) {
         total += s.getCurrent();
     }
     return formatVnd(total);
@@ -154,7 +159,7 @@ QString SavingsController::totalSavedText() const
 QString SavingsController::totalRemainingText() const
 {
     double totalRem = 0.0;
-    for (const auto &s : DatabaseManager::instance().getAllSavings()) {
+    for (const auto &s : DatabaseManager::instance().savingDAO()->getAll()) {
         totalRem += s.getRemainingAmount();
     }
     return formatVnd(totalRem);
@@ -163,7 +168,7 @@ QString SavingsController::totalRemainingText() const
 QString SavingsController::completedText() const
 {
     int completedCount = 0;
-    const auto &all = DatabaseManager::instance().getAllSavings();
+    const auto &all = DatabaseManager::instance().savingDAO()->getAll();
     for (const auto &s : all) {
         if (s.isCompleted()) {
             completedCount++;
@@ -182,7 +187,10 @@ bool SavingsController::addSaving(const QString &name, int priority, int categor
     }
 
     Priority p = static_cast<Priority>(qBound(0, priority, 2));
-    DatabaseManager::instance().addSaving(name, p, categoryId, target, current, dueDate);
+    int catId = (categoryId == 0 ? Saving::parentCategory : categoryId);
+    Saving s(0, name, p, dueDate, target, current, catId);
+    DatabaseManager::instance().savingDAO()->add(s);
+    DatabaseManager::instance().triggerDataChanged();
 
     refresh();
     return true;
@@ -198,7 +206,20 @@ bool SavingsController::updateSaving(int id, const QString &name, int priority, 
     }
 
     Priority p = static_cast<Priority>(qBound(0, priority, 2));
-    bool success = DatabaseManager::instance().updateSaving(id, name, p, categoryId, target, current, dueDate);
+    bool success = false;
+    for (const Saving& s : DatabaseManager::instance().savingDAO()->getAll()) {
+        if (s.getId() == id) {
+            Saving updatedS = s;
+            updatedS.setName(name);
+            updatedS.setPriority(p);
+            if (categoryId != 0) updatedS.setCategoryId(categoryId);
+            updatedS.setTarget(target);
+            updatedS.setCurrent(current);
+            updatedS.setDueDate(dueDate);
+            success = DatabaseManager::instance().savingDAO()->update(id, updatedS);
+            break;
+        }
+    }
 
     if (success) {
         refresh();
@@ -208,8 +229,9 @@ bool SavingsController::updateSaving(int id, const QString &name, int priority, 
 
 bool SavingsController::removeSaving(int id)
 {
-    bool success = DatabaseManager::instance().deleteSaving(id);
+    bool success = DatabaseManager::instance().savingDAO()->remove(id);
     if (success) {
+        DatabaseManager::instance().triggerDataChanged();
         refresh();
     }
     return success;
@@ -220,4 +242,9 @@ void SavingsController::refresh()
     m_listDirty = true;
     emit savingsListChanged();
     emit totalsChanged();
+}
+
+bool SavingsController::exportToCSV(const QString &filePath)
+{
+    return DatabaseManager::instance().savingDAO()->exportToCSV(filePath);
 }

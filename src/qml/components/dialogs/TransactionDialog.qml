@@ -31,7 +31,8 @@ Item {
 
     function setCategoryName(catName) {
         var allCats = categoriesController.categoriesList;
-        var list = allCats.filter(function(c) { return c.parentId === 1 || c.parentId === 2; });
+        var targetParent = root.transactionTypeIndex + 1; // 1 for Income, 2 for Expense
+        var list = allCats.filter(function(c) { return c.parentId === targetParent; });
         for (var i = 0; i < list.length; i++) {
             if (list[i].name === catName) {
                 dropdown_3.selectedIndex = i;
@@ -44,7 +45,20 @@ Item {
             dropdown_3.selectedIndex = 0;
             dropdown_3.selectedText = list[0].name;
             transactionCategoryId = list[0].id;
+        } else {
+            dropdown_3.selectedIndex = -1;
+            dropdown_3.selectedText = "Select Category";
+            transactionCategoryId = 0;
         }
+    }
+
+    function setFieldsForEdit(title, amount, method) {
+        transactionTitle = title;
+        transactionAmount = amount;
+        transactionMethod = method;
+        if (typeof textField !== "undefined" && textField) textField.text = title;
+        if (typeof supporting_text !== "undefined" && supporting_text) supporting_text.text = amount;
+        if (typeof supporting_text_1 !== "undefined" && supporting_text_1) supporting_text_1.text = method;
     }
 
     function open() { visible = true }
@@ -56,21 +70,18 @@ Item {
         transactionTitle = "";
         transactionAmount = "";
         transactionMethod = "";
-        transactionTypeIndex = 0;
-        transactionTypeText = "Income";
+        transactionTypeIndex = -1;
+        transactionTypeText = "Select Type";
         isValidating = false;
-        dateField.clear();
+        if (dateField) dateField.clear();
         
-        var allCats = categoriesController.categoriesList;
-        var list = allCats.filter(function(c) { return c.parentId === 1 || c.parentId === 2; });
-        if (list.length > 0) {
-            dropdown_3.selectedIndex = 0;
-            dropdown_3.selectedText = list[0].name;
-            transactionCategoryId = list[0].id;
-        } else {
-            transactionCategoryId = 0;
-            dropdown_3.selectedText = "Select Category";
-        }
+        transactionCategoryId = 0;
+        dropdown_3.selectedIndex = -1;
+        dropdown_3.selectedText = "Select Category";
+
+        if (typeof textField !== "undefined" && textField) textField.text = "";
+        if (typeof supporting_text !== "undefined" && supporting_text) supporting_text.text = "";
+        if (typeof supporting_text_1 !== "undefined" && supporting_text_1) supporting_text_1.text = "";
     }
 
     // Dimmed background overlay
@@ -80,7 +91,10 @@ Item {
 
         MouseArea {
             anchors.fill: parent
-            onClicked: root.close()
+            onClicked: {
+                root.reset()
+                root.close()
+            }
         }
     }
 
@@ -230,8 +244,16 @@ Item {
                     width: 225
                     _state: Dropdown_1.State_1.State_1_default
                     clip: true
-                    model: ["Income", "Expense", "Transfer"]
-                    selectedText: "Income" // Default
+                    model: ["Income", "Expense"]
+                    selectedText: root.isEditMode ? transactionTypeText : "Select Type"
+                    selectedIndex: root.isEditMode ? transactionTypeIndex : -1
+                    onSelected: function(index, value) {
+                        if (!root.isEditMode) {
+                            root.transactionCategoryId = 0
+                            dropdown_3.selectedIndex = -1
+                            dropdown_3.selectedText = "Select Category"
+                        }
+                    }
                 }
             }
 
@@ -268,10 +290,16 @@ Item {
                     _state: Dropdown_1.State_1.State_1_default
                     clip: true
                     
+                    enabled: root.transactionTypeIndex !== -1
+                    opacity: enabled ? 1.0 : 0.5
+                    
                     property var allCats: categoriesController.categoriesList
-                    property var catList: allCats.filter(function(c) { return c.parentId === 1 || c.parentId === 2; })
+                    property var catList: {
+                        if (root.transactionTypeIndex === -1) return [];
+                        var targetParent = root.transactionTypeIndex + 1; // 1 for Income, 2 for Expense
+                        return allCats.filter(function(c) { return c.parentId === targetParent; })
+                    }
                     model: catList.map(function(c) { return c.name; })
-                    selectedText: catList.length > 0 ? catList[0].name : "Select Category"
                     
                     onSelected: function(index, value) {
                         if (index >= 0 && index < catList.length) {
@@ -476,6 +504,7 @@ Item {
                     anchors.fill: parent
                     cursorShape: Qt.PointingHandCursor
                     onClicked: {
+                        root.reset()
                         root.rejected()
                         root.close()
                     }
@@ -496,7 +525,7 @@ Item {
                     cursorShape: Qt.PointingHandCursor
                     onClicked: {
                         root.isValidating = true
-                        if (root.transactionTitle.trim() === "" || root.transactionAmount.trim() === "" || root.transactionMethod.trim() === "" || root.dateField.selectedDate.trim() === "") {
+                        if (root.transactionTitle.trim() === "" || root.transactionAmount.trim() === "" || root.transactionMethod.trim() === "" || root.dateField.selectedDate.trim() === "" || root.transactionCategoryId === 0 || root.transactionTypeIndex === -1) {
                             return
                         }
                         root.accepted()

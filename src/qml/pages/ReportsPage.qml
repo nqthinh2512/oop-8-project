@@ -1,6 +1,8 @@
 import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls
+import QtQuick.Dialogs
+import QtCore
 
 import "../components"
 
@@ -9,6 +11,25 @@ Rectangle {
 
     color: "#f8fafc"
     clip: true
+
+    FileDialog {
+        id: exportFileDialog
+        title: "Export Reports Data to CSV"
+        fileMode: FileDialog.SaveFile
+        nameFilters: ["CSV Files (*.csv)", "All Files (*)"]
+        defaultSuffix: "csv"
+        currentFolder: StandardPaths.standardLocations(StandardPaths.DocumentsLocation)[0]
+        currentFile: "file:///" + StandardPaths.writableLocation(StandardPaths.DocumentsLocation) + "/reports_export.csv"
+        onAccepted: {
+            reportsController.exportToCSV(selectedFile.toString())
+        }
+    }
+
+    onVisibleChanged: {
+        if (visible) {
+            reportsController.refresh()
+        }
+    }
 
     ScrollView {
         id: scrollView
@@ -34,12 +55,23 @@ Rectangle {
                     Layout.fillWidth: true
                     spacing: 16
 
-                    Text {
-                        text: "Reports"
-                        font.family: "Inter"
-                        font.pixelSize: 32
-                        font.weight: Font.Bold
-                        color: "#0f172a"
+                    RowLayout {
+                        Layout.fillWidth: true
+
+                        Text {
+                            text: "Reports"
+                            font.family: "Inter"
+                            font.pixelSize: 32
+                            font.weight: Font.Bold
+                            color: "#0f172a"
+                        }
+
+                        Item { Layout.fillWidth: true }
+
+                        UniversalButton_1 {
+                            buttonText: "Export CSV"
+                            onClicked: exportFileDialog.open()
+                        }
                     }
 
                     Rectangle {
@@ -177,7 +209,7 @@ Rectangle {
                                 }
 
                                 Text {
-                                    text: "Monthly Comparison"
+                                    text: "Last 6 Months"
                                     font.family: "Inter"
                                     font.pixelSize: 13
                                     color: "#64748b"
@@ -199,8 +231,16 @@ Rectangle {
                                 border.color: "#f1f5f9"
 
                                 Canvas {
+                                    id: rptBarCanvas
                                     anchors.fill: parent
                                     anchors.margins: 12
+
+                                    Connections {
+                                        target: reportsController
+                                        function onReportChanged() {
+                                            rptBarCanvas.requestPaint()
+                                        }
+                                    }
                                     onPaint: {
                                         var ctx = getContext("2d");
                                         ctx.reset();
@@ -217,7 +257,8 @@ Rectangle {
                                         ctx.strokeStyle = "#f1f5f9";
                                         ctx.lineWidth = 1;
 
-                                        var yTicks = ["20M", "15M", "10M", "5M", "0"];
+                                        var chartData = reportsController.monthlyChartData;
+                                        var yTicks = (chartData && chartData.yTicks) ? chartData.yTicks : ["20M", "15M", "10M", "5M", "0"];
                                         for (var i = 0; i < yTicks.length; i++) {
                                             var ratio = i / (yTicks.length - 1);
                                             var y = padT + ratio * chartH;
@@ -230,9 +271,9 @@ Rectangle {
                                         }
 
                                         // Bars & X-Axis Labels
-                                        var months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun"];
-                                        var incomeRatios = [0.65, 0.50, 0.80, 0.55, 0.85, 0.70];
-                                        var expenseRatios = [0.40, 0.55, 0.45, 0.60, 0.35, 0.50];
+                                        var months = (chartData && chartData.months) ? chartData.months : ["Jan", "Feb", "Mar", "Apr", "May", "Jun"];
+                                        var incomeRatios = (chartData && chartData.incomeRatios) ? chartData.incomeRatios : [0, 0, 0, 0, 0, 0];
+                                        var expenseRatios = (chartData && chartData.expenseRatios) ? chartData.expenseRatios : [0, 0, 0, 0, 0, 0];
 
                                         var count = months.length;
                                         var groupWidth = chartW / count;
@@ -333,8 +374,16 @@ Rectangle {
                                 border.color: "#f1f5f9"
 
                                 Canvas {
+                                    id: rptNwCanvas
                                     anchors.fill: parent
                                     anchors.margins: 12
+
+                                    Connections {
+                                        target: reportsController
+                                        function onReportChanged() {
+                                            rptNwCanvas.requestPaint()
+                                        }
+                                    }
                                     onPaint: {
                                         var ctx = getContext("2d");
                                         ctx.reset();
@@ -351,7 +400,8 @@ Rectangle {
                                         ctx.strokeStyle = "#f1f5f9";
                                         ctx.lineWidth = 1;
 
-                                        var yTicks = ["30M", "22.5M", "15M", "7.5M", "0"];
+                                        var chartData = reportsController.netWorthChartData;
+                                        var yTicks = (chartData && chartData.yTicks) ? chartData.yTicks : ["30M", "22.5M", "15M", "7.5M", "0"];
                                         for (var i = 0; i < yTicks.length; i++) {
                                             var ratio = i / (yTicks.length - 1);
                                             var y = padT + ratio * chartH;
@@ -364,8 +414,8 @@ Rectangle {
                                         }
 
                                         // Net Worth Curve Points
-                                        var months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun"];
-                                        var nwRatios = [0.30, 0.45, 0.55, 0.62, 0.78, 0.88];
+                                        var months = (chartData && chartData.months) ? chartData.months : ["Jan", "Feb", "Mar", "Apr", "May", "Jun"];
+                                        var nwRatios = (chartData && chartData.nwRatios) ? chartData.nwRatios : [0, 0, 0, 0, 0, 0];
                                         var count = months.length;
                                         var step = chartW / (count - 1);
 
@@ -491,6 +541,13 @@ Rectangle {
                                         anchors.margins: 12
                                         property var chartData: reportsController.categoryExpenseReport
 
+                                        Connections {
+                                            target: reportsController
+                                            function onReportChanged() {
+                                                expenseCanvas.requestPaint()
+                                            }
+                                        }
+
                                         onPaint: {
                                             var ctx = getContext("2d");
                                             ctx.reset();
@@ -610,6 +667,13 @@ Rectangle {
                                         anchors.fill: parent
                                         anchors.margins: 12
                                         property var chartData: reportsController.categoryIncomeReport
+
+                                        Connections {
+                                            target: reportsController
+                                            function onReportChanged() {
+                                                incomeCanvas.requestPaint()
+                                            }
+                                        }
 
                                         onPaint: {
                                             var ctx = getContext("2d");

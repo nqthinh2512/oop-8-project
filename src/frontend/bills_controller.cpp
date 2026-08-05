@@ -8,13 +8,14 @@ BillsController::BillsController(QObject *parent)
       m_totalPaid(0.0), m_totalOnTime(0.0), m_totalOverdue(0.0),
       m_filterType(-1), m_categoryIdFilter(0)
 {
+    connect(&DatabaseManager::instance(), &DatabaseManager::dataChanged, this, &BillsController::loadBills);
     loadBills();
 }
 
 void BillsController::loadBills()
 {
     beginResetModel();
-    m_allBills = DatabaseManager::instance().getAllBills();
+    m_allBills = DatabaseManager::instance().billDAO()->getAll();
     m_filteredBills.clear();
 
     m_totalPaid = 0.0;
@@ -95,14 +96,13 @@ QVariant BillsController::data(const QModelIndex &index, int role) const
     case AmountRole: return QLocale::system().toString(b->getAmount(), 'f', 0);
     case CategoryRole: {
         int catId = b->getCategoryId();
-        QString catName = "Unknown";
-        for (const auto& cat : DatabaseManager::instance().getAllCategories()) {
+        if (catId == 0) return "Uncategorized";
+        for (const auto& cat : DatabaseManager::instance().categoryDAO()->getAll()) {
             if (cat.getId() == catId) {
-                catName = cat.getName();
-                break;
+                return cat.getName();
             }
         }
-        return catName;
+        return "Uncategorized";
     }
     case DateRole: return b->getDueDate().toString("dd/MM/yyyy");
     case StatusRole: return status;
@@ -160,7 +160,8 @@ void BillsController::addBill(const QString& title, double amount, const QString
 
     // Default to unpaid when adding
     Bill b(0, title, amount, date, categoryId, false);
-    DatabaseManager::instance().addBill(b);
+    DatabaseManager::instance().billDAO()->add(b);
+    DatabaseManager::instance().triggerDataChanged();
     loadBills();
 }
 
@@ -178,13 +179,15 @@ void BillsController::updateBill(int id, const QString& title, double amount, co
     }
 
     Bill b(id, title, amount, date, categoryId, currentIsPaid);
-    DatabaseManager::instance().updateBill(id, b);
+    DatabaseManager::instance().billDAO()->update(id, b);
+    DatabaseManager::instance().triggerDataChanged();
     loadBills();
 }
 
 void BillsController::deleteBill(int id)
 {
-    DatabaseManager::instance().deleteBill(id);
+    DatabaseManager::instance().billDAO()->remove(id);
+    DatabaseManager::instance().triggerDataChanged();
     loadBills();
 }
 
@@ -193,9 +196,15 @@ void BillsController::togglePaidStatus(int id)
     for (const Bill& existingBill : m_allBills) {
         if (existingBill.getId() == id) {
             Bill updatedBill(existingBill.getId(), existingBill.getName(), existingBill.getAmount(), existingBill.getDueDate(), existingBill.getCategoryId(), !existingBill.checkPaid());
-            DatabaseManager::instance().updateBill(id, updatedBill);
+            DatabaseManager::instance().billDAO()->update(id, updatedBill);
+            DatabaseManager::instance().triggerDataChanged();
             loadBills();
             return;
         }
     }
+}
+
+bool BillsController::exportToCSV(const QString& filePath)
+{
+    return DatabaseManager::instance().billDAO()->exportToCSV(filePath);
 }

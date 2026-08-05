@@ -1,12 +1,27 @@
 import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls
+import QtQuick.Dialogs
+import QtCore
 
 Rectangle {
     id: billsPage
 
     color: "#f8fafc"
     clip: true
+
+    FileDialog {
+        id: exportFileDialog
+        title: "Export Bills to CSV"
+        fileMode: FileDialog.SaveFile
+        nameFilters: ["CSV Files (*.csv)", "All Files (*)"]
+        defaultSuffix: "csv"
+        currentFolder: StandardPaths.standardLocations(StandardPaths.DocumentsLocation)[0]
+        currentFile: "file:///" + StandardPaths.writableLocation(StandardPaths.DocumentsLocation) + "/bills_export.csv"
+        onAccepted: {
+            billsController.exportToCSV(selectedFile.toString())
+        }
+    }
 
     ColumnLayout {
         anchors.fill: parent
@@ -143,6 +158,11 @@ Rectangle {
 
                     Item {
                         Layout.fillWidth: true
+                    }
+
+                    UniversalButton_1 {
+                        buttonText: "Export CSV"
+                        onClicked: exportFileDialog.open()
                     }
 
                     UniversalButton_1 {
@@ -297,10 +317,10 @@ Rectangle {
                         billDialog.reset()
                         billDialog.isEditMode = true
                         billDialog.billId = model.tId
-                        billDialog.billTitle = model.tName
                         
                         var rawAmount = model.tAmount.replace(/[^0-9]/g, '')
-                        billDialog.billAmount = rawAmount.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                        var formattedAmount = rawAmount.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                        billDialog.setFieldsForEdit(model.tName, formattedAmount)
                         
                         billDialog.setCategoryName(model.tCat)
                         billDialog.setDateStr(model.tDate)

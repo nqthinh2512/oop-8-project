@@ -45,9 +45,10 @@ public:
                                double limit, double initialSpent,
                                const QString &startDateStr, const QString &endDateStr);
     Q_INVOKABLE bool updateBudget(int id, const QString &name, int priority, int categoryId,
-                                  double limit, const QString &startDateStr, const QString &endDateStr);
+                                  double limit, double spent, const QString &startDateStr, const QString &endDateStr);
     Q_INVOKABLE bool removeBudget(int id);
     Q_INVOKABLE void refresh();
+    Q_INVOKABLE bool exportToCSV(const QString &filePath);
 signals:
     void budgetsListChanged(); // danh sách hiển thị: đổi khi filter đổi HOẶC khi dữ liệu ngân sách đổi
     void totalsChanged();      // 3 ô tổng quan: chỉ đổi khi dữ liệu ngân sách THẬT SỰ đổi (add/update/remove)

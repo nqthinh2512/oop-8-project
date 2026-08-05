@@ -1,12 +1,27 @@
 import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls
+import QtQuick.Dialogs
+import QtCore
 
 Rectangle {
     id: savingsPage
 
     color: "#f8fafc"
     clip: true
+
+    FileDialog {
+        id: exportFileDialog
+        title: "Export Savings to CSV"
+        fileMode: FileDialog.SaveFile
+        nameFilters: ["CSV Files (*.csv)", "All Files (*)"]
+        defaultSuffix: "csv"
+        currentFolder: StandardPaths.standardLocations(StandardPaths.DocumentsLocation)[0]
+        currentFile: "file:///" + StandardPaths.writableLocation(StandardPaths.DocumentsLocation) + "/savings_export.csv"
+        onAccepted: {
+            savingsController.exportToCSV(selectedFile.toString())
+        }
+    }
 
     // savingsController đã được main.cpp bơm sẵn vào QML qua context property
 
@@ -158,6 +173,11 @@ Rectangle {
                     }
 
                     Item { Layout.fillWidth: true }
+
+                    UniversalButton_1 {
+                        buttonText: "Export CSV"
+                        onClicked: exportFileDialog.open()
+                    }
 
                     UniversalButton_1 {
                         buttonText: "+Add Saving"

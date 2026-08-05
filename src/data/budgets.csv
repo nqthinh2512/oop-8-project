@@ -1,1 +1,2 @@
-id,name,priority,categoryId,limitAmount,spentAmount,startDate,endDate
+1;Monthly Living Budget;1;15;5000000.00;2500000.00;2026-08-01;2026-08-31
+2;Dining & Entertainment;1;15;2000000.00;1500000.00;2026-08-01;2026-08-31

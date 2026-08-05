@@ -1,12 +1,27 @@
 import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls
+import QtQuick.Dialogs
+import QtCore
 
 Rectangle {
     id: budgetsPage
 
     color: "#f8fafc"
     clip: true
+
+    FileDialog {
+        id: exportFileDialog
+        title: "Export Budgets to CSV"
+        fileMode: FileDialog.SaveFile
+        nameFilters: ["CSV Files (*.csv)", "All Files (*)"]
+        defaultSuffix: "csv"
+        currentFolder: StandardPaths.standardLocations(StandardPaths.DocumentsLocation)[0]
+        currentFile: "file:///" + StandardPaths.writableLocation(StandardPaths.DocumentsLocation) + "/budgets_export.csv"
+        onAccepted: {
+            budgetsController.exportToCSV(selectedFile.toString())
+        }
+    }
 
     // budgetsController đã được main.cpp bơm sẵn vào QML qua context property — KHÔNG cần khai báo lại ở đây
 
@@ -130,6 +145,11 @@ Rectangle {
                     Item { Layout.fillWidth: true }
 
                     UniversalButton_1 {
+                        buttonText: "Export CSV"
+                        onClicked: exportFileDialog.open()
+                    }
+
+                    UniversalButton_1 {
                         buttonText: "+Add Budget"
                         _state: UniversalButton_1.State_1.State_1_selected
                         Layout.alignment: Qt.AlignRight | Qt.AlignVCenter
@@ -209,7 +229,7 @@ Rectangle {
         onAccepted: (isEdit, id, name, priority, categoryId, spent, limit, startDateStr, endDateStr) => {
             var ok
             if (isEdit)
-                ok = budgetsController.updateBudget(id, name, priority, categoryId, limit, startDateStr, endDateStr)
+                ok = budgetsController.updateBudget(id, name, priority, categoryId, limit, spent, startDateStr, endDateStr)
             else
                 ok = budgetsController.addBudget(name, priority, categoryId, limit, spent, startDateStr, endDateStr)
 

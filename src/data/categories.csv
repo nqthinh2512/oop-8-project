@@ -1,1 +1,19 @@
-id,parentId,name
+id,name,parentId,active
+1,Salary,1,1
+2,Freelance & Side Income,1,1
+3,Investment Returns,1,1
+4,Gifts & Allowances,1,1
+5,Food & Dining,2,1
+6,Housing & Rent,2,1
+7,Transportation & Fuel,2,1
+8,Utilities & Services,2,1
+9,Entertainment & Leisure,2,1
+10,Healthcare & Medical,2,1
+11,Electricity Bill,3,1
+12,Water Bill,3,1
+13,Internet & Cable,3,1
+14,Credit Card Bill,3,1
+15,Monthly Living Budget,4,1
+16,Discretionary Budget,4,1
+17,Emergency Savings,5,1
+18,Vacation Fund,5,1

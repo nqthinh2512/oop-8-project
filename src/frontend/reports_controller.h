@@ -26,6 +26,9 @@ class ReportsController : public QObject {
     Q_PROPERTY(QVariantList categoryExpenseReport READ categoryExpenseReport NOTIFY reportChanged)
     Q_PROPERTY(QVariantList categoryIncomeReport READ categoryIncomeReport NOTIFY reportChanged)
 
+    Q_PROPERTY(QVariantMap monthlyChartData READ monthlyChartData NOTIFY reportChanged)
+    Q_PROPERTY(QVariantMap netWorthChartData READ netWorthChartData NOTIFY reportChanged)
+
 public:
     explicit ReportsController(QObject *parent = nullptr);
 
@@ -41,7 +44,11 @@ public:
     QVariantList categoryExpenseReport() const;
     QVariantList categoryIncomeReport() const;
 
+    QVariantMap monthlyChartData() const;
+    QVariantMap netWorthChartData() const;
+
     Q_INVOKABLE void refresh();
+    Q_INVOKABLE bool exportToCSV(const QString &filePath);
 
 signals:
     void reportChanged();

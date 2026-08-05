@@ -1,6 +1,8 @@
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
+import QtQuick.Dialogs
+import QtCore
 
 Rectangle {
     id: settingsPage
@@ -8,6 +10,17 @@ Rectangle {
     width: 1728
     clip: true
     color: "#f8fafc"
+
+    FolderDialog {
+        id: exportFolderDialog
+        title: "Select Folder to Export All CSV Data"
+        currentFolder: StandardPaths.standardLocations(StandardPaths.DocumentsLocation)[0]
+        onAccepted: {
+            var dateStr = new Date().toISOString().replace(/[:\-\.]/g, "").substring(0, 14);
+            var targetDir = selectedFolder.toString() + "/Finance_Export_" + dateStr;
+            settingsController.exportAllToCSV(targetDir)
+        }
+    }
 
     property bool isEditing: settingsController.isEditing
 
@@ -142,6 +155,176 @@ Rectangle {
                         font.pixelSize: 22
                         font.weight: Font.Bold
                         color: "#0f172a"
+                    }
+
+                    // =========================================================
+                    // AVATAR (circular photo or colored initials placeholder)
+                    // =========================================================
+                    RowLayout {
+                        Layout.fillWidth: true
+                        spacing: 20
+
+                        Rectangle {
+                            id: avatarCircle
+                            width: 84
+                            height: 84
+                            radius: 42
+                            color: settingsController.avatarColor
+                            border.color: "#e2e8f0"
+                            border.width: 1
+                            clip: true
+
+                            Image {
+                                id: avatarImage
+                                anchors.fill: parent
+                                source: settingsController.avatarImagePath
+                                visible: settingsController.avatarImagePath !== ""
+                                fillMode: Image.PreserveAspectCrop
+                            }
+
+                            Text {
+                                anchors.centerIn: parent
+                                visible: settingsController.avatarImagePath === ""
+                                text: settingsController.initials
+                                color: "white"
+                                font.family: "Inter"
+                                font.pixelSize: 30
+                                font.weight: Font.Bold
+                            }
+                        }
+
+                        ColumnLayout {
+                            spacing: 6
+
+                            Rectangle {
+                                width: 160
+                                height: 38
+                                radius: 6
+                                color: "#f1f5f9"
+                                border.color: "#e2e8f0"
+                                border.width: 1
+
+                                Text {
+                                    anchors.centerIn: parent
+                                    text: "Đổi ảnh đại diện"
+                                    color: "#0f172a"
+                                    font.family: "Inter"
+                                    font.pixelSize: 14
+                                    font.weight: Font.Medium
+                                }
+
+                                MouseArea {
+                                    anchors.fill: parent
+                                    cursorShape: Qt.PointingHandCursor
+                                    onClicked: avatarPickerPopup.open()
+                                }
+                            }
+
+                            Text {
+                                text: "PNG or JPG, or pick a preset color"
+                                color: "#94a3b8"
+                                font.family: "Inter"
+                                font.pixelSize: 12
+                            }
+                        }
+                    }
+
+                    // Avatar picker popup: upload from device OR choose a preset color
+                    Popup {
+                        id: avatarPickerPopup
+                        anchors.centerIn: Overlay.overlay
+                        width: 340
+                        modal: true
+                        focus: true
+                        padding: 20
+                        background: Rectangle {
+                            color: "white"
+                            radius: 12
+                            border.color: "#e2e8f0"
+                            border.width: 1
+                        }
+
+                        ColumnLayout {
+                            width: parent.width
+                            spacing: 16
+
+                            Text {
+                                text: "Change Avatar"
+                                font.family: "Inter"
+                                font.pixelSize: 18
+                                font.weight: Font.Bold
+                                color: "#0f172a"
+                            }
+
+                            Rectangle {
+                                Layout.fillWidth: true
+                                height: 40
+                                radius: 8
+                                color: "#3b82f6"
+
+                                Text {
+                                    anchors.centerIn: parent
+                                    text: "Upload From This Device"
+                                    color: "white"
+                                    font.family: "Inter"
+                                    font.pixelSize: 14
+                                    font.weight: Font.Medium
+                                }
+
+                                MouseArea {
+                                    anchors.fill: parent
+                                    cursorShape: Qt.PointingHandCursor
+                                    onClicked: avatarFileDialog.open()
+                                }
+                            }
+
+                            Text {
+                                text: "Or pick a preset"
+                                font.family: "Inter"
+                                font.pixelSize: 13
+                                color: "#64748b"
+                            }
+
+                            GridLayout {
+                                Layout.fillWidth: true
+                                columns: 6
+                                rowSpacing: 10
+                                columnSpacing: 10
+
+                                Repeater {
+                                    model: ["#3b82f6", "#ef4444", "#10b981", "#f59e0b", "#8b5cf6", "#ec4899",
+                                            "#06b6d4", "#84cc16", "#f97316", "#6366f1", "#14b8a6", "#64748b"]
+
+                                    Rectangle {
+                                        width: 36
+                                        height: 36
+                                        radius: 18
+                                        color: modelData
+                                        border.width: settingsController.avatarColor === modelData && settingsController.avatarImagePath === "" ? 3 : 0
+                                        border.color: "#0f172a"
+
+                                        MouseArea {
+                                            anchors.fill: parent
+                                            cursorShape: Qt.PointingHandCursor
+                                            onClicked: {
+                                                settingsController.setAvatarPreset(modelData)
+                                                avatarPickerPopup.close()
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    FileDialog {
+                        id: avatarFileDialog
+                        title: "Choose an avatar photo"
+                        nameFilters: ["Image files (*.png *.jpg *.jpeg)"]
+                        onAccepted: {
+                            settingsController.setAvatarImage(selectedFile.toString())
+                            avatarPickerPopup.close()
+                        }
                     }
 
                     // Profile Details Grid
@@ -502,6 +685,123 @@ Rectangle {
                 }
             }
             
+            // =================================================================
+            // DATA EXPORT CARD
+            // =================================================================
+            Rectangle {
+                Layout.fillWidth: true
+                Layout.preferredHeight: exportCol.implicitHeight + 48
+                radius: 12
+                color: "white"
+                border.color: "#e2e8f0"
+                border.width: 1
+
+                ColumnLayout {
+                    id: exportCol
+                    anchors.left: parent.left
+                    anchors.right: parent.right
+                    anchors.top: parent.top
+                    anchors.margins: 24
+                    spacing: 16
+
+                    Text {
+                        text: "Data Export & Backup"
+                        font.family: "Inter"
+                        font.pixelSize: 22
+                        font.weight: Font.Bold
+                        color: "#0f172a"
+                    }
+
+                    RowLayout {
+                        Layout.fillWidth: true
+
+                        Text {
+                            Layout.fillWidth: true
+                            text: "Export all your financial records (categories, transactions, bills, budgets, savings) to CSV files."
+                            font.family: "Inter"
+                            font.pixelSize: 14
+                            color: "#64748b"
+                            elide: Text.ElideRight
+                        }
+
+                        UniversalButton_1 {
+                            buttonText: "Export All Data (CSV)"
+                            _state: UniversalButton_1.State_1.State_1_selected
+                            onClicked: exportFolderDialog.open()
+                        }
+                    }
+                }
+            }
+
+            // =================================================================
+            // ACCOUNT CARD (Logout)
+            // =================================================================
+            Rectangle {
+                Layout.fillWidth: true
+                Layout.preferredHeight: accountCol.implicitHeight + 48
+                radius: 12
+                color: "white"
+                border.color: "#e2e8f0"
+                border.width: 1
+
+                ColumnLayout {
+                    id: accountCol
+                    anchors.left: parent.left
+                    anchors.right: parent.right
+                    anchors.top: parent.top
+                    anchors.margins: 24
+                    spacing: 16
+
+                    Text {
+                        text: "Account"
+                        font.family: "Inter"
+                        font.pixelSize: 22
+                        font.weight: Font.Bold
+                        color: "#0f172a"
+                    }
+
+                    RowLayout {
+                        Layout.fillWidth: true
+
+                        Text {
+                            Layout.fillWidth: true
+                            text: "Signed in as " + settingsController.email
+                            font.family: "Inter"
+                            font.pixelSize: 14
+                            color: "#64748b"
+                            elide: Text.ElideRight
+                        }
+
+                        Rectangle {
+                            width: 120
+                            height: 42
+                            radius: 6
+                            color: "#fee2e2"
+
+                            Text {
+                                anchors.centerIn: parent
+                                text: "Đăng xuất"
+                                color: "#dc2626"
+                                font.family: "Inter"
+                                font.pixelSize: 15
+                                font.weight: Font.Medium
+                            }
+
+                            MouseArea {
+                                anchors.fill: parent
+                                cursorShape: Qt.PointingHandCursor
+                                onClicked: {
+                                    sessionController.logout()
+                                    if (typeof sidebarMenu !== "undefined") {
+                                        sidebarMenu.selectedIndex = 0
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
             // Bottom Spacing Buffer
             Item {
                 Layout.preferredWidth: 1

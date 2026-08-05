@@ -61,8 +61,10 @@ Item {
         title_1.text = "Edit Saving"
 
         textField.text = modelData.name || ""
-        amountFundedInput.text = String(modelData.currentAmount || 0)
-        saveGoalInput.text = String(modelData.targetAmount || 0)
+        var rawCurrent = modelData.currentAmount ? String(modelData.currentAmount).replace(/[^0-9]/g, '') : "0"
+        amountFundedInput.text = rawCurrent.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+        var rawTarget = modelData.targetAmount ? String(modelData.targetAmount).replace(/[^0-9]/g, '') : "0"
+        saveGoalInput.text = rawTarget.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
 
         var priorityLabels = ["Low", "Medium", "High"]
         var pIdx = (typeof modelData.priority === "number") ? modelData.priority : 2
@@ -263,6 +265,18 @@ Item {
                         color: "#191919"; font.family: "Roboto"; font.pixelSize: 15
                         clip: true; selectByMouse: true
                         inputMethodHints: Qt.ImhFormattedNumbersOnly
+                        onTextChanged: {
+                            if (activeFocus) {
+                                var raw = text.replace(/[^0-9]/g, "")
+                                var formatted = raw.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                                if (text !== formatted) {
+                                    var oldLen = text.length
+                                    var pos = cursorPosition
+                                    text = formatted
+                                    cursorPosition = Math.min(formatted.length, Math.max(0, pos + (formatted.length - oldLen)))
+                                }
+                            }
+                        }
                         Text { text: "0"; color: "#aab0bb"; font: parent.font; visible: !parent.text && !parent.activeFocus; anchors.fill: parent; verticalAlignment: Text.AlignVCenter }
                     }
                 }
@@ -282,6 +296,18 @@ Item {
                         color: "#191919"; font.family: "Roboto"; font.pixelSize: 15
                         clip: true; selectByMouse: true
                         inputMethodHints: Qt.ImhFormattedNumbersOnly
+                        onTextChanged: {
+                            if (activeFocus) {
+                                var raw = text.replace(/[^0-9]/g, "")
+                                var formatted = raw.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                                if (text !== formatted) {
+                                    var oldLen = text.length
+                                    var pos = cursorPosition
+                                    text = formatted
+                                    cursorPosition = Math.min(formatted.length, Math.max(0, pos + (formatted.length - oldLen)))
+                                }
+                            }
+                        }
                         Text { text: "0"; color: "#aab0bb"; font: parent.font; visible: !parent.text && !parent.activeFocus; anchors.fill: parent; verticalAlignment: Text.AlignVCenter }
                     }
                 }
@@ -344,13 +370,13 @@ Item {
                             return
                         }
 
-                        var target = parseFloat(saveGoalInput.text) || 0.0
+                        var target = parseFloat(saveGoalInput.text.replace(/,/g, '')) || 0.0
                         if (target <= 0) {
                             root.showError("Save Goal phải lớn hơn 0!")
                             return
                         }
 
-                        var current = parseFloat(amountFundedInput.text) || 0.0
+                        var current = parseFloat(amountFundedInput.text.replace(/,/g, '')) || 0.0
                         if (current > target) {
                             root.showError("Amount Funded không được lớn hơn Save Goal!")
                             return
