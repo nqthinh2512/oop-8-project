@@ -101,8 +101,7 @@ Rectangle {
                         UniversalButton_1 {
                             buttonText: "High"
                             _state: budgetsController.priorityFilter === 2 ? UniversalButton_1.State_1.State_1_selected : UniversalButton_1.State_1.State_1_default
-                            onClicked: budgetsController.priorityFilter = 2
-                        }
+                            onClicked: budgetsController.priorityFilter = 2                        }
                         UniversalButton_1 {
                             buttonText: "Medium"
                             _state: budgetsController.priorityFilter === 1 ? UniversalButton_1.State_1.State_1_selected : UniversalButton_1.State_1.State_1_default
