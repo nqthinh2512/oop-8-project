@@ -1,4 +1,5 @@
 import QtQuick
+import src
 import QtQuick.Layouts
 Item {
 

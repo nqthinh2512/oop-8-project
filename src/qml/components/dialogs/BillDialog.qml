@@ -1,4 +1,7 @@
 import QtQuick
+import QtQuick.Controls
+import QtQuick.Controls.impl
+import src
 import ".."
 
 Item {
@@ -98,14 +101,15 @@ Item {
         height: 417
         width: 500
 
-        color: "#ffffff"
+        color: AppTheme.bgCard
         radius: 15
         clip: true
 
         // Absorb clicks inside the card so they don't reach the dimmed overlay
         MouseArea { anchors.fill: parent }
 
-        Image {
+        ColorImage {
+        color: AppTheme.textMain
             id: title
             source: Qt.resolvedUrl("../../assets/title_13.png")
 
@@ -115,7 +119,7 @@ Item {
                 y: 9
                 height: 32
                 width: 461
-                color: "#191919"
+                color: AppTheme.textMain
                 font.capitalization: Font.Capitalize
                 font.family: "Intel One Mono"
                 font.pixelSize: 24
@@ -173,7 +177,7 @@ Item {
                     anchors.leftMargin: 15
                     anchors.rightMargin: 15
                     verticalAlignment: Text.AlignVCenter
-                    color: "#191919"
+                    color: AppTheme.textMain
                     font.family: "Roboto"
                     font.pixelSize: 16
                     font.weight: Font.Normal
@@ -244,7 +248,7 @@ Item {
                         anchors.leftMargin: 15
                         anchors.rightMargin: 15
                         verticalAlignment: Text.AlignVCenter
-                        color: "#191919"
+                        color: AppTheme.textMain
                         font.family: "Roboto"
                         font.pixelSize: 16
                         font.weight: Font.Normal
@@ -362,7 +366,8 @@ Item {
         }
 
         // 5. Footer Action Buttons
-        Image {
+        ColorImage {
+        color: AppTheme.textMain
             id: choice
             y: 364
             source: Qt.resolvedUrl("../../assets/choice_4.png")

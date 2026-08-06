@@ -1,4 +1,5 @@
 import QtQuick
+import src
 
 Rectangle {
     id: form_Log_In
@@ -85,7 +86,7 @@ Rectangle {
 
     border.color: "#d9d9d9"
     border.width: 1
-    color: "#ffffff"
+    color: AppTheme.bgCard
     radius: 8
 
     Input_Field {

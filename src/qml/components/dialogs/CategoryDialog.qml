@@ -1,4 +1,7 @@
 import QtQuick
+import QtQuick.Controls
+import QtQuick.Controls.impl
+import src
 import "../"
 
 Item {
@@ -71,7 +74,7 @@ Item {
         height: 318
         width: 500
 
-        color: "#ffffff"
+        color: AppTheme.bgCard
         radius: 15
         clip: false
 
@@ -79,7 +82,8 @@ Item {
         MouseArea { anchors.fill: parent }
 
         // 1. Title Header
-        Image {
+        ColorImage {
+        color: AppTheme.textMain
             id: title
             source: Qt.resolvedUrl("../../assets/title_12.png")
 
@@ -89,7 +93,7 @@ Item {
                 y: 9
                 height: 32
                 width: 461
-                color: "#191919"
+                color: AppTheme.textMain
                 font.capitalization: Font.Capitalize
                 font.family: "Intel One Mono"
                 font.pixelSize: 24
@@ -148,7 +152,7 @@ Item {
                     anchors.rightMargin: 15
                     maximumLength: 30
                     verticalAlignment: Text.AlignVCenter
-                    color: "#191919"
+                    color: AppTheme.textMain
                     font.family: "Roboto"
                     font.pixelSize: 16
                     font.weight: Font.Normal
@@ -171,7 +175,7 @@ Item {
                 x: 20
                 y: 76
                 text: "Category name already exists under this section"
-                color: "#ef4444"
+                color: AppTheme.danger
                 font.family: "Roboto"
                 font.pixelSize: 12
                 visible: root.trySave && categoriesController.isCategoryNameExists(textField.text, pageDropdown.selectedIndex + 1, root.isEditMode ? root.editingCategoryId : 0)
@@ -264,7 +268,8 @@ Item {
         }
 
         // 4. Footer Action Buttons
-        Image {
+        ColorImage {
+        color: AppTheme.textMain
             id: choice
             y: 265
             source: Qt.resolvedUrl("../../assets/choice_3.png")

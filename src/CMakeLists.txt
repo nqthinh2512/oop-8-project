@@ -9,7 +9,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 # Disable QML Ahead-Of-Time C++ code generation to prevent compiling 70+ QML files into 500MB of C++ .obj files
 set(QT_NO_CREATE_QMLCACHE ON CACHE BOOL "Disable QML cache generation" FORCE)
 
-find_package(Qt6 REQUIRED COMPONENTS Quick)
+find_package(Qt6 REQUIRED COMPONENTS Quick QuickControls2)
 
 qt_standard_project_setup(REQUIRES 6.10)
 
@@ -82,11 +82,13 @@ qt_add_executable(appFinanceDashboard
 )
 
 # 2. REGISTER QML MODULE & ALL QML FILES AND ASSETS
+set_source_files_properties(qml/core/AppTheme.qml PROPERTIES QT_QML_SINGLETON_TYPE TRUE)
 qt_add_qml_module(appFinanceDashboard
     URI src
     VERSION 1.0
     NO_CACHEGEN
     QML_FILES
+        qml/core/AppTheme.qml
         qml/Main.qml
 
         # Pages:
@@ -135,6 +137,7 @@ qt_add_qml_module(appFinanceDashboard
         qml/components/DateStatus_1.qml
         qml/components/ReportBox1_1.qml
         qml/components/ReportBox2_1.qml
+        qml/components/ToggleSwitch_1.qml
         qml/components/UniversalButton_1.qml
         qml/components/SearchBar_1.qml
         qml/components/Dropdown_1.qml
@@ -203,7 +206,7 @@ qt_add_qml_module(appFinanceDashboard
         RESOURCES data/auth.csv data/bills.csv data/budgets.csv data/categories.csv data/savings.csv data/session.txt data/transactions.csv
     )
 
-target_link_libraries(appFinanceDashboard PRIVATE Qt6::Quick)
+target_link_libraries(appFinanceDashboard PRIVATE Qt6::Quick Qt6::QuickControls2)
 
 install(TARGETS appFinanceDashboard
     BUNDLE DESTINATION .

@@ -1,4 +1,5 @@
 import QtQuick
+import src
 import QtQuick.Layouts
 
 Item {
@@ -6,7 +7,7 @@ Item {
 
     property string labelText: "Income"
     property color dotColor: "#34c759"
-    property color textColor: "#191919"
+    property color textColor: AppTheme.textMain
     property int pixelSize: 14
 
     implicitWidth: layout.implicitWidth

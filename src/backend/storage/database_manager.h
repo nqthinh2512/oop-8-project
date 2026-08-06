@@ -68,6 +68,7 @@ signals:
 public:
     //=============================EXPORT SECTION==================================
     bool exportAllToCSV(const QString& targetFolderPath) const;
+    void factoryReset();
 };
 
 #endif // DATABASE_MANAGER_H

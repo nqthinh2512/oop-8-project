@@ -1,4 +1,5 @@
 import QtQuick
+import src
 import QtQuick.Layouts
 import QtQuick.Controls
 import QtQuick.Dialogs
@@ -7,7 +8,7 @@ import QtCore
 Rectangle {
     id: savingsPage
 
-    color: "#f8fafc"
+    color: AppTheme.bgApp
     clip: true
 
     FileDialog {
@@ -42,13 +43,13 @@ Rectangle {
                 font.family: "Inter"
                 font.pixelSize: 32
                 font.weight: Font.Bold
-                color: "#0f172a"
+                color: AppTheme.textMain
             }
 
             Rectangle {
                 Layout.fillWidth: true
                 height: 1
-                color: "#e2e8f0"
+                color: AppTheme.border
             }
         }
 
@@ -90,8 +91,8 @@ Rectangle {
             Rectangle {
                 Layout.fillWidth: true
                 implicitHeight: 70
-                color: "#ffffff"
-                border.color: "#e2e8f0"
+                color: AppTheme.bgCard
+                border.color: AppTheme.border
                 border.width: 1
                 topLeftRadius: 12
                 topRightRadius: 12
@@ -145,7 +146,7 @@ Rectangle {
                     Rectangle {
                         Layout.preferredWidth: 1
                         Layout.preferredHeight: 24
-                        color: "#cbd5e1"
+                        color: AppTheme.divider
                     }
 
                     // Category filter dropdown
@@ -194,8 +195,8 @@ Rectangle {
             Rectangle {
                 Layout.fillWidth: true
                 implicitHeight: 48
-                color: "#f1f5f9"
-                border.color: "#e2e8f0"
+                color: AppTheme.bgHover
+                border.color: AppTheme.border
                 border.width: 1
 
                 RowLayout {
@@ -205,17 +206,17 @@ Rectangle {
                     spacing: 0
 
                     Item { Layout.fillWidth: true; Layout.preferredWidth: 260; Layout.fillHeight: true
-                        Text { anchors.left: parent.left; anchors.verticalCenter: parent.verticalCenter; text: "SAVING"; font.family: "Inter"; font.pixelSize: 12; font.weight: Font.Bold; color: "#64748b" } }
+                        Text { anchors.left: parent.left; anchors.verticalCenter: parent.verticalCenter; text: "SAVING"; font.family: "Inter"; font.pixelSize: 12; font.weight: Font.Bold; color: AppTheme.textSub } }
                     Item { Layout.preferredWidth: 80; Layout.fillHeight: true
-                        Text { anchors.left: parent.left; anchors.verticalCenter: parent.verticalCenter; text: "PRIORITY"; font.family: "Inter"; font.pixelSize: 12; font.weight: Font.Bold; color: "#64748b" } }
+                        Text { anchors.left: parent.left; anchors.verticalCenter: parent.verticalCenter; text: "PRIORITY"; font.family: "Inter"; font.pixelSize: 12; font.weight: Font.Bold; color: AppTheme.textSub } }
                     Item { Layout.preferredWidth: 160; Layout.fillHeight: true
-                        Text { anchors.left: parent.left; anchors.verticalCenter: parent.verticalCenter; text: "CATEGORY"; font.family: "Inter"; font.pixelSize: 12; font.weight: Font.Bold; color: "#64748b" } }
+                        Text { anchors.left: parent.left; anchors.verticalCenter: parent.verticalCenter; text: "CATEGORY"; font.family: "Inter"; font.pixelSize: 12; font.weight: Font.Bold; color: AppTheme.textSub } }
                     Item { Layout.preferredWidth: 280; Layout.fillHeight: true
-                        Text { anchors.left: parent.left; anchors.verticalCenter: parent.verticalCenter; text: "PROGRESS"; font.family: "Inter"; font.pixelSize: 12; font.weight: Font.Bold; color: "#64748b" } }
+                        Text { anchors.left: parent.left; anchors.verticalCenter: parent.verticalCenter; text: "PROGRESS"; font.family: "Inter"; font.pixelSize: 12; font.weight: Font.Bold; color: AppTheme.textSub } }
                     Item { Layout.preferredWidth: 180; Layout.fillHeight: true
-                        Text { anchors.left: parent.left; anchors.verticalCenter: parent.verticalCenter; text: "DUE DATE"; font.family: "Inter"; font.pixelSize: 12; font.weight: Font.Bold; color: "#64748b" } }
+                        Text { anchors.left: parent.left; anchors.verticalCenter: parent.verticalCenter; text: "DUE DATE"; font.family: "Inter"; font.pixelSize: 12; font.weight: Font.Bold; color: AppTheme.textSub } }
                     Item { Layout.preferredWidth: 100; Layout.fillHeight: true
-                        Text { anchors.right: parent.right; anchors.rightMargin: 8; anchors.verticalCenter: parent.verticalCenter; text: "ACTIONS"; font.family: "Inter"; font.pixelSize: 12; font.weight: Font.Bold; color: "#64748b" } }
+                        Text { anchors.right: parent.right; anchors.rightMargin: 8; anchors.verticalCenter: parent.verticalCenter; text: "ACTIONS"; font.family: "Inter"; font.pixelSize: 12; font.weight: Font.Bold; color: AppTheme.textSub } }
                 }
             }
 

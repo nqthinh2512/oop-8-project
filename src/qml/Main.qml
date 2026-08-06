@@ -1,4 +1,5 @@
 import QtQuick
+import src
 import QtQuick.Window
 import QtQuick.Layouts
 import QtQuick.Controls

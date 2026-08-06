@@ -1,4 +1,5 @@
 import QtQuick
+import src
 
 Rectangle {
     enum State_1 { State_1_Default, State_1_Hover, State_1_Active, State_1_Disabled, State_1_Range, State_1_Range_Disabled, State_1_Hidden}
@@ -16,7 +17,7 @@ Rectangle {
     height: 40
     width: 40
 
-    border.color: "white"
+    border.color: AppTheme.bgCard
     border.width: 0
     color: "transparent"
     radius: 8
@@ -35,7 +36,7 @@ Rectangle {
                 target: calendar_Button
             }
             PropertyChanges {
-                border.color: "white"
+                border.color: AppTheme.bgCard
                 target: calendar_Button
             }
             PropertyChanges {
@@ -60,7 +61,7 @@ Rectangle {
             when: calendar_Button._state === Calendar_Button.State_1.State_1_Hover
     
             PropertyChanges {
-                color: "#ffffff"
+                color: AppTheme.bgCard
                 target: calendar_Button
             }
             PropertyChanges {
@@ -101,7 +102,7 @@ Rectangle {
                 target: calendar_Button
             }
             PropertyChanges {
-                border.color: "white"
+                border.color: AppTheme.bgCard
                 target: calendar_Button
             }
             PropertyChanges {
@@ -134,7 +135,7 @@ Rectangle {
                 target: calendar_Button
             }
             PropertyChanges {
-                border.color: "white"
+                border.color: AppTheme.bgCard
                 target: calendar_Button
             }
             PropertyChanges {
@@ -167,7 +168,7 @@ Rectangle {
                 target: calendar_Button
             }
             PropertyChanges {
-                border.color: "white"
+                border.color: AppTheme.bgCard
                 target: calendar_Button
             }
             PropertyChanges {
@@ -200,7 +201,7 @@ Rectangle {
                 target: calendar_Button
             }
             PropertyChanges {
-                border.color: "white"
+                border.color: AppTheme.bgCard
                 target: calendar_Button
             }
             PropertyChanges {
@@ -233,7 +234,7 @@ Rectangle {
                 target: calendar_Button
             }
             PropertyChanges {
-                border.color: "white"
+                border.color: AppTheme.bgCard
                 target: calendar_Button
             }
             PropertyChanges {

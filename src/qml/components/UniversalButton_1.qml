@@ -1,4 +1,5 @@
 import QtQuick
+import src
 
 Rectangle {
     enum State_1 { State_1_default, State_1_hover, State_1_selected }
@@ -19,7 +20,7 @@ Rectangle {
     height: implicitHeight
 
     radius: height / 2
-    border.color: "#d1d5db"
+    border.color: AppTheme.border
     border.width: 1
     color: "transparent"
 
@@ -33,11 +34,11 @@ Rectangle {
                 target: universalButton
                 border.width: 0
                 border.color: "transparent"
-                color: "#3b82f6"
+                color: AppTheme.primary
             }
             PropertyChanges {
                 target: label
-                color: "#ffffff"
+                color: AppTheme.bgCard
                 font.weight: Font.Bold
             }
         },
@@ -48,12 +49,12 @@ Rectangle {
             PropertyChanges {
                 target: universalButton
                 border.width: 1
-                border.color: "#3b82f6"
-                color: "#eff6ff"
+                border.color: AppTheme.primary
+                color: AppTheme.isDark ? AppTheme.bgHover : "#eff6ff"
             }
             PropertyChanges {
                 target: label
-                color: "#2563eb"
+                color: AppTheme.primary
                 font.weight: Font.DemiBold
             }
         },
@@ -64,12 +65,12 @@ Rectangle {
             PropertyChanges {
                 target: universalButton
                 border.width: 1
-                border.color: "#d1d5db"
-                color: "#ffffff"
+                border.color: AppTheme.border
+                color: AppTheme.bgCard
             }
             PropertyChanges {
                 target: label
-                color: "#4b5563"
+                color: AppTheme.textMain
                 font.weight: Font.Medium
             }
         }

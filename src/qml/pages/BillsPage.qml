@@ -1,4 +1,5 @@
 import QtQuick
+import src
 import QtQuick.Layouts
 import QtQuick.Controls
 import QtQuick.Dialogs
@@ -7,7 +8,7 @@ import QtCore
 Rectangle {
     id: billsPage
 
-    color: "#f8fafc"
+    color: AppTheme.bgApp
     clip: true
 
     FileDialog {
@@ -40,13 +41,13 @@ Rectangle {
                 font.family: "Inter"
                 font.pixelSize: 32
                 font.weight: Font.Bold
-                color: "#0f172a"
+                color: AppTheme.textMain
             }
 
             Rectangle {
                 Layout.fillWidth: true
                 height: 1
-                color: "#e2e8f0"
+                color: AppTheme.border
             }
         }
 
@@ -88,8 +89,8 @@ Rectangle {
             Rectangle {
                 Layout.fillWidth: true
                 implicitHeight: 70
-                color: "#ffffff"
-                border.color: "#e2e8f0"
+                color: AppTheme.bgCard
+                border.color: AppTheme.border
                 border.width: 1
                 topLeftRadius: 12
                 topRightRadius: 12
@@ -136,7 +137,7 @@ Rectangle {
                     Rectangle {
                         Layout.preferredWidth: 1
                         Layout.preferredHeight: 24
-                        color: "#cbd5e1"
+                        color: AppTheme.divider
                     }
 
                     Dropdown_1 {
@@ -181,8 +182,8 @@ Rectangle {
             Rectangle {
                 Layout.fillWidth: true
                 implicitHeight: 48
-                color: "#f1f5f9"
-                border.color: "#e2e8f0"
+                color: AppTheme.bgHover
+                border.color: AppTheme.border
                 border.width: 1
 
                 RowLayout {
@@ -204,7 +205,7 @@ Rectangle {
                             font.family: "Inter"
                             font.pixelSize: 12
                             font.weight: Font.Bold
-                            color: "#64748b"
+                            color: AppTheme.textSub
                         }
                     }
 
@@ -220,7 +221,7 @@ Rectangle {
                             font.family: "Inter"
                             font.pixelSize: 12
                             font.weight: Font.Bold
-                            color: "#64748b"
+                            color: AppTheme.textSub
                         }
                     }
 
@@ -236,7 +237,7 @@ Rectangle {
                             font.family: "Inter"
                             font.pixelSize: 12
                             font.weight: Font.Bold
-                            color: "#64748b"
+                            color: AppTheme.textSub
                         }
                     }
 
@@ -252,7 +253,7 @@ Rectangle {
                             font.family: "Inter"
                             font.pixelSize: 12
                             font.weight: Font.Bold
-                            color: "#64748b"
+                            color: AppTheme.textSub
                         }
                     }
 
@@ -268,7 +269,7 @@ Rectangle {
                             font.family: "Inter"
                             font.pixelSize: 12
                             font.weight: Font.Bold
-                            color: "#64748b"
+                            color: AppTheme.textSub
                         }
                     }
 
@@ -285,7 +286,7 @@ Rectangle {
                             font.family: "Inter"
                             font.pixelSize: 12
                             font.weight: Font.Bold
-                            color: "#64748b"
+                            color: AppTheme.textSub
                         }
                     }
                 }

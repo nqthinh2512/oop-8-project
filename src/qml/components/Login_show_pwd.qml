@@ -1,4 +1,5 @@
 import QtQuick
+import src
 
 Rectangle {
     id: login_show_pwd

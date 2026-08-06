@@ -1,4 +1,5 @@
 import QtQuick
+import src
 import QtQuick.Layouts
 
 Item {
@@ -8,7 +9,7 @@ Item {
     property string limitText: "/ 20,000 VND"
     property real progressFraction: 0.67
     property string subText: "67% saved"
-    property color progressColor: "#3b82f6"
+    property color progressColor: AppTheme.primary
 
     implicitHeight: 48
     Layout.fillWidth: true
@@ -27,14 +28,14 @@ Item {
                 font.family: "Intel One Mono"
                 font.pixelSize: 13
                 font.weight: Font.Bold
-                color: "#0f172a"
+                color: AppTheme.textMain
                 text: root.spentText
             }
 
             Text {
                 font.family: "Intel One Mono"
                 font.pixelSize: 12
-                color: "#64748b"
+                color: AppTheme.textSub
                 text: root.limitText
                 Layout.fillWidth: true
             }
@@ -45,7 +46,7 @@ Item {
             Layout.fillWidth: true
             implicitHeight: 6
             radius: 3
-            color: "#e2e8f0"
+            color: AppTheme.border
 
             Rectangle {
                 width: parent.width * Math.min(Math.max(root.progressFraction, 0), 1)
@@ -59,7 +60,7 @@ Item {
         Text {
             font.family: "Intel One Mono"
             font.pixelSize: 11
-            color: "#94a3b8"
+            color: AppTheme.textMuted
             text: root.subText
             Layout.alignment: Qt.AlignHCenter
         }

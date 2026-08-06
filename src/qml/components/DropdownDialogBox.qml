@@ -1,4 +1,5 @@
 import QtQuick
+import src
 import QtQuick.Controls
 
 Rectangle {
@@ -13,9 +14,9 @@ Rectangle {
     width: 240
     height: Math.min(listView.contentHeight + 16, 216)
 
-    border.color: "#d1d5db"
+    border.color: AppTheme.border
     border.width: 1
-    color: "#ffffff"
+    color: AppTheme.bgCard
     radius: 8
 
     // Drop-shadow effect (subtle)
@@ -23,7 +24,7 @@ Rectangle {
         anchors.fill: parent
         anchors.margins: -1
         radius: parent.radius + 1
-        color: "#0a000000"
+        color: AppTheme.isDark ? "#80000000" : "#0a000000"
         z: -1
     }
 

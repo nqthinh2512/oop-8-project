@@ -1,5 +1,8 @@
 import QtQuick
+import src
 import QtQuick.Layouts
+import QtQuick.Controls
+import QtQuick.Controls.impl
 
 Rectangle {
     id: loginPage
@@ -33,7 +36,7 @@ Rectangle {
         gradient: Gradient {
             orientation: Gradient.Vertical
             GradientStop { position: 0.0; color: "#eef2ff" }
-            GradientStop { position: 1.0; color: "#f8fafc" }
+            GradientStop { position: 1.0; color: AppTheme.bgApp }
         }
     }
 
@@ -43,8 +46,8 @@ Rectangle {
         width: 420
         height: cardColumn.implicitHeight + 64
         radius: 16
-        color: "#ffffff"
-        border.color: "#e2e8f0"
+        color: AppTheme.bgCard
+        border.color: AppTheme.border
         border.width: 1
 
         ColumnLayout {
@@ -56,7 +59,8 @@ Rectangle {
             spacing: 20
 
             // Logo
-            Image {
+            ColorImage {
+                color: AppTheme.textMain
                 Layout.alignment: Qt.AlignHCenter
                 source: Qt.resolvedUrl("../assets/fManagement.png")
                 fillMode: Image.PreserveAspectFit
@@ -73,7 +77,7 @@ Rectangle {
                     font.family: "Inter"
                     font.pixelSize: 24
                     font.weight: Font.Bold
-                    color: "#0f172a"
+                    color: AppTheme.textMain
                 }
 
                 Text {
@@ -81,7 +85,7 @@ Rectangle {
                     text: "Sign in to FManagement to continue"
                     font.family: "Inter"
                     font.pixelSize: 14
-                    color: "#64748b"
+                    color: AppTheme.textSub
                 }
             }
 
@@ -102,7 +106,7 @@ Rectangle {
                     Layout.fillWidth: true
                     height: 46
                     radius: 8
-                    color: "#f8fafc"
+                    color: AppTheme.bgApp
                     border.color: usernameInput.activeFocus ? "#3b82f6" : "#e2e8f0"
                     border.width: 1
 
@@ -114,7 +118,7 @@ Rectangle {
                         verticalAlignment: TextInput.AlignVCenter
                         font.family: "Inter"
                         font.pixelSize: 15
-                        color: "#0f172a"
+                        color: AppTheme.textMain
                         selectByMouse: true
                         text: loginPage.username
                         onTextChanged: loginPage.username = text
@@ -124,7 +128,7 @@ Rectangle {
                             anchors.fill: parent
                             verticalAlignment: Text.AlignVCenter
                             text: "e.g. admin"
-                            color: "#94a3b8"
+                            color: AppTheme.textMuted
                             font: parent.font
                             visible: parent.text === "" && !parent.activeFocus
                         }
@@ -149,7 +153,7 @@ Rectangle {
                     Layout.fillWidth: true
                     height: 46
                     radius: 8
-                    color: "#f8fafc"
+                    color: AppTheme.bgApp
                     border.color: passwordInput.activeFocus ? "#3b82f6" : "#e2e8f0"
                     border.width: 1
 
@@ -161,7 +165,7 @@ Rectangle {
                         verticalAlignment: TextInput.AlignVCenter
                         font.family: "Inter"
                         font.pixelSize: 15
-                        color: "#0f172a"
+                        color: AppTheme.textMain
                         selectByMouse: true
                         echoMode: loginPage.showPassword ? TextInput.Normal : TextInput.Password
                         text: loginPage.password
@@ -172,7 +176,7 @@ Rectangle {
                             anchors.fill: parent
                             verticalAlignment: Text.AlignVCenter
                             text: "Enter your password"
-                            color: "#94a3b8"
+                            color: AppTheme.textMuted
                             font: parent.font
                             visible: parent.text === "" && !parent.activeFocus
                         }
@@ -222,7 +226,7 @@ Rectangle {
                     Text {
                         anchors.centerIn: parent
                         text: "✓"
-                        color: "white"
+                        color: AppTheme.bgCard
                         font.pixelSize: 12
                         visible: loginPage.rememberMe
                     }
@@ -270,7 +274,7 @@ Rectangle {
                 Text {
                     anchors.centerIn: parent
                     text: "Login"
-                    color: "white"
+                    color: AppTheme.bgCard
                     font.family: "Inter"
                     font.pixelSize: 15
                     font.weight: Font.DemiBold
@@ -290,7 +294,7 @@ Rectangle {
                 text: "Demo account: admin / admin123"
                 font.family: "Inter"
                 font.pixelSize: 12
-                color: "#94a3b8"
+                color: AppTheme.textMuted
             }
         }
     }

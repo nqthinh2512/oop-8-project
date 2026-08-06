@@ -1,4 +1,5 @@
 import QtQuick
+import src
 import QtQuick.Layouts
 
 Rectangle {
@@ -8,7 +9,7 @@ Rectangle {
     width: implicitWidth
     Layout.preferredWidth: 330
     Layout.fillHeight: true
-    color: "#ffffff"
+    color: AppTheme.bgCard
     clip: true
 
     property int selectedIndex: 0
@@ -22,7 +23,7 @@ Rectangle {
         anchors.top: parent.top
         anchors.bottom: parent.bottom
         width: 1
-        color: "#e2e8f0"
+        color: AppTheme.border
         z: 2
     }
 
@@ -45,7 +46,7 @@ Rectangle {
             Layout.alignment: Qt.AlignHCenter
             Layout.preferredWidth: 290
             height: 1
-            color: "#e2e8f0"
+            color: AppTheme.border
         }
 
         // 2. Navigation Items List (290px wide, centered)
@@ -83,7 +84,7 @@ Rectangle {
             Layout.alignment: Qt.AlignHCenter
             Layout.preferredWidth: 290
             height: 1
-            color: "#e2e8f0"
+            color: AppTheme.border
         }
     }
 }

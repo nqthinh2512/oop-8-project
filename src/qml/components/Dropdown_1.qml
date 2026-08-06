@@ -1,4 +1,5 @@
 import QtQuick
+import src
 import QtQuick.Layouts
 import QtQuick.Shapes
 
@@ -24,9 +25,9 @@ Rectangle {
     width: implicitWidth
     height: implicitHeight
 
-    color: "#ffffff"
+    color: AppTheme.bgCard
     radius: 8
-    border.color: menuOpen || dropdown._state === Dropdown_1.State_1.State_1_hover ? "#3b82f6" : "#d1d5db"
+    border.color: menuOpen || dropdown._state === Dropdown_1.State_1.State_1_hover ? AppTheme.primary : AppTheme.border
     border.width: 1
 
     // ===== Button Label + Chevron Icon =====
@@ -44,7 +45,7 @@ Rectangle {
             font.family: "Inter"
             font.pixelSize: 14
             font.weight: Font.Medium
-            color: menuOpen || dropdown._state === Dropdown_1.State_1.State_1_hover ? "#2563eb" : "#4b5563"
+            color: menuOpen || dropdown._state === Dropdown_1.State_1.State_1_hover ? AppTheme.primary : AppTheme.textSub
             text: dropdown.selectedText
             elide: Text.ElideRight
         }
@@ -62,7 +63,7 @@ Rectangle {
 
                 ShapePath {
                     fillColor: "#00000000"
-                    strokeColor: menuOpen || dropdown._state === Dropdown_1.State_1.State_1_hover ? "#2563eb" : "#64748b"
+                    strokeColor: menuOpen || dropdown._state === Dropdown_1.State_1.State_1_hover ? AppTheme.primary : AppTheme.textSub
                     strokeWidth: 1.8
 
                     PathSvg {

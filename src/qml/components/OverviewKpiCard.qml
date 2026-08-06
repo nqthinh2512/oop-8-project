@@ -1,4 +1,5 @@
 import QtQuick
+import src
 import QtQuick.Layouts
 import QtQuick.Shapes
 
@@ -48,7 +49,7 @@ ColumnLayout {
     Rectangle {
         Layout.fillWidth: true
         Layout.preferredHeight: 96
-        color: "#ffffff"
+        color: AppTheme.bgCard
         radius: 12
 
         ColumnLayout {
@@ -69,7 +70,7 @@ ColumnLayout {
                     font.family: "Inter"
                     font.pixelSize: 26
                     font.weight: Font.Bold
-                    color: "#191919"
+                    color: AppTheme.textMain
                     text: root.amountText
                     verticalAlignment: Text.AlignVCenter
                 }
@@ -132,4 +133,4 @@ ColumnLayout {
             }
         }
     }
-}
+}

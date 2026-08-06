@@ -1,4 +1,7 @@
 import QtQuick
+import src
+import QtQuick.Controls
+import QtQuick.Controls.impl
 
 Rectangle {
     id: settingsPage
@@ -36,7 +39,8 @@ Rectangle {
             verticalAlignment: Text.AlignTop
             wrapMode: Text.Wrap
         }
-        Image {
+        ColorImage {
+            color: AppTheme.divider
             id: line_2
 
             x: 33

@@ -1,4 +1,5 @@
 import QtQuick
+import src
 import QtQuick.Layouts
 
 Item {
@@ -73,7 +74,7 @@ Item {
         font.family: "Inter"
         font.pixelSize: 13
         font.weight: Font.Bold
-        color: "#191919"
+        color: AppTheme.textMain
     }
 
     // Max label ($20k)

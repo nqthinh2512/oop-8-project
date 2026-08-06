@@ -1,4 +1,5 @@
 import QtQuick
+import src
 
 Rectangle {
     id: calendar
@@ -8,7 +9,7 @@ Rectangle {
 
     border.color: "#d9d9d9"
     border.width: 1
-    color: "#ffffff"
+    color: AppTheme.bgCard
     radius: 16
 
     Rectangle {

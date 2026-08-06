@@ -1,4 +1,5 @@
 import QtQuick
+import src
 
 Rectangle {
     enum State_1 { State_1_Disabled, State_1_Default, State_1_Error}
@@ -51,7 +52,7 @@ Rectangle {
                 target: label
             }
             PropertyChanges {
-                color: "#ffffff"
+                color: AppTheme.bgCard
                 target: input
             }
             PropertyChanges {
@@ -76,7 +77,7 @@ Rectangle {
                 target: label
             }
             PropertyChanges {
-                color: "#ffffff"
+                color: AppTheme.bgCard
                 target: input
             }
             PropertyChanges {
@@ -101,7 +102,7 @@ Rectangle {
                 target: label
             }
             PropertyChanges {
-                color: "#ffffff"
+                color: AppTheme.bgCard
                 target: input
             }
             PropertyChanges {
@@ -126,7 +127,7 @@ Rectangle {
                 target: label
             }
             PropertyChanges {
-                color: "#ffffff"
+                color: AppTheme.bgCard
                 target: input
             }
             PropertyChanges {
@@ -244,7 +245,7 @@ Rectangle {
         border.color: "#d9d9d9"
         border.width: 1
         clip: true
-        color: "#ffffff"
+        color: AppTheme.bgCard
         radius: 8
 
         Text {

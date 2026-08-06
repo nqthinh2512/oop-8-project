@@ -1,4 +1,5 @@
 import QtQuick
+import src
 import QtQuick.Shapes
 
 Rectangle {
@@ -19,7 +20,7 @@ Rectangle {
     width: 239.73
 
     clip: true
-    color: "#ffffff"
+    color: AppTheme.bgCard
 
     states: [
         State {
@@ -27,11 +28,11 @@ Rectangle {
             when: dropdownItem._state === DropdownItem.State_1.State_1_Default
 
             PropertyChanges {
-                color: "#ffffff"
+                color: AppTheme.bgCard
                 target: dropdownItem
             }
             PropertyChanges {
-                color: "#222222"
+                color: AppTheme.textMain
                 target: placeholder_1
             }
             PropertyChanges {
@@ -44,11 +45,11 @@ Rectangle {
             when: dropdownItem._state === DropdownItem.State_1.State_1_hover
 
             PropertyChanges {
-                color: "#d9d9d9"
+                color: AppTheme.bgHover
                 target: dropdownItem
             }
             PropertyChanges {
-                color: "#222222"
+                color: AppTheme.textMain
                 target: placeholder_1
             }
             PropertyChanges {
@@ -61,11 +62,11 @@ Rectangle {
             when: dropdownItem._state === DropdownItem.State_1.State_1_selected
 
             PropertyChanges {
-                color: "#ffffff"
+                color: AppTheme.bgCard
                 target: dropdownItem
             }
             PropertyChanges {
-                color: "#0225d4"
+                color: AppTheme.primary
                 target: placeholder_1
             }
             PropertyChanges {
@@ -78,11 +79,11 @@ Rectangle {
             when: dropdownItem._state === DropdownItem.State_1.State_1_hover_selected
 
             PropertyChanges {
-                color: "#d9d9d9"
+                color: AppTheme.bgHover
                 target: dropdownItem
             }
             PropertyChanges {
-                color: "#0225d4"
+                color: AppTheme.primary
                 target: placeholder_1
             }
             PropertyChanges {
@@ -100,7 +101,7 @@ Rectangle {
         width: parent.width - (check.visible ? 44 : 24)
         height: 20
 
-        color: "#222222"
+        color: AppTheme.textMain
         font.family: "Inter"
         font.pixelSize: 14
         font.weight: Font.Normal
@@ -138,7 +139,7 @@ Rectangle {
 
                 fillColor: "#00000000"
                 fillRule: ShapePath.WindingFill
-                strokeColor: "#0225d4"
+                strokeColor: AppTheme.primary
                 strokeWidth: 2.85
 
                 PathSvg {

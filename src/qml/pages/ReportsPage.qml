@@ -1,4 +1,5 @@
 import QtQuick
+import src
 import QtQuick.Layouts
 import QtQuick.Controls
 import QtQuick.Dialogs
@@ -9,7 +10,7 @@ import "../components"
 Rectangle {
     id: reportsPage
 
-    color: "#f8fafc"
+    color: AppTheme.bgApp
     clip: true
 
     FileDialog {
@@ -63,7 +64,7 @@ Rectangle {
                             font.family: "Inter"
                             font.pixelSize: 32
                             font.weight: Font.Bold
-                            color: "#0f172a"
+                            color: AppTheme.textMain
                         }
 
                         Item { Layout.fillWidth: true }
@@ -77,7 +78,7 @@ Rectangle {
                     Rectangle {
                         Layout.fillWidth: true
                         height: 1
-                        color: "#e2e8f0"
+                        color: AppTheme.border
                     }
                 }
 
@@ -93,7 +94,7 @@ Rectangle {
                         amountText: reportsController.monthlyIncomeFormatted
                         labelText: "Current Month"
                         subtitleText: "Total Earned"
-                        subtitleColor: "#10b981"
+                        subtitleColor: AppTheme.success
                         Layout.fillWidth: true
                         Layout.preferredWidth: 1
                     }
@@ -103,7 +104,7 @@ Rectangle {
                         amountText: reportsController.monthlyExpenseFormatted
                         labelText: "Current Month"
                         subtitleText: "Total Spent"
-                        subtitleColor: "#ef4444"
+                        subtitleColor: AppTheme.danger
                         Layout.fillWidth: true
                         Layout.preferredWidth: 1
                     }
@@ -185,8 +186,8 @@ Rectangle {
                         Layout.fillWidth: true
                         Layout.preferredWidth: 1
                         implicitHeight: 340
-                        color: "#ffffff"
-                        border.color: "#e2e8f0"
+                        color: AppTheme.bgCard
+                        border.color: AppTheme.border
                         border.width: 1
                         radius: 12
                         clip: true
@@ -205,30 +206,30 @@ Rectangle {
                                     font.family: "Inter"
                                     font.pixelSize: 18
                                     font.weight: Font.Bold
-                                    color: "#0f172a"
+                                    color: AppTheme.textMain
                                 }
 
                                 Text {
                                     text: "Last 6 Months"
                                     font.family: "Inter"
                                     font.pixelSize: 13
-                                    color: "#64748b"
+                                    color: AppTheme.textSub
                                 }
                             }
 
                             Rectangle {
                                 Layout.fillWidth: true
                                 height: 1
-                                color: "#e2e8f0"
+                                color: AppTheme.border
                             }
 
                             // Bar Chart Canvas
                             Rectangle {
                                 Layout.fillWidth: true
                                 Layout.fillHeight: true
-                                color: "#f8fafc"
+                                color: AppTheme.bgApp
                                 radius: 8
-                                border.color: "#f1f5f9"
+                                border.color: AppTheme.bgHover
 
                                 Canvas {
                                     id: rptBarCanvas
@@ -312,12 +313,12 @@ Rectangle {
 
                                 Indicator_1 {
                                     labelText: "Income"
-                                    dotColor: "#10b981"
+                                    dotColor: AppTheme.success
                                 }
 
                                 Indicator_1 {
                                     labelText: "Expense"
-                                    dotColor: "#ef4444"
+                                    dotColor: AppTheme.danger
                                 }
                             }
                         }
@@ -328,8 +329,8 @@ Rectangle {
                         Layout.fillWidth: true
                         Layout.preferredWidth: 1
                         implicitHeight: 340
-                        color: "#ffffff"
-                        border.color: "#e2e8f0"
+                        color: AppTheme.bgCard
+                        border.color: AppTheme.border
                         border.width: 1
                         radius: 12
                         clip: true
@@ -348,30 +349,30 @@ Rectangle {
                                     font.family: "Inter"
                                     font.pixelSize: 18
                                     font.weight: Font.Bold
-                                    color: "#0f172a"
+                                    color: AppTheme.textMain
                                 }
 
                                 Text {
                                     text: "Cumulative Net Assets"
                                     font.family: "Inter"
                                     font.pixelSize: 13
-                                    color: "#64748b"
+                                    color: AppTheme.textSub
                                 }
                             }
 
                             Rectangle {
                                 Layout.fillWidth: true
                                 height: 1
-                                color: "#e2e8f0"
+                                color: AppTheme.border
                             }
 
                             // Area Chart Canvas
                             Rectangle {
                                 Layout.fillWidth: true
                                 Layout.fillHeight: true
-                                color: "#f8fafc"
+                                color: AppTheme.bgApp
                                 radius: 8
-                                border.color: "#f1f5f9"
+                                border.color: AppTheme.bgHover
 
                                 Canvas {
                                     id: rptNwCanvas
@@ -484,8 +485,8 @@ Rectangle {
                         Layout.fillWidth: true
                         Layout.preferredWidth: 1
                         implicitHeight: 340
-                        color: "#ffffff"
-                        border.color: "#e2e8f0"
+                        color: AppTheme.bgCard
+                        border.color: AppTheme.border
                         border.width: 1
                         radius: 12
                         clip: true
@@ -504,21 +505,21 @@ Rectangle {
                                     font.family: "Inter"
                                     font.pixelSize: 18
                                     font.weight: Font.Bold
-                                    color: "#0f172a"
+                                    color: AppTheme.textMain
                                 }
 
                                 Text {
                                     text: "Top 5 Categories & Unlisted"
                                     font.family: "Inter"
                                     font.pixelSize: 13
-                                    color: "#64748b"
+                                    color: AppTheme.textSub
                                 }
                             }
 
                             Rectangle {
                                 Layout.fillWidth: true
                                 height: 1
-                                color: "#e2e8f0"
+                                color: AppTheme.border
                             }
 
                             RowLayout {
@@ -531,9 +532,9 @@ Rectangle {
                                     Layout.fillWidth: true
                                     Layout.preferredWidth: 1
                                     Layout.fillHeight: true
-                                    color: "#f8fafc"
+                                    color: AppTheme.bgApp
                                     radius: 8
-                                    border.color: "#f1f5f9"
+                                    border.color: AppTheme.bgHover
 
                                     Canvas {
                                         id: expenseCanvas
@@ -611,8 +612,8 @@ Rectangle {
                         Layout.fillWidth: true
                         Layout.preferredWidth: 1
                         implicitHeight: 340
-                        color: "#ffffff"
-                        border.color: "#e2e8f0"
+                        color: AppTheme.bgCard
+                        border.color: AppTheme.border
                         border.width: 1
                         radius: 12
                         clip: true
@@ -631,21 +632,21 @@ Rectangle {
                                     font.family: "Inter"
                                     font.pixelSize: 18
                                     font.weight: Font.Bold
-                                    color: "#0f172a"
+                                    color: AppTheme.textMain
                                 }
 
                                 Text {
                                     text: "Top 5 Categories & Unlisted"
                                     font.family: "Inter"
                                     font.pixelSize: 13
-                                    color: "#64748b"
+                                    color: AppTheme.textSub
                                 }
                             }
 
                             Rectangle {
                                 Layout.fillWidth: true
                                 height: 1
-                                color: "#e2e8f0"
+                                color: AppTheme.border
                             }
 
                             RowLayout {
@@ -658,9 +659,9 @@ Rectangle {
                                     Layout.fillWidth: true
                                     Layout.preferredWidth: 1
                                     Layout.fillHeight: true
-                                    color: "#f8fafc"
+                                    color: AppTheme.bgApp
                                     radius: 8
-                                    border.color: "#f1f5f9"
+                                    border.color: AppTheme.bgHover
 
                                     Canvas {
                                         id: incomeCanvas

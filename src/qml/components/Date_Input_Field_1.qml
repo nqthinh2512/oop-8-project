@@ -1,4 +1,5 @@
 import QtQuick
+import src
 import QtQuick.Controls
 
 Rectangle {
@@ -234,9 +235,9 @@ Rectangle {
         focus: true
 
         background: Rectangle {
-            color: "#ffffff"
+            color: AppTheme.bgCard
             radius: 12
-            border.color: "#cbd5e1"
+            border.color: AppTheme.divider
             border.width: 1
         }
 
@@ -260,7 +261,7 @@ Rectangle {
                 }
 
                 Rectangle {
-                    width: 28; height: 28; radius: 6; color: "#f1f5f9"
+                    width: 28; height: 28; radius: 6; color: AppTheme.bgHover
                     Text { text: "◀"; anchors.centerIn: parent; font.pixelSize: 10; color: "#475569" }
                     MouseArea {
                         anchors.fill: parent
@@ -270,7 +271,7 @@ Rectangle {
                 }
 
                 Rectangle {
-                    width: 28; height: 28; radius: 6; color: "#f1f5f9"
+                    width: 28; height: 28; radius: 6; color: AppTheme.bgHover
                     Text { text: "▶"; anchors.centerIn: parent; font.pixelSize: 10; color: "#475569" }
                     MouseArea {
                         anchors.fill: parent
@@ -291,7 +292,7 @@ Rectangle {
                         text: modelData
                         font.pixelSize: 11
                         font.weight: Font.Bold
-                        color: "#94a3b8"
+                        color: AppTheme.textMuted
                         horizontalAlignment: Text.AlignHCenter
                         verticalAlignment: Text.AlignVCenter
                     }

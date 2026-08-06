@@ -1,4 +1,5 @@
 import QtQuick
+import src
 import QtQuick.Layouts
 import QtQuick.Shapes
 
@@ -19,9 +20,9 @@ Rectangle {
     height: implicitHeight
     Layout.fillWidth: true
 
-    border.color: "#f1f5f9"
+    border.color: AppTheme.bgHover
     border.width: 1
-    color: "#ffffff"
+    color: AppTheme.bgCard
 
     readonly property var statusConfig: {
         if (status_1 === CategoryRow_1.Status.Status_active) {
@@ -45,7 +46,7 @@ Rectangle {
             Text {
                 anchors.left: parent.left
                 anchors.verticalCenter: parent.verticalCenter
-                color: "#0f172a"
+                color: AppTheme.textMain
                 font.family: "Inter"
                 font.pixelSize: 14
                 font.weight: Font.Bold
@@ -82,7 +83,7 @@ Rectangle {
             Text {
                 anchors.left: parent.left
                 anchors.verticalCenter: parent.verticalCenter
-                color: "#0f172a"
+                color: AppTheme.textMain
                 font.family: "Intel One Mono"
                 font.pixelSize: 15
                 font.weight: Font.Bold

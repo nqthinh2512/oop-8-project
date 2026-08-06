@@ -32,3 +32,9 @@ bool DatabaseManager::exportAllToCSV(const QString& targetFolderPath) const {
     success &= m_savingDAO->exportToCSV(targetFolderPath + "/savings_export.csv");
     return success;
 }
+
+void DatabaseManager::factoryReset() {
+    QFile::remove(getDataDirectoryPath() + "/settings.ini");
+    QFile::remove(getDataDirectoryPath() + "/avatar.txt");
+    // Note: Other CSVs are not cleared in this simple version unless requested
+}

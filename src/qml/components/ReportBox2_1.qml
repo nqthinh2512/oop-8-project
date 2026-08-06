@@ -1,4 +1,5 @@
 import QtQuick
+import src
 import QtQuick.Layouts
 
 Rectangle {
@@ -20,8 +21,8 @@ Rectangle {
     Layout.preferredWidth: 1
     clip: true
 
-    color: "#ffffff"
-    border.color: "#e2e8f0"
+    color: AppTheme.bgCard
+    border.color: AppTheme.border
     border.width: 1
     radius: 12
 
@@ -35,7 +36,7 @@ Rectangle {
             font.family: "Intel One Mono"
             font.pixelSize: 15
             font.weight: Font.Bold
-            color: "#0f172a"
+            color: AppTheme.textMain
             text: root.titleText
             Layout.fillWidth: true
         }
@@ -43,7 +44,7 @@ Rectangle {
         Rectangle {
             Layout.fillWidth: true
             height: 1
-            color: "#e2e8f0"
+            color: AppTheme.border
         }
 
         // Data Rows
@@ -57,7 +58,7 @@ Rectangle {
                 Text {
                     font.family: "Inter"
                     font.pixelSize: 13
-                    color: "#64748b"
+                    color: AppTheme.textSub
                     text: root.row1Label
                     Layout.fillWidth: true
                     elide: Text.ElideRight
@@ -66,7 +67,7 @@ Rectangle {
                     font.family: "Intel One Mono"
                     font.pixelSize: 13
                     font.weight: Font.Bold
-                    color: "#0f172a"
+                    color: AppTheme.textMain
                     text: root.row1Amount
                     elide: Text.ElideRight
                 }
@@ -75,7 +76,7 @@ Rectangle {
             Rectangle {
                 Layout.fillWidth: true
                 height: 1
-                color: "#f1f5f9"
+                color: AppTheme.bgHover
             }
 
             // Row 2
@@ -84,7 +85,7 @@ Rectangle {
                 Text {
                     font.family: "Inter"
                     font.pixelSize: 13
-                    color: "#64748b"
+                    color: AppTheme.textSub
                     text: root.row2Label
                     Layout.fillWidth: true
                     elide: Text.ElideRight
@@ -93,7 +94,7 @@ Rectangle {
                     font.family: "Intel One Mono"
                     font.pixelSize: 13
                     font.weight: Font.Bold
-                    color: "#0f172a"
+                    color: AppTheme.textMain
                     text: root.row2Amount
                     elide: Text.ElideRight
                 }
@@ -102,7 +103,7 @@ Rectangle {
             Rectangle {
                 Layout.fillWidth: true
                 height: 1
-                color: "#f1f5f9"
+                color: AppTheme.bgHover
             }
 
             // Row 3
@@ -111,7 +112,7 @@ Rectangle {
                 Text {
                     font.family: "Inter"
                     font.pixelSize: 13
-                    color: "#64748b"
+                    color: AppTheme.textSub
                     text: root.row3Label
                     Layout.fillWidth: true
                     elide: Text.ElideRight
@@ -120,7 +121,7 @@ Rectangle {
                     font.family: "Intel One Mono"
                     font.pixelSize: 13
                     font.weight: Font.Bold
-                    color: "#0f172a"
+                    color: AppTheme.textMain
                     text: root.row3Amount
                     elide: Text.ElideRight
                 }

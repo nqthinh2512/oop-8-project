@@ -1,4 +1,7 @@
 import QtQuick
+import QtQuick.Controls
+import QtQuick.Controls.impl
+import src
 
 Rectangle {
     id: login_hide_pwd
@@ -91,54 +94,62 @@ Rectangle {
 
         color: "transparent"
 
-        Image {
+        ColorImage {
+        color: AppTheme.textMain
             id: ellipse_2
 
             source: Qt.resolvedUrl("../assets/ellipse_26.png")
         }
-        Image {
+        ColorImage {
+        color: AppTheme.textMain
             id: ellipse_3
 
             x: 15
 
             source: Qt.resolvedUrl("../assets/ellipse_27.png")
         }
-        Image {
+        ColorImage {
+        color: AppTheme.textMain
             id: ellipse_5
 
             x: 30
 
             source: Qt.resolvedUrl("../assets/ellipse_28.png")
         }
-        Image {
+        ColorImage {
+        color: AppTheme.textMain
             id: ellipse_4
 
             x: 45
 
             source: Qt.resolvedUrl("../assets/ellipse_29.png")
         }
-        Image {
+        ColorImage {
+        color: AppTheme.textMain
             id: ellipse_6
 
             x: 60
 
             source: Qt.resolvedUrl("../assets/ellipse_30.png")
         }
-        Image {
+        ColorImage {
+        color: AppTheme.textMain
             id: ellipse_7
 
             x: 75
 
             source: Qt.resolvedUrl("../assets/ellipse_31.png")
         }
-        Image {
+        ColorImage {
+        color: AppTheme.textMain
             id: ellipse_8
 
             x: 90
 
             source: Qt.resolvedUrl("../assets/ellipse_32.png")
         }
-        Image {
+        ColorImage {
+        color: AppTheme.textMain
             id: ellipse_9
 
             x: 105
