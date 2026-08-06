@@ -14,6 +14,7 @@ Rectangle {
     property real progressFraction: 0.67
     property string progressSubText: "67% saved"
     property string dueDateText: "31/12/2012"
+    property string plannerText: ""
 
     signal editClicked()
     signal deleteClicked()
@@ -81,13 +82,13 @@ Rectangle {
 
         // 4. PROGRESS
         Item {
-            Layout.preferredWidth: 280
+            Layout.preferredWidth: 260
             Layout.fillHeight: true
 
             ProgressInfo_1 {
                 anchors.left: parent.left
                 anchors.right: parent.right
-                anchors.rightMargin: 16
+                anchors.rightMargin: 30
                 anchors.verticalCenter: parent.verticalCenter
                 spentText: savingRow.savedText
                 limitText: savingRow.goalText
@@ -96,20 +97,34 @@ Rectangle {
             }
         }
 
-        // 5. DUE DATE
+        // 5. DUE DATE & PLANNER
         Item {
-            Layout.preferredWidth: 180
+            Layout.preferredWidth: 200
             Layout.fillHeight: true
 
-            Text {
+            Column {
                 anchors.left: parent.left
                 anchors.verticalCenter: parent.verticalCenter
-                color: AppTheme.textSub
-                font.family: "Intel One Mono"
-                font.pixelSize: 14
-                font.weight: Font.Normal
-                text: savingRow.dueDateText
-                elide: Text.ElideRight
+                spacing: 4
+
+                Text {
+                    color: AppTheme.textSub
+                    font.family: "Intel One Mono"
+                    font.pixelSize: 14
+                    font.weight: Font.Normal
+                    text: savingRow.dueDateText
+                    elide: Text.ElideRight
+                }
+
+                Text {
+                    color: AppTheme.primary // Use primary color for planner
+                    font.family: "Inter"
+                    font.pixelSize: 12
+                    font.weight: Font.Medium
+                    text: savingRow.plannerText
+                    elide: Text.ElideRight
+                    visible: text !== ""
+                }
             }
         }
 

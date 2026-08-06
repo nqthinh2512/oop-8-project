@@ -200,6 +200,11 @@ void TransactionsController::addTransaction(int typeIndex, const QString& title,
     Transaction* newTx = TransactionFactory::createTransaction(typeIndex, id, cleanTitle, amount, dt, cleanMethod, categoryId);
 
     DatabaseManager::instance().transactionDAO()->add(newTx);
+    
+    if (typeIndex == 1) { // 1 = Expense
+        DatabaseManager::instance().budgetDAO()->addExpenseToBudget(categoryId, amount);
+    }
+    
     DatabaseManager::instance().triggerDataChanged();
     loadTransactions();
 }
@@ -214,15 +219,55 @@ void TransactionsController::updateTransaction(int id, int typeIndex, const QStr
 
     QString cleanMethod = method.isEmpty() ? "Cash/Bank" : method;
     QString cleanTitle = title.isEmpty() ? "Transaction" : title;
+    
+    // Auto-sync Budget: Remove old amount, add new amount
+    int oldCategoryId = 0;
+    double oldAmount = 0;
+    int oldTypeIndex = 0;
+    for (const Transaction* t : DatabaseManager::instance().transactionDAO()->getAll()) {
+        if (t->getId() == id) {
+            oldCategoryId = t->getCategoryId();
+            oldAmount = t->getAmount();
+            oldTypeIndex = (dynamic_cast<const Income*>(t) != nullptr) ? 0 : 1;
+            break;
+        }
+    }
+
+    if (oldTypeIndex == 1) {
+        DatabaseManager::instance().budgetDAO()->addExpenseToBudget(oldCategoryId, -oldAmount);
+    }
+    
     Transaction* newTx = TransactionFactory::createTransaction(typeIndex, id, cleanTitle, amount, dt, cleanMethod, categoryId);
 
     DatabaseManager::instance().transactionDAO()->update(id, newTx);
+    
+    if (typeIndex == 1) {
+        DatabaseManager::instance().budgetDAO()->addExpenseToBudget(categoryId, amount);
+    }
+    
     DatabaseManager::instance().triggerDataChanged();
     loadTransactions();
 }
 
 void TransactionsController::deleteTransaction(int id)
 {
+    // Lấy thông tin giao dịch để trừ lại khỏi budget
+    int categoryId = 0;
+    double amount = 0;
+    int typeIndex = 0;
+    for (const Transaction* t : DatabaseManager::instance().transactionDAO()->getAll()) {
+        if (t->getId() == id) {
+            categoryId = t->getCategoryId();
+            amount = t->getAmount();
+            typeIndex = (dynamic_cast<const Income*>(t) != nullptr) ? 0 : 1;
+            break;
+        }
+    }
+
+    if (typeIndex == 1) {
+        DatabaseManager::instance().budgetDAO()->addExpenseToBudget(categoryId, -amount);
+    }
+
     DatabaseManager::instance().transactionDAO()->remove(id);
     DatabaseManager::instance().triggerDataChanged();
     loadTransactions();

@@ -91,7 +91,7 @@ Rectangle {
             ProgressInfo_1 {
                 anchors.left: parent.left
                 anchors.right: parent.right
-                anchors.rightMargin: 16
+                anchors.rightMargin: 30
                 anchors.verticalCenter: parent.verticalCenter
                 spentText: budgetRow.spentText
                 limitText: budgetRow.limitText

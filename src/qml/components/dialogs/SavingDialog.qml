@@ -40,8 +40,8 @@ Item {
         amountFundedInput.text = ""
         saveGoalInput.text = ""
 
-        dropdown_1.selectedIndex = 2
-        dropdown_1.selectedText = "High"
+        dropdown_1.selectedIndex = 1
+        dropdown_1.selectedText = "Medium"
 
         if (root.realCategoryList.length > 0) {
             dropdown_3.selectedIndex = 0
@@ -218,8 +218,8 @@ Item {
                     id: dropdown_1
                     width: 220; height: 36
                     model: ["Low", "Medium", "High"]
-                    selectedText: "High"
-                    selectedIndex: 2
+                    selectedText: "Medium"
+                    selectedIndex: 1
                 }
             }
 

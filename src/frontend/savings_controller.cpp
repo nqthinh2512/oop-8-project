@@ -1,6 +1,7 @@
 #include "savings_controller.h"
 #include <QLocale>
 #include <QDate>
+#include <QLocale>
 #include <cmath>
 #include <QDebug>
 
@@ -83,6 +84,26 @@ QVariantList SavingsController::savingsList() const
         m["progressSubText"] = QString::number(percent) + "% saved";
         m["dDate"] = s.getDueDate().toString("dd/MM/yyyy");
         m["dueDateText"] = s.getDueDate().toString("dd/MM/yyyy");
+
+        // Auto-Planner logic
+        QString plannerText = "";
+        double remaining = target - current;
+        if (remaining > 0.0) {
+            int daysLeft = QDate::currentDate().daysTo(s.getDueDate());
+            if (daysLeft > 0) {
+                // Estimate months and round up to whole month
+                int monthsLeft = qMax(1, (int)std::ceil(daysLeft / 30.0));
+                double monthlyNeeded = remaining / monthsLeft;
+                // Round up to nearest 1,000 to avoid weird numbers (số lẻ)
+                monthlyNeeded = std::ceil(monthlyNeeded / 1000.0) * 1000.0;
+                plannerText = "Need: " + formatVnd(monthlyNeeded) + " / month";
+            } else {
+                plannerText = "Overdue!";
+            }
+        } else {
+            plannerText = "Goal Reached!";
+        }
+        m["plannerText"] = plannerText;
 
         list.append(m);
     }
