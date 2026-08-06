@@ -22,7 +22,6 @@ Window {
     RowLayout {
         anchors.fill: parent
         spacing: 0
-        visible: sessionController.isLoggedIn
 
         // 1. SIDEBAR NAVIGATION MENU
         Sidebar_menu_1 {
@@ -51,9 +50,5 @@ Window {
         }
     }
 
-    // 2. LOGIN PAGE OVERLAY (Shown when logged out)
-    LoginPage {
-        anchors.fill: parent
-        visible: !sessionController.isLoggedIn
-    }
+
 }
