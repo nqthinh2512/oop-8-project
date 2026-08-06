@@ -11,7 +11,6 @@
 #include "frontend/overview_controller.h"
 #include "frontend/reports_controller.h"
 #include "frontend/savings_controller.h"
-#include "frontend/session_controller.h"
 #include "frontend/settings_controller.h"
 #include "frontend/transactions_controller.h"
 
@@ -32,7 +31,6 @@ int main(int argc, char *argv[])
     TransactionsController transactionsCtrl;
     BillsController billsCtrl;
     SavingsController savingsCtrl;
-    SessionController sessionCtrl;
 
     QQmlApplicationEngine engine;
 
@@ -45,7 +43,6 @@ int main(int argc, char *argv[])
     engine.rootContext()->setContextProperty("transactionsController", &transactionsCtrl);
     engine.rootContext()->setContextProperty("billsController", &billsCtrl);
     engine.rootContext()->setContextProperty("savingsController", &savingsCtrl);
-    engine.rootContext()->setContextProperty("sessionController", &sessionCtrl);
 
     engine.load(QUrl(QStringLiteral("qrc:/qt/qml/src/qml/Main.qml")));
 

@@ -453,12 +453,6 @@ Rectangle {
                                     text: overviewController.topSaving.name || "No Savings"
                                     Layout.fillWidth: true
                                 }
-
-                                Edit_1 {
-                                    Layout.alignment: Qt.AlignRight | Qt.AlignVCenter
-                                    _vector_ShapePath0StrokeColor: AppTheme.textSub
-                                    _vector_1_ShapePath0StrokeColor: AppTheme.textSub
-                                }
                             }
 
                             RowLayout {
@@ -543,12 +537,6 @@ Rectangle {
                                     color: AppTheme.textMain
                                     text: overviewController.topBudget.name || "No Budgets"
                                     Layout.fillWidth: true
-                                }
-
-                                Edit_1 {
-                                    Layout.alignment: Qt.AlignRight | Qt.AlignVCenter
-                                    _vector_ShapePath0StrokeColor: AppTheme.textSub
-                                    _vector_1_ShapePath0StrokeColor: AppTheme.textSub
                                 }
                             }
 

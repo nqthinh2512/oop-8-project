@@ -484,8 +484,7 @@ Item {
                 y: 32
                 height: 42
                 width: 460
-                border.color: (root.isValidating && date_Input_Field.selectedDate.trim() === "") ? "red" : "transparent"
-                border.width: (root.isValidating && date_Input_Field.selectedDate.trim() === "") ? 1 : 0
+                showValidationError: (root.isValidating && date_Input_Field.selectedDate.trim() === "")
             }
         }
 

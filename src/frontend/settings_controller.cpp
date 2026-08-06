@@ -153,7 +153,17 @@ void SettingsController::persistAvatar() const
 
 bool SettingsController::exportAllToCSV(const QString &folderPath)
 {
-    return DatabaseManager::instance().exportAllToCSV(folderPath);
+    QUrl url(folderPath);
+    QString localPath = url.isLocalFile() ? url.toLocalFile() : folderPath;
+
+    // Remove any trailing slashes to be safe
+    if (localPath.endsWith("/")) {
+        localPath.chop(1);
+    }
+    // Convert to native separators (Windows specific fix just in case, though Qt usually handles it)
+    localPath = QDir::toNativeSeparators(localPath);
+
+    return DatabaseManager::instance().exportAllToCSV(localPath);
 }
 
 void SettingsController::factoryReset()

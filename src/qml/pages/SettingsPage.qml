@@ -30,12 +30,7 @@ Rectangle {
     property string currentEmail: settingsController.email
     property string currentContact: settingsController.contact
 
-    // Password State
-    property bool showCurrentPwd: false
-    property bool showNewPwd: false
-    property bool showConfirmPwd: false
-
-    // Sync input state when edit mode is activated/canceled
+        // Sync input state when edit mode is activated/canceled
     Connections {
         target: settingsController
         function onIsEditingChanged() {
@@ -44,14 +39,7 @@ Rectangle {
                 currentEmail = settingsController.email;
                 currentContact = settingsController.contact;
             } else {
-                // Clear passwords when edit mode is exited
-                currentPwdInput.text = "";
-                newPwdInput.text = "";
-                confirmPwdInput.text = "";
-                showCurrentPwd = false;
-                showNewPwd = false;
-                showConfirmPwd = false;
-            }
+                            }
         }
     }
 
@@ -421,238 +409,11 @@ Rectangle {
                             }
                         }
 
-                        // --- Row 3 ---
-                        // Department (Read-only)
-                        ColumnLayout {
-                            spacing: 6
-                            Layout.fillWidth: true
-                            Layout.alignment: Qt.AlignTop
-                            Text { text: "Department"; font.pixelSize: 14; color: AppTheme.textSub; font.family: "Inter" }
-                            Text { text: "IT Department"; font.pixelSize: 16; color: AppTheme.textMain; font.family: "Inter"; font.weight: Font.Medium }
-                        }
-                        // Role (Read-only)
-                        ColumnLayout {
-                            spacing: 6
-                            Layout.fillWidth: true
-                            Layout.alignment: Qt.AlignTop
-                            Text { text: "Role"; font.pixelSize: 14; color: AppTheme.textSub; font.family: "Inter" }
-                            Text { text: "Administrator"; font.pixelSize: 16; color: AppTheme.textMain; font.family: "Inter"; font.weight: Font.Medium }
-                        }
-
-                        // --- Row 4 ---
-                        // Account Type (Read-only)
-                        ColumnLayout {
-                            spacing: 6
-                            Layout.fillWidth: true
-                            Layout.alignment: Qt.AlignTop
-                            Text { text: "Account Type"; font.pixelSize: 14; color: AppTheme.textSub; font.family: "Inter" }
-                            Text { text: "Administrator"; font.pixelSize: 16; color: AppTheme.textMain; font.family: "Inter"; font.weight: Font.Medium }
-                        }
+                        
                     }
                 }
             }
 
-            // =================================================================
-            // 3. CHANGE PASSWORD CARD
-            // =================================================================
-            Rectangle {
-                Layout.fillWidth: true
-                Layout.preferredHeight: changePwdCol.implicitHeight + 48
-                radius: 12
-                color: AppTheme.bgCard
-                border.color: AppTheme.border
-                border.width: 1
-
-                // Dim the entire card if not editing
-                opacity: isEditing ? 1.0 : 0.6
-
-                ColumnLayout {
-                    id: changePwdCol
-                    anchors.left: parent.left
-                    anchors.right: parent.right
-                    anchors.top: parent.top
-                    anchors.margins: 24
-                    spacing: 24
-
-                    Text {
-                        text: "Change Password"
-                        font.family: "Inter"
-                        font.pixelSize: 22
-                        font.weight: Font.Bold
-                        color: AppTheme.textMain
-                    }
-
-                    ColumnLayout {
-                        Layout.fillWidth: true
-                        Layout.maximumWidth: 600
-                        spacing: 20
-
-                        // Field 1: Current Password
-                        ColumnLayout {
-                            spacing: 8
-                            Layout.fillWidth: true
-                            Text { text: "Current Password"; font.pixelSize: 14; color: AppTheme.textMain; font.weight: Font.Medium; font.family: "Inter" }
-                            Rectangle {
-                                Layout.fillWidth: true
-                                height: 44
-                                radius: 8
-                                color: AppTheme.bgApp
-                                border.color: AppTheme.border
-                                border.width: 1
-                                TextInput {
-                                    id: currentPwdInput
-                                    anchors.fill: parent
-                                    anchors.leftMargin: 16
-                                    anchors.rightMargin: 40
-                                    verticalAlignment: TextInput.AlignVCenter
-                                    font.pixelSize: 15
-                                    font.family: "Inter"
-                                    color: AppTheme.textMain
-                                    echoMode: showCurrentPwd ? TextInput.Normal : TextInput.Password
-                                    enabled: isEditing
-                                    Text {
-                                        anchors.fill: parent
-                                        verticalAlignment: Text.AlignVCenter
-                                        text: "Enter current password"
-                                        color: AppTheme.textMuted
-                                        font.pixelSize: 15
-                                        font.family: "Inter"
-                                        visible: parent.text === "" && !currentPwdInput.activeFocus
-                                    }
-                                }
-                                Text {
-                                    anchors.right: parent.right
-                                    anchors.verticalCenter: parent.verticalCenter
-                                    anchors.rightMargin: 16
-                                    text: "👁"
-                                    color: showCurrentPwd ? "#3b82f6" : "#94a3b8"
-                                    font.pixelSize: 16
-                                    MouseArea {
-                                        anchors.fill: parent
-                                        anchors.margins: -10
-                                        cursorShape: isEditing ? Qt.PointingHandCursor : Qt.ArrowCursor
-                                        onClicked: {
-                                            if (isEditing) showCurrentPwd = !showCurrentPwd
-                                        }
-                                    }
-                                }
-                            }
-                        }
-
-                        // Field 2: New Password
-                        ColumnLayout {
-                            spacing: 8
-                            Layout.fillWidth: true
-                            Text { text: "New Password"; font.pixelSize: 14; color: AppTheme.textMain; font.weight: Font.Medium; font.family: "Inter" }
-                            Rectangle {
-                                Layout.fillWidth: true
-                                height: 44
-                                radius: 8
-                                color: AppTheme.bgApp
-                                border.color: AppTheme.border
-                                border.width: 1
-                                TextInput {
-                                    id: newPwdInput
-                                    anchors.fill: parent
-                                    anchors.leftMargin: 16
-                                    anchors.rightMargin: 40
-                                    verticalAlignment: TextInput.AlignVCenter
-                                    font.pixelSize: 15
-                                    font.family: "Inter"
-                                    color: AppTheme.textMain
-                                    echoMode: showNewPwd ? TextInput.Normal : TextInput.Password
-                                    enabled: isEditing
-                                    Text {
-                                        anchors.fill: parent
-                                        verticalAlignment: Text.AlignVCenter
-                                        text: "Enter new password"
-                                        color: AppTheme.textMuted
-                                        font.pixelSize: 15
-                                        font.family: "Inter"
-                                        visible: parent.text === "" && !newPwdInput.activeFocus
-                                    }
-                                }
-                                Text {
-                                    anchors.right: parent.right
-                                    anchors.verticalCenter: parent.verticalCenter
-                                    anchors.rightMargin: 16
-                                    text: "👁"
-                                    color: showNewPwd ? "#3b82f6" : "#94a3b8"
-                                    font.pixelSize: 16
-                                    MouseArea {
-                                        anchors.fill: parent
-                                        anchors.margins: -10
-                                        cursorShape: isEditing ? Qt.PointingHandCursor : Qt.ArrowCursor
-                                        onClicked: {
-                                            if (isEditing) showNewPwd = !showNewPwd
-                                        }
-                                    }
-                                }
-                            }
-                        }
-
-                        // Field 3: Confirm Password
-                        ColumnLayout {
-                            spacing: 8
-                            Layout.fillWidth: true
-                            Text { text: "Confirm Password"; font.pixelSize: 14; color: AppTheme.textMain; font.weight: Font.Medium; font.family: "Inter" }
-                            Rectangle {
-                                Layout.fillWidth: true
-                                height: 44
-                                radius: 8
-                                color: AppTheme.bgApp
-                                border.color: AppTheme.border
-                                border.width: 1
-                                TextInput {
-                                    id: confirmPwdInput
-                                    anchors.fill: parent
-                                    anchors.leftMargin: 16
-                                    anchors.rightMargin: 40
-                                    verticalAlignment: TextInput.AlignVCenter
-                                    font.pixelSize: 15
-                                    font.family: "Inter"
-                                    color: AppTheme.textMain
-                                    echoMode: showConfirmPwd ? TextInput.Normal : TextInput.Password
-                                    enabled: isEditing
-                                    Text {
-                                        anchors.fill: parent
-                                        verticalAlignment: Text.AlignVCenter
-                                        text: "Confirm new password"
-                                        color: AppTheme.textMuted
-                                        font.pixelSize: 15
-                                        font.family: "Inter"
-                                        visible: parent.text === "" && !confirmPwdInput.activeFocus
-                                    }
-                                }
-                                Text {
-                                    anchors.right: parent.right
-                                    anchors.verticalCenter: parent.verticalCenter
-                                    anchors.rightMargin: 16
-                                    text: "👁"
-                                    color: showConfirmPwd ? "#3b82f6" : "#94a3b8"
-                                    font.pixelSize: 16
-                                    MouseArea {
-                                        anchors.fill: parent
-                                        anchors.margins: -10
-                                        cursorShape: isEditing ? Qt.PointingHandCursor : Qt.ArrowCursor
-                                        onClicked: {
-                                            if (isEditing) showConfirmPwd = !showConfirmPwd
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
-            UniversalButton_1 {
-                visible: isEditing
-                buttonText: "Save Changes"
-                _state: UniversalButton_1.State_1.State_1_selected
-                onClicked: settingsController.saveChanges(currentFullName, currentEmail, currentContact)
-            }
-            
             // =================================================================
             // 4. PREFERENCES CARD
             // =================================================================
@@ -803,75 +564,6 @@ Rectangle {
             }
 
             // =================================================================
-            // ACCOUNT CARD (Logout)
-            // =================================================================
-            Rectangle {
-                Layout.fillWidth: true
-                Layout.preferredHeight: accountCol.implicitHeight + 48
-                radius: 12
-                color: AppTheme.bgCard
-                border.color: AppTheme.border
-                border.width: 1
-
-                ColumnLayout {
-                    id: accountCol
-                    anchors.left: parent.left
-                    anchors.right: parent.right
-                    anchors.top: parent.top
-                    anchors.margins: 24
-                    spacing: 16
-
-                    Text {
-                        text: "Account"
-                        font.family: "Inter"
-                        font.pixelSize: 22
-                        font.weight: Font.Bold
-                        color: AppTheme.textMain
-                    }
-
-                    RowLayout {
-                        Layout.fillWidth: true
-
-                        Text {
-                            Layout.fillWidth: true
-                            text: "Signed in as " + settingsController.email
-                            font.family: "Inter"
-                            font.pixelSize: 14
-                            color: AppTheme.textSub
-                            elide: Text.ElideRight
-                        }
-
-                        Rectangle {
-                            width: 120
-                            height: 42
-                            radius: 6
-                            color: "#fee2e2"
-
-                            Text {
-                                anchors.centerIn: parent
-                                text: "Đăng xuất"
-                                color: "#dc2626"
-                                font.family: "Inter"
-                                font.pixelSize: 15
-                                font.weight: Font.Medium
-                            }
-
-                            MouseArea {
-                                anchors.fill: parent
-                                cursorShape: Qt.PointingHandCursor
-                                onClicked: {
-                                    sessionController.logout()
-                                    if (typeof sidebarMenu !== "undefined") {
-                                        sidebarMenu.selectedIndex = 0
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
-            // Bottom Spacing Buffer
             Item {
                 Layout.preferredWidth: 1
                 Layout.preferredHeight: 32

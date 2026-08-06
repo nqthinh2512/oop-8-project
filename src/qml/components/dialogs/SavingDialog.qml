@@ -329,6 +329,7 @@ Item {
             Text { text: "Due Date"; color: "#878787"; font.family: "Intel One Mono"; font.pixelSize: 14; font.weight: Font.DemiBold }
             Date_Input_Field_1 {
                 id: date_Input_Field
+                allowFutureDates: true
                 width: parent.width
                 height: 42
             }

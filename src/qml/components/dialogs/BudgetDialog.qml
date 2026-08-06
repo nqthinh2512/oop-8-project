@@ -496,6 +496,7 @@ Item {
 
             Date_Input_Field_1 {
                 id: date_Input_Field
+                allowFutureDates: true
                 x: 20
                 y: 32
                 height: 42
@@ -531,6 +532,7 @@ Item {
 
             Date_Input_Field_1 {
                 id: date_Input_Field_1
+                allowFutureDates: true
                 x: 20
                 y: 32
                 height: 42

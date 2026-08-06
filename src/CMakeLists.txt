@@ -76,9 +76,6 @@ qt_add_executable(appFinanceDashboard
 
     frontend/settings_controller.cpp
     frontend/settings_controller.h
-
-    frontend/session_controller.h
-    frontend/session_controller.cpp
 )
 
 # 2. REGISTER QML MODULE & ALL QML FILES AND ASSETS
@@ -101,7 +98,6 @@ qt_add_qml_module(appFinanceDashboard
         qml/pages/ReportsPage.qml
         qml/pages/SettingsPage.qml
         qml/pages/SettingsPage_1.qml
-        qml/pages/LoginPage.qml
 
         # Sidebar Components:
         qml/components/sidebar/Sidebar_menu_1.qml
@@ -176,7 +172,6 @@ qt_add_qml_module(appFinanceDashboard
         qml/components/Eye.qml
         qml/components/Eye_off.qml
         qml/components/Filter.qml
-        qml/components/Form_Log_In.qml
         qml/components/Frame_133540.qml
         qml/components/Frame_133543.qml
         qml/components/Frame_133550.qml
@@ -186,10 +181,6 @@ qt_add_qml_module(appFinanceDashboard
         qml/components/Icon_Button.qml
         qml/components/Input_Field.qml
         qml/components/Line_2.qml
-        qml/components/Login_empty.qml
-        qml/components/Login_error_pwd.qml
-        qml/components/Login_hide_pwd.qml
-        qml/components/Login_show_pwd.qml
         qml/components/Octicon_goal_16.qml
         qml/components/Settings_1.qml
         qml/components/Star.qml
