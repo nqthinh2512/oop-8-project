@@ -1,5 +1,6 @@
 #include "bills_controller.h"
 #include "../backend/storage/database_manager.h"
+#include "../backend/models/transaction_factory.h"
 #include <QDateTime>
 #include <QDebug>
 
@@ -195,8 +196,41 @@ void BillsController::togglePaidStatus(int id)
 {
     for (const Bill& existingBill : m_allBills) {
         if (existingBill.getId() == id) {
-            Bill updatedBill(existingBill.getId(), existingBill.getName(), existingBill.getAmount(), existingBill.getDueDate(), existingBill.getCategoryId(), !existingBill.checkPaid());
+            bool newStatus = !existingBill.checkPaid();
+            Bill updatedBill(existingBill.getId(), existingBill.getName(), existingBill.getAmount(), existingBill.getDueDate(), existingBill.getCategoryId(), newStatus);
             DatabaseManager::instance().billDAO()->update(id, updatedBill);
+            
+            QString autoTitle = QString("[Auto-Bill ID:%1] %2").arg(id).arg(existingBill.getName());
+            
+            if (newStatus) {
+                // Bill marked as Paid -> Create an Expense Transaction (typeIndex = 1)
+                Transaction* newTx = TransactionFactory::createTransaction(
+                    1, 0, autoTitle, existingBill.getAmount(), QDateTime::currentDateTime(), "Bill Payment", existingBill.getCategoryId()
+                );
+                DatabaseManager::instance().transactionDAO()->add(newTx);
+                DatabaseManager::instance().budgetDAO()->addExpenseToBudget(existingBill.getCategoryId(), existingBill.getAmount());
+            } else {
+                // Bill marked as Unpaid -> Find the auto-transaction and delete it
+                const auto& transactions = DatabaseManager::instance().transactionDAO()->getAll();
+                int txIdToDelete = -1;
+                double txAmount = 0;
+                int txCategoryId = 0;
+                
+                for (const Transaction* t : transactions) {
+                    if (t->getTitle().startsWith(QString("[Auto-Bill ID:%1]").arg(id))) {
+                        txIdToDelete = t->getId();
+                        txAmount = t->getAmount();
+                        txCategoryId = t->getCategoryId();
+                        break;
+                    }
+                }
+                
+                if (txIdToDelete != -1) {
+                    DatabaseManager::instance().budgetDAO()->addExpenseToBudget(txCategoryId, -txAmount);
+                    DatabaseManager::instance().transactionDAO()->remove(txIdToDelete);
+                }
+            }
+            
             DatabaseManager::instance().triggerDataChanged();
             loadBills();
             return;
