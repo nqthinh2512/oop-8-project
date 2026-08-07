@@ -210,6 +210,7 @@ Rectangle {
                     startDate: modelData.startDateText
                     endDate: modelData.endDateText
                     periodVal: modelData.period
+                    isOverBudget: modelData.isOverBudget
 
                     onEditClicked: {
                         budgetDialogContent.openForEdit(modelData)

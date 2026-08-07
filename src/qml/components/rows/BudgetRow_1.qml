@@ -16,6 +16,7 @@ Rectangle {
     property string startDate: "31/12/2012"
     property string endDate: "31/12/2013"
     property int periodVal: DateCycle_1.Period.Period_yearly
+    property bool isOverBudget: false
 
     signal editClicked()
     signal deleteClicked()
@@ -97,6 +98,7 @@ Rectangle {
                 limitText: budgetRow.limitText
                 progressFraction: budgetRow.progressFraction
                 subText: budgetRow.progressSubText
+                progressColor: budgetRow.isOverBudget ? AppTheme.danger : AppTheme.primary
             }
         }
 

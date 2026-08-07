@@ -47,6 +47,7 @@ public:
     void setSearchKeyword(const QString& keyword);
 
     Q_INVOKABLE void loadBills();
+    Q_INVOKABLE QVariantList getAllBills() const;
     Q_INVOKABLE void addBill(const QString& title, double amount, const QString& dateStr, int categoryId);
     Q_INVOKABLE void updateBill(int id, const QString& title, double amount, const QString& dateStr, int categoryId);
     Q_INVOKABLE void deleteBill(int id);
