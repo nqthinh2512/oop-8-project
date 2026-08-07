@@ -97,13 +97,7 @@ Item {
         transactionCategoryId = 0;
         dropdown_3.selectedIndex = -1;
         dropdown_3.selectedText = "Select Category";
-        
-        linkedBillId = -1;
         linkedSavingId = -1;
-        if (typeof dropdown_bill !== "undefined" && dropdown_bill) {
-            dropdown_bill.selectedIndex = -1;
-            dropdown_bill.selectedText = "Select Bill to Pay";
-        }
         if (typeof dropdown_saving !== "undefined" && dropdown_saving) {
             dropdown_saving.selectedIndex = -1;
             dropdown_saving.selectedText = "Select Saving to Add";
@@ -482,59 +476,11 @@ Item {
             height: 74
             width: 500
             color: "transparent"
-            visible: root.transactionTypeIndex !== -1 && !root.isEditMode // Only show on Add, to keep it simple, or allow edit? Let's allow edit if we want full hub, but keep it simple for now. Actually, if we allow edit, it's very complex. Let's just allow linking on creation for now, or allow edit but with caution. Let's show it always.
-            
-            // Link to Bill (Expense only)
-            Rectangle {
-                x: 20
-                height: 66
-                width: 225
-                color: "transparent"
-                visible: root.transactionTypeIndex === 1 // Expense
-                z: 1
-
-                Text {
-                    height: 32
-                    width: 226
-                    color: "#878787"
-                    font.family: "Intel One Mono"
-                    font.pixelSize: 20
-                    font.weight: Font.DemiBold
-                    text: "Link to Bill"
-                    verticalAlignment: Text.AlignTop
-                }
-
-                Dropdown_1 {
-                    id: dropdown_bill
-                    y: 32
-                    height: 34
-                    width: 225
-                    
-                    property var unpaidBills: {
-                        if (!root.allBills) return [];
-                        return root.allBills.filter(function(b) { return !b.paid; })
-                    }
-                    model: ["None"].concat(unpaidBills.map(function(b) { return b.name; }))
-                    selectedText: "Select Bill to Pay"
-                    
-                    onSelected: function(index, value) {
-                        if (index === 0) {
-                            root.linkedBillId = -1;
-                        } else if (index > 0 && index <= unpaidBills.length) {
-                            root.linkedBillId = unpaidBills[index-1].id;
-                            // Auto-fill amount and title
-                            root.transactionAmount = unpaidBills[index-1].amount.toString();
-                            root.transactionTitle = unpaidBills[index-1].name;
-                            root.transactionCategoryId = unpaidBills[index-1].categoryId;
-                            root.setCategoryName(categoriesController.getCategoryName(unpaidBills[index-1].categoryId));
-                        }
-                    }
-                }
-            }
+            visible: root.transactionTypeIndex !== -1 && !root.isEditMode
             
             // Link to Saving
             Rectangle {
-                x: 255
+                x: 20
                 height: 66
                 width: 225
                 color: "transparent"
