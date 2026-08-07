@@ -154,6 +154,21 @@ void BillsController::setSearchKeyword(const QString& keyword) {
     }
 }
 
+QVariantList BillsController::getAllBills() const
+{
+    QVariantList list;
+    for (const Bill& b : m_allBills) {
+        QVariantMap map;
+        map["id"] = b.getId();
+        map["name"] = b.getName();
+        map["amount"] = b.getAmount();
+        map["categoryId"] = b.getCategoryId();
+        map["paid"] = b.checkPaid();
+        list.append(map);
+    }
+    return list;
+}
+
 void BillsController::addBill(const QString& title, double amount, const QString& dateStr, int categoryId)
 {
     QDate date = QDate::fromString(dateStr, "dd/MM/yyyy");
@@ -181,12 +196,57 @@ void BillsController::updateBill(int id, const QString& title, double amount, co
 
     Bill b(id, title, amount, date, categoryId, currentIsPaid);
     DatabaseManager::instance().billDAO()->update(id, b);
+    
+    if (currentIsPaid) {
+        // Find the linked transaction and update its amount
+        const auto& transactions = DatabaseManager::instance().transactionDAO()->getAll();
+        for (const Transaction* t : transactions) {
+            if (t->getLinkedBillId() == id) {
+                double oldAmount = t->getAmount();
+                int txId = t->getId();
+                
+                // Reverse old budget deduction
+                DatabaseManager::instance().budgetDAO()->addExpenseToBudget(t->getCategoryId(), -oldAmount);
+                
+                // Update transaction
+                Transaction* newTx = TransactionFactory::createTransaction(
+                    1, txId, t->getTitle(), amount, t->getDateTime(), t->getMethod(), categoryId, id, -1
+                );
+                DatabaseManager::instance().transactionDAO()->update(txId, newTx);
+                
+                // Apply new budget deduction
+                DatabaseManager::instance().budgetDAO()->addExpenseToBudget(categoryId, amount);
+                break;
+            }
+        }
+    }
+    
     DatabaseManager::instance().triggerDataChanged();
     loadBills();
 }
 
 void BillsController::deleteBill(int id)
 {
+    // Check if it's paid to clean up the linked transaction
+    bool currentIsPaid = false;
+    for (const Bill& existingBill : m_allBills) {
+        if (existingBill.getId() == id) {
+            currentIsPaid = existingBill.checkPaid();
+            break;
+        }
+    }
+    
+    if (currentIsPaid) {
+        const auto& transactions = DatabaseManager::instance().transactionDAO()->getAll();
+        for (const Transaction* t : transactions) {
+            if (t->getLinkedBillId() == id) {
+                DatabaseManager::instance().budgetDAO()->addExpenseToBudget(t->getCategoryId(), -t->getAmount());
+                DatabaseManager::instance().transactionDAO()->remove(t->getId());
+                break;
+            }
+        }
+    }
+
     DatabaseManager::instance().billDAO()->remove(id);
     DatabaseManager::instance().triggerDataChanged();
     loadBills();
@@ -200,12 +260,12 @@ void BillsController::togglePaidStatus(int id)
             Bill updatedBill(existingBill.getId(), existingBill.getName(), existingBill.getAmount(), existingBill.getDueDate(), existingBill.getCategoryId(), newStatus);
             DatabaseManager::instance().billDAO()->update(id, updatedBill);
             
-            QString autoTitle = QString("[Auto-Bill ID:%1] %2").arg(id).arg(existingBill.getName());
+            QString autoTitle = existingBill.getName(); // Clean title without ugly prefix
             
             if (newStatus) {
                 // Bill marked as Paid -> Create an Expense Transaction (typeIndex = 1)
                 Transaction* newTx = TransactionFactory::createTransaction(
-                    1, 0, autoTitle, existingBill.getAmount(), QDateTime::currentDateTime(), "Bill Payment", existingBill.getCategoryId()
+                    1, 0, autoTitle, existingBill.getAmount(), QDateTime::currentDateTime(), "Bill Payment", existingBill.getCategoryId(), existingBill.getId(), -1
                 );
                 DatabaseManager::instance().transactionDAO()->add(newTx);
                 DatabaseManager::instance().budgetDAO()->addExpenseToBudget(existingBill.getCategoryId(), existingBill.getAmount());
@@ -217,7 +277,7 @@ void BillsController::togglePaidStatus(int id)
                 int txCategoryId = 0;
                 
                 for (const Transaction* t : transactions) {
-                    if (t->getTitle().startsWith(QString("[Auto-Bill ID:%1]").arg(id))) {
+                    if (t->getLinkedBillId() == id) { // Robust linking
                         txIdToDelete = t->getId();
                         txAmount = t->getAmount();
                         txCategoryId = t->getCategoryId();

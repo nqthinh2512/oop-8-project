@@ -98,11 +98,18 @@ void TransactionDAO::loadFromCSV() {
                 if (!dt.isValid()) dt = QDateTime::currentDateTime();
                 QString method = fields[5];
                 int catId = fields[6].toInt();
+                
+                int linkedBillId = -1;
+                int linkedSavingId = -1;
+                if (fields.size() >= 9) {
+                    linkedBillId = fields[7].toInt();
+                    linkedSavingId = fields[8].toInt();
+                }
 
                 if (type == "Income") {
-                    m_transactions.append(new Income(id, title, amount, dt, method, catId));
+                    m_transactions.append(new Income(id, title, amount, dt, method, catId, linkedBillId, linkedSavingId));
                 } else {
-                    m_transactions.append(new Expense(id, title, amount, dt, method, catId));
+                    m_transactions.append(new Expense(id, title, amount, dt, method, catId, linkedBillId, linkedSavingId));
                 }
             }
         }
@@ -137,7 +144,7 @@ void TransactionDAO::saveToCSV() const {
     }
 
     QTextStream out(&file);
-    out << "type,id,title,amount,dateTime,method,categoryId\n";
+    out << "type,id,title,amount,dateTime,method,categoryId,linkedBillId,linkedSavingId\n";
 
     for (const Transaction* t : m_transactions) {
         if (!t) continue;
@@ -148,7 +155,9 @@ void TransactionDAO::saveToCSV() const {
             << QString::number(t->getAmount(), 'f', 2) << ","
             << t->getDateTime().toString(Qt::ISODate) << ","
             << t->getMethod() << ","
-            << t->getCategoryId() << "\n";
+            << t->getCategoryId() << ","
+            << t->getLinkedBillId() << ","
+            << t->getLinkedSavingId() << "\n";
     }
     file.close();
 }

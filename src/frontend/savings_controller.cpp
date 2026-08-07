@@ -219,9 +219,9 @@ bool SavingsController::addSaving(const QString &name, int priority, int categor
         const auto& allSavings = DatabaseManager::instance().savingDAO()->getAll();
         int newId = allSavings.isEmpty() ? 0 : allSavings.last().getId();
         
-        QString autoTitle = QString("[Auto-Saving ID:%1] Deposit to %2").arg(newId).arg(name);
+        QString autoTitle = "Deposit to " + name; // Clean title
         Transaction* newTx = TransactionFactory::createTransaction(
-            1, 0, autoTitle, current, QDateTime::currentDateTime(), "Saving Deposit", catId
+            1, 0, autoTitle, current, QDateTime::currentDateTime(), "Saving Deposit", catId, -1, newId
         );
         DatabaseManager::instance().transactionDAO()->add(newTx);
         DatabaseManager::instance().budgetDAO()->addExpenseToBudget(catId, current);
@@ -258,10 +258,10 @@ bool SavingsController::updateSaving(int id, const QString &name, int priority, 
             success = DatabaseManager::instance().savingDAO()->update(id, updatedS);
             
             if (success && delta != 0) {
-                QString autoTitle = QString("[Auto-Saving ID:%1] %2 %3").arg(id).arg(delta > 0 ? "Deposit to" : "Withdraw from").arg(name);
+                QString autoTitle = QString("%1 %2").arg(delta > 0 ? "Deposit to" : "Withdraw from").arg(name);
                 int typeIndex = (delta > 0) ? 1 : 0; // 1 = Expense (Deposit to saving), 0 = Income (Withdraw from saving)
                 Transaction* newTx = TransactionFactory::createTransaction(
-                    typeIndex, 0, autoTitle, std::abs(delta), QDateTime::currentDateTime(), "Saving Transfer", updatedS.getCategoryId()
+                    typeIndex, 0, autoTitle, std::abs(delta), QDateTime::currentDateTime(), "Saving Transfer", updatedS.getCategoryId(), -1, id
                 );
                 DatabaseManager::instance().transactionDAO()->add(newTx);
                 
@@ -277,6 +277,7 @@ bool SavingsController::updateSaving(int id, const QString &name, int priority, 
     }
 
     if (success) {
+        DatabaseManager::instance().triggerDataChanged();
         refresh();
     }
     return success;
@@ -284,8 +285,31 @@ bool SavingsController::updateSaving(int id, const QString &name, int priority, 
 
 bool SavingsController::removeSaving(int id)
 {
+    // Fix Bug 3: Refund money to net balance if deleting a saving with current > 0
+    double amountToRefund = 0;
+    QString savingName = "";
+    int savingCatId = 0;
+    
+    for (const Saving& s : DatabaseManager::instance().savingDAO()->getAll()) {
+        if (s.getId() == id) {
+            amountToRefund = s.getCurrent();
+            savingName = s.getName();
+            savingCatId = s.getCategoryId();
+            break;
+        }
+    }
+    
     bool success = DatabaseManager::instance().savingDAO()->remove(id);
     if (success) {
+        if (amountToRefund > 0) {
+            // Refund the money by creating an Income transaction (typeIndex = 0)
+            QString refundTitle = "Refund from " + savingName;
+            Transaction* refundTx = TransactionFactory::createTransaction(
+                0, 0, refundTitle, amountToRefund, QDateTime::currentDateTime(), "Saving Refund", savingCatId, -1, -1 // -1 because the saving is deleted
+            );
+            DatabaseManager::instance().transactionDAO()->add(refundTx);
+        }
+        
         DatabaseManager::instance().triggerDataChanged();
         refresh();
     }

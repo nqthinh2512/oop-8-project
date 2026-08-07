@@ -24,6 +24,12 @@ Item {
     property alias transactionTypeText: dropdown_1.selectedText
     property alias dateField: date_Input_Field
     property bool isValidating: false
+    
+    property var allBills: []
+    
+    // Hub Architecture Properties
+    property int linkedBillId: -1
+    property int linkedSavingId: -1
 
     function setDateStr(dateStr) {
         var parts = dateStr.split("/");
@@ -61,10 +67,20 @@ Item {
         transactionMethod = method;
         if (typeof textField !== "undefined" && textField) textField.text = title;
         if (typeof supporting_text !== "undefined" && supporting_text) supporting_text.text = amount;
-        if (typeof supporting_text_1 !== "undefined" && supporting_text_1) supporting_text_1.text = method;
+        
+        if (typeof dropdown_method !== "undefined" && dropdown_method) {
+            dropdown_method.selectedText = method;
+            var methods = ["Cash", "Bank Transfer", "Credit Card", "Bill Payment", "Saving Payment", "Budget", "Other"];
+            dropdown_method.selectedIndex = methods.indexOf(method);
+        }
     }
 
-    function open() { visible = true }
+    function open() {
+        if (typeof billsController !== "undefined" && billsController) {
+            allBills = billsController.getAllBills();
+        }
+        visible = true 
+    }
     function close() { visible = false }
 
     function reset() {
@@ -81,16 +97,30 @@ Item {
         transactionCategoryId = 0;
         dropdown_3.selectedIndex = -1;
         dropdown_3.selectedText = "Select Category";
+        
+        linkedBillId = -1;
+        linkedSavingId = -1;
+        if (typeof dropdown_bill !== "undefined" && dropdown_bill) {
+            dropdown_bill.selectedIndex = -1;
+            dropdown_bill.selectedText = "Select Bill to Pay";
+        }
+        if (typeof dropdown_saving !== "undefined" && dropdown_saving) {
+            dropdown_saving.selectedIndex = -1;
+            dropdown_saving.selectedText = "Select Saving to Add";
+        }
 
         if (typeof textField !== "undefined" && textField) textField.text = "";
         if (typeof supporting_text !== "undefined" && supporting_text) supporting_text.text = "";
-        if (typeof supporting_text_1 !== "undefined" && supporting_text_1) supporting_text_1.text = "";
+        if (typeof dropdown_method !== "undefined" && dropdown_method) {
+            dropdown_method.selectedIndex = -1;
+            dropdown_method.selectedText = "Select Method";
+        }
     }
 
     // Dimmed background overlay
     Rectangle {
         anchors.fill: parent
-        color: "#66000000"
+        color: "#CC000000" // 80% opacity for darker background
 
         MouseArea {
             anchors.fill: parent
@@ -106,7 +136,7 @@ Item {
         id: transactionDialog
         anchors.centerIn: parent
 
-        height: 493
+        height: 580
         width: 500
 
         color: AppTheme.bgCard
@@ -175,10 +205,10 @@ Item {
                 y: 32
                 height: 42
                 width: 460
-                color: "#e9e9e9"
-                radius: 10
-                border.color: (root.isValidating && root.transactionTitle.trim() === "") ? "red" : "transparent"
-                border.width: (root.isValidating && root.transactionTitle.trim() === "") ? 1 : 0
+                color: AppTheme.bgInput
+                radius: 8
+                border.color: (root.isValidating && root.transactionTitle.trim() === "") ? AppTheme.danger : AppTheme.border
+                border.width: 1
 
                 TextInput {
                     id: textField
@@ -344,10 +374,17 @@ Item {
                     y: 32
                     height: 34
                     width: 225
-                    color: "#e9e9e9"
-                    radius: 10
-                    border.color: (root.isValidating && root.transactionAmount.trim() === "") ? "red" : "transparent"
-                    border.width: (root.isValidating && root.transactionAmount.trim() === "") ? 1 : 0
+                    color: AppTheme.bgInput
+                    radius: 8
+                    
+                    property bool isAmountInvalid: {
+                        if (!root.isValidating) return false;
+                        if (root.transactionAmount.trim() === "") return true;
+                        var val = parseFloat(root.transactionAmount.replace(/,/g, "")) || 0;
+                        return val === 0 || val % 1000 !== 0;
+                    }
+                    border.color: isAmountInvalid ? AppTheme.danger : AppTheme.border
+                    border.width: 1
 
                     TextInput {
                         id: supporting_text
@@ -386,6 +423,16 @@ Item {
                         }
                     }
                 }
+                
+                Text {
+                    anchors.top: inputBox_1.bottom
+                    anchors.topMargin: 2
+                    anchors.right: inputBox_1.right
+                    text: "Must be multiple of 1,000"
+                    color: AppTheme.danger
+                    font.pixelSize: 10
+                    visible: inputBox_1.isAmountInvalid && root.transactionAmount.trim() !== ""
+                }
             }
 
             // Method Input
@@ -414,38 +461,117 @@ Item {
                     wrapMode: Text.Wrap
                 }
 
-                Rectangle {
-                    id: inputBox_2
+                Dropdown_1 {
+                    id: dropdown_method
                     y: 32
                     height: 34
                     width: 225
-                    color: "#e9e9e9"
-                    radius: 10
-                    border.color: (root.isValidating && root.transactionMethod.trim() === "") ? "red" : "transparent"
-                    border.width: (root.isValidating && root.transactionMethod.trim() === "") ? 1 : 0
+                    model: ["Cash", "Bank Transfer", "Credit Card", "Bill Payment", "Saving Payment", "Budget", "Other"]
+                    selectedText: root.transactionMethod === "" ? "Select Method" : root.transactionMethod
+                    onSelected: function(index, value) {
+                        root.transactionMethod = value;
+                    }
+                }
+            }
+        }
 
-                    TextInput {
-                        id: supporting_text_1
-                        anchors.fill: parent
-                        anchors.leftMargin: 15
-                        anchors.rightMargin: 15
-                        verticalAlignment: Text.AlignVCenter
-                        color: AppTheme.textMain
-                        font.family: "Roboto"
-                        font.pixelSize: 16
-                        font.weight: Font.Normal
-                        clip: true
-                        selectByMouse: true
-                        text: root.transactionMethod
-                        onTextChanged: root.transactionMethod = text
+        // 3.5 Link To Row (Hub Architecture)
+        Rectangle {
+            id: linkRowContainer
+            y: 330
+            height: 74
+            width: 500
+            color: "transparent"
+            visible: root.transactionTypeIndex !== -1 && !root.isEditMode // Only show on Add, to keep it simple, or allow edit? Let's allow edit if we want full hub, but keep it simple for now. Actually, if we allow edit, it's very complex. Let's just allow linking on creation for now, or allow edit but with caution. Let's show it always.
+            
+            // Link to Bill (Expense only)
+            Rectangle {
+                x: 20
+                height: 66
+                width: 225
+                color: "transparent"
+                visible: root.transactionTypeIndex === 1 // Expense
+                z: 1
 
-                        Text {
-                            text: "input text"
-                            color: "#8049454f"
-                            font: parent.font
-                            visible: !parent.text && !parent.activeFocus
-                            anchors.fill: parent
-                            verticalAlignment: Text.AlignVCenter
+                Text {
+                    height: 32
+                    width: 226
+                    color: "#878787"
+                    font.family: "Intel One Mono"
+                    font.pixelSize: 20
+                    font.weight: Font.DemiBold
+                    text: "Link to Bill"
+                    verticalAlignment: Text.AlignTop
+                }
+
+                Dropdown_1 {
+                    id: dropdown_bill
+                    y: 32
+                    height: 34
+                    width: 225
+                    
+                    property var unpaidBills: {
+                        if (!root.allBills) return [];
+                        return root.allBills.filter(function(b) { return !b.paid; })
+                    }
+                    model: ["None"].concat(unpaidBills.map(function(b) { return b.name; }))
+                    selectedText: "Select Bill to Pay"
+                    
+                    onSelected: function(index, value) {
+                        if (index === 0) {
+                            root.linkedBillId = -1;
+                        } else if (index > 0 && index <= unpaidBills.length) {
+                            root.linkedBillId = unpaidBills[index-1].id;
+                            // Auto-fill amount and title
+                            root.transactionAmount = unpaidBills[index-1].amount.toString();
+                            root.transactionTitle = unpaidBills[index-1].name;
+                            root.transactionCategoryId = unpaidBills[index-1].categoryId;
+                            root.setCategoryName(categoriesController.getCategoryName(unpaidBills[index-1].categoryId));
+                        }
+                    }
+                }
+            }
+            
+            // Link to Saving
+            Rectangle {
+                x: 255
+                height: 66
+                width: 225
+                color: "transparent"
+                visible: root.transactionTypeIndex !== -1
+                z: 1
+
+                Text {
+                    height: 32
+                    width: 226
+                    color: "#878787"
+                    font.family: "Intel One Mono"
+                    font.pixelSize: 20
+                    font.weight: Font.DemiBold
+                    text: "Link to Saving"
+                    verticalAlignment: Text.AlignTop
+                }
+
+                Dropdown_1 {
+                    id: dropdown_saving
+                    y: 32
+                    height: 34
+                    width: 225
+                    
+                    property var allSavings: savingsController.savingsList
+                    property var activeSavings: {
+                        if (!allSavings) return [];
+                        return allSavings;
+                    }
+                    model: ["None"].concat(activeSavings.map(function(s) { return s.name; }))
+                    selectedText: "Select Saving to Add"
+                    
+                    onSelected: function(index, value) {
+                        if (index === 0) {
+                            root.linkedSavingId = -1;
+                        } else if (index > 0 && index <= activeSavings.length) {
+                            root.linkedSavingId = activeSavings[index-1].id;
+                            root.transactionTitle = (root.transactionTypeIndex === 1 ? "Deposit to " : "Withdraw from ") + activeSavings[index-1].name;
                         }
                     }
                 }
@@ -455,7 +581,7 @@ Item {
         // 4. Transaction Date Field
         Rectangle {
             id: dueDate
-            y: 341
+            y: 421
             height: 74
             width: 500
             color: "transparent"
@@ -492,7 +618,7 @@ Item {
         ColorImage {
         color: AppTheme.textMain
             id: choice
-            y: 440
+            y: 520
             source: Qt.resolvedUrl("../../assets/choice_5.png")
 
             UniversalButton_1 {
@@ -529,7 +655,17 @@ Item {
                     cursorShape: Qt.PointingHandCursor
                     onClicked: {
                         root.isValidating = true
-                        if (root.transactionTitle.trim() === "" || root.transactionAmount.trim() === "" || root.transactionMethod.trim() === "" || root.dateField.selectedDate.trim() === "" || root.transactionCategoryId === 0 || root.transactionTypeIndex === -1) {
+                        
+                        var amtVal = parseFloat(root.transactionAmount.replace(/,/g, "")) || 0;
+                        
+                        if (root.transactionTitle.trim() === "" || 
+                            root.transactionAmount.trim() === "" || 
+                            amtVal === 0 || 
+                            amtVal % 1000 !== 0 ||
+                            root.transactionMethod.trim() === "" || 
+                            root.dateField.selectedDate.trim() === "" || 
+                            root.transactionCategoryId === 0 || 
+                            root.transactionTypeIndex === -1) {
                             return
                         }
                         root.accepted()

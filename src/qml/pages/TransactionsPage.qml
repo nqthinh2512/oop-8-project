@@ -341,7 +341,9 @@ Rectangle {
                     parseFloat(transactionAmount.replace(/,/g, '')) || 0.0,
                     dateStr, 
                     transactionDialog.transactionCategoryId,
-                    transactionMethod
+                    transactionMethod,
+                    transactionDialog.linkedBillId,
+                    transactionDialog.linkedSavingId
                 )
             } else {
                 transactionsController.addTransaction(
@@ -350,7 +352,9 @@ Rectangle {
                     parseFloat(transactionAmount.replace(/,/g, '')) || 0.0,
                     dateStr, 
                     transactionDialog.transactionCategoryId,
-                    transactionMethod
+                    transactionMethod,
+                    transactionDialog.linkedBillId,
+                    transactionDialog.linkedSavingId
                 )
             }
         }

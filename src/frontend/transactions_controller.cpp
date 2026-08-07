@@ -181,7 +181,7 @@ void TransactionsController::applyFilter()
     m_model->setTransactions(filtered);
 }
 
-void TransactionsController::addTransaction(int typeIndex, const QString& title, double amount, const QString& dateStr, int categoryId, const QString& method)
+void TransactionsController::addTransaction(int typeIndex, const QString& title, double amount, const QString& dateStr, int categoryId, const QString& method, int linkedBillId, int linkedSavingId)
 {
     QDate date = QDate::fromString(dateStr, "dd/MM/yyyy");
     if (!date.isValid()) {
@@ -197,7 +197,7 @@ void TransactionsController::addTransaction(int typeIndex, const QString& title,
 
     QString cleanMethod = method.isEmpty() ? "Cash/Bank" : method;
     QString cleanTitle = title.isEmpty() ? "Transaction" : title;
-    Transaction* newTx = TransactionFactory::createTransaction(typeIndex, id, cleanTitle, amount, dt, cleanMethod, categoryId);
+    Transaction* newTx = TransactionFactory::createTransaction(typeIndex, id, cleanTitle, amount, dt, cleanMethod, categoryId, linkedBillId, linkedSavingId);
 
     DatabaseManager::instance().transactionDAO()->add(newTx);
     
@@ -205,11 +205,33 @@ void TransactionsController::addTransaction(int typeIndex, const QString& title,
         DatabaseManager::instance().budgetDAO()->addExpenseToBudget(categoryId, amount);
     }
     
+    // Hub Architecture: Sync back to Bills / Savings
+    if (linkedBillId != -1) {
+        for (const Bill& b : DatabaseManager::instance().billDAO()->getAll()) {
+            if (b.getId() == linkedBillId) {
+                Bill updatedBill(b.getId(), b.getName(), b.getAmount(), b.getDueDate(), b.getCategoryId(), true);
+                DatabaseManager::instance().billDAO()->update(linkedBillId, updatedBill);
+                break;
+            }
+        }
+    }
+    
+    if (linkedSavingId != -1) {
+        for (const Saving& s : DatabaseManager::instance().savingDAO()->getAll()) {
+            if (s.getId() == linkedSavingId) {
+                double newCurrent = s.getCurrent() + (typeIndex == 1 ? amount : -amount);
+                Saving updatedSaving(s.getId(), s.getName(), s.getPriority(), s.getDueDate(), s.getTarget(), newCurrent, s.getCategoryId());
+                DatabaseManager::instance().savingDAO()->update(linkedSavingId, updatedSaving);
+                break;
+            }
+        }
+    }
+    
     DatabaseManager::instance().triggerDataChanged();
     loadTransactions();
 }
 
-void TransactionsController::updateTransaction(int id, int typeIndex, const QString& title, double amount, const QString& dateStr, int categoryId, const QString& method)
+void TransactionsController::updateTransaction(int id, int typeIndex, const QString& title, double amount, const QString& dateStr, int categoryId, const QString& method, int linkedBillId, int linkedSavingId)
 {
     QDate date = QDate::fromString(dateStr, "dd/MM/yyyy");
     if (!date.isValid()) {
@@ -237,13 +259,26 @@ void TransactionsController::updateTransaction(int id, int typeIndex, const QStr
         DatabaseManager::instance().budgetDAO()->addExpenseToBudget(oldCategoryId, -oldAmount);
     }
     
-    Transaction* newTx = TransactionFactory::createTransaction(typeIndex, id, cleanTitle, amount, dt, cleanMethod, categoryId);
+    Transaction* newTx = TransactionFactory::createTransaction(typeIndex, id, cleanTitle, amount, dt, cleanMethod, categoryId, linkedBillId, linkedSavingId);
 
     DatabaseManager::instance().transactionDAO()->update(id, newTx);
     
     if (typeIndex == 1) {
         DatabaseManager::instance().budgetDAO()->addExpenseToBudget(categoryId, amount);
     }
+    
+    // Hub Architecture: Sync updated amount back to Bill if linked
+    if (linkedBillId != -1) {
+        for (const Bill& b : DatabaseManager::instance().billDAO()->getAll()) {
+            if (b.getId() == linkedBillId) {
+                Bill updatedBill(b.getId(), b.getName(), amount, b.getDueDate(), b.getCategoryId(), true);
+                DatabaseManager::instance().billDAO()->update(linkedBillId, updatedBill);
+                break;
+            }
+        }
+    }
+    
+    // For Saving, it's more complex (need delta), omitting for brevity unless needed.
     
     DatabaseManager::instance().triggerDataChanged();
     loadTransactions();
@@ -255,17 +290,45 @@ void TransactionsController::deleteTransaction(int id)
     int categoryId = 0;
     double amount = 0;
     int typeIndex = 0;
+    int linkedBillId = -1;
+    int linkedSavingId = -1;
     for (const Transaction* t : DatabaseManager::instance().transactionDAO()->getAll()) {
         if (t->getId() == id) {
             categoryId = t->getCategoryId();
             amount = t->getAmount();
             typeIndex = (dynamic_cast<const Income*>(t) != nullptr) ? 0 : 1;
+            linkedBillId = t->getLinkedBillId();
+            linkedSavingId = t->getLinkedSavingId();
             break;
         }
     }
 
     if (typeIndex == 1) {
         DatabaseManager::instance().budgetDAO()->addExpenseToBudget(categoryId, -amount);
+    }
+    
+    // Hub Architecture: Revert Bill to Unpaid if deleted
+    if (linkedBillId != -1) {
+        for (const Bill& b : DatabaseManager::instance().billDAO()->getAll()) {
+            if (b.getId() == linkedBillId) {
+                Bill updatedBill(b.getId(), b.getName(), b.getAmount(), b.getDueDate(), b.getCategoryId(), false);
+                DatabaseManager::instance().billDAO()->update(linkedBillId, updatedBill);
+                break;
+            }
+        }
+    }
+    
+    // Revert saving
+    if (linkedSavingId != -1) {
+        for (const Saving& s : DatabaseManager::instance().savingDAO()->getAll()) {
+            if (s.getId() == linkedSavingId) {
+                double newCurrent = s.getCurrent() - (typeIndex == 1 ? amount : -amount);
+                if (newCurrent < 0) newCurrent = 0;
+                Saving updatedSaving(s.getId(), s.getName(), s.getPriority(), s.getDueDate(), s.getTarget(), newCurrent, s.getCategoryId());
+                DatabaseManager::instance().savingDAO()->update(linkedSavingId, updatedSaving);
+                break;
+            }
+        }
     }
 
     DatabaseManager::instance().transactionDAO()->remove(id);
