@@ -28,8 +28,10 @@ Item {
     property var allBills: []
     
     // Hub Architecture Properties
+    property int targetModuleIndex: 0 // 0: None, 1: Budgets, 2: Savings
     property int linkedBillId: -1
     property int linkedSavingId: -1
+    property int linkedBudgetId: -1
 
     function setDateStr(dateStr) {
         var parts = dateStr.split("/");
@@ -97,10 +99,16 @@ Item {
         transactionCategoryId = 0;
         dropdown_3.selectedIndex = -1;
         dropdown_3.selectedText = "Select Category";
+        targetModuleIndex = 0;
         linkedSavingId = -1;
-        if (typeof dropdown_saving !== "undefined" && dropdown_saving) {
-            dropdown_saving.selectedIndex = -1;
-            dropdown_saving.selectedText = "Select Saving to Add";
+        linkedBudgetId = -1;
+        if (typeof dropdown_target_module !== "undefined" && dropdown_target_module) {
+            dropdown_target_module.selectedIndex = 0;
+            dropdown_target_module.selectedText = "None";
+        }
+        if (typeof dropdown_target_item !== "undefined" && dropdown_target_item) {
+            dropdown_target_item.selectedIndex = -1;
+            dropdown_target_item.selectedText = "Select Target";
         }
 
         if (typeof textField !== "undefined" && textField) textField.text = "";
@@ -469,7 +477,7 @@ Item {
             }
         }
 
-        // 3.5 Link To Row (Hub Architecture)
+        // 3.5 Link Target Page Row (Hub Architecture)
         Rectangle {
             id: linkRowContainer
             y: 330
@@ -477,15 +485,16 @@ Item {
             width: 500
             color: "transparent"
             visible: root.transactionTypeIndex !== -1 && !root.isEditMode
-            
-            // Link to Saving
+            z: 3
+
+            // 1st Dropdown: Target Page
             Rectangle {
+                id: targetPageBox
                 x: 20
                 height: 66
                 width: 225
                 color: "transparent"
-                visible: root.transactionTypeIndex !== -1
-                z: 1
+                z: 4
 
                 Text {
                     height: 32
@@ -494,30 +503,93 @@ Item {
                     font.family: "Intel One Mono"
                     font.pixelSize: 20
                     font.weight: Font.DemiBold
-                    text: "Link to Saving"
+                    text: "Target Page"
                     verticalAlignment: Text.AlignTop
                 }
 
                 Dropdown_1 {
-                    id: dropdown_saving
+                    id: dropdown_target_module
+                    y: 32
+                    height: 34
+                    width: 225
+                    model: ["None", "Budgets", "Savings"]
+                    selectedText: root.targetModuleIndex === 1 ? "Budgets" : root.targetModuleIndex === 2 ? "Savings" : "None"
+                    selectedIndex: root.targetModuleIndex
+                    
+                    onSelected: function(index, value) {
+                        root.targetModuleIndex = index;
+                        root.linkedBudgetId = -1;
+                        root.linkedSavingId = -1;
+                        if (typeof dropdown_target_item !== "undefined" && dropdown_target_item) {
+                            dropdown_target_item.selectedIndex = -1;
+                            dropdown_target_item.selectedText = (index === 1) ? "Select Budget" : (index === 2) ? "Select Saving Goal" : "Select Target";
+                        }
+                    }
+                }
+            }
+
+            // 2nd Dropdown: Target Item (Appears when Budgets or Savings is selected)
+            Rectangle {
+                id: targetItemBox
+                x: 255
+                height: 66
+                width: 225
+                color: "transparent"
+                visible: root.targetModuleIndex > 0
+                z: 4
+
+                Text {
+                    height: 32
+                    width: 226
+                    color: "#878787"
+                    font.family: "Intel One Mono"
+                    font.pixelSize: 20
+                    font.weight: Font.DemiBold
+                    text: root.targetModuleIndex === 1 ? "Select Budget" : "Select Saving Goal"
+                    verticalAlignment: Text.AlignTop
+                }
+
+                Dropdown_1 {
+                    id: dropdown_target_item
                     y: 32
                     height: 34
                     width: 225
                     
-                    property var allSavings: savingsController.savingsList
-                    property var activeSavings: {
-                        if (!allSavings) return [];
-                        return allSavings;
+                    property var bList: (typeof budgetsController !== "undefined" && budgetsController && budgetsController.budgetsList) ? budgetsController.budgetsList : []
+                    property var sList: (typeof savingsController !== "undefined" && savingsController && savingsController.savingsList) ? savingsController.savingsList : []
+                    
+                    model: {
+                        if (root.targetModuleIndex === 1) {
+                            return bList.map(function(b) { return b.name; });
+                        } else if (root.targetModuleIndex === 2) {
+                            return sList.map(function(s) { return s.name; });
+                        }
+                        return [];
                     }
-                    model: ["None"].concat(activeSavings.map(function(s) { return s.name; }))
-                    selectedText: "Select Saving to Add"
+                    
+                    selectedText: {
+                        if (root.targetModuleIndex === 1) return "Select Budget";
+                        if (root.targetModuleIndex === 2) return "Select Saving Goal";
+                        return "Select Target";
+                    }
                     
                     onSelected: function(index, value) {
-                        if (index === 0) {
-                            root.linkedSavingId = -1;
-                        } else if (index > 0 && index <= activeSavings.length) {
-                            root.linkedSavingId = activeSavings[index-1].id;
-                            root.transactionTitle = (root.transactionTypeIndex === 1 ? "Deposit to " : "Withdraw from ") + activeSavings[index-1].name;
+                        if (root.targetModuleIndex === 1) {
+                            if (index >= 0 && index < bList.length) {
+                                root.linkedBudgetId = bList[index].id;
+                                if (!root.transactionTitle) {
+                                    root.transactionTitle = "Expense for " + bList[index].name;
+                                    if (typeof textField !== "undefined" && textField) textField.text = root.transactionTitle;
+                                }
+                            }
+                        } else if (root.targetModuleIndex === 2) {
+                            if (index >= 0 && index < sList.length) {
+                                root.linkedSavingId = sList[index].id;
+                                if (!root.transactionTitle) {
+                                    root.transactionTitle = (root.transactionTypeIndex === 0 ? "Deposit to " : "Withdraw from ") + sList[index].name;
+                                    if (typeof textField !== "undefined" && textField) textField.text = root.transactionTitle;
+                                }
+                            }
                         }
                     }
                 }

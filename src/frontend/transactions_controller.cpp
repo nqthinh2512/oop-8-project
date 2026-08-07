@@ -181,7 +181,7 @@ void TransactionsController::applyFilter()
     m_model->setTransactions(filtered);
 }
 
-void TransactionsController::addTransaction(int typeIndex, const QString& title, double amount, const QString& dateStr, int categoryId, const QString& method, int linkedBillId, int linkedSavingId)
+void TransactionsController::addTransaction(int typeIndex, const QString& title, double amount, const QString& dateStr, int categoryId, const QString& method, int linkedBillId, int linkedSavingId, int linkedBudgetId)
 {
     QDate date = QDate::fromString(dateStr, "dd/MM/yyyy");
     if (!date.isValid()) {
@@ -201,11 +201,25 @@ void TransactionsController::addTransaction(int typeIndex, const QString& title,
 
     DatabaseManager::instance().transactionDAO()->add(newTx);
     
-    if (typeIndex == 1) { // 1 = Expense
+    // Hub Architecture: Sync back to Budgets / Bills / Savings
+    if (linkedBudgetId != -1) {
+        for (const Budget& b : DatabaseManager::instance().budgetDAO()->getAll()) {
+            if (b.getId() == linkedBudgetId) {
+                Budget updatedBudget = b;
+                if (typeIndex == 1) { // Expense
+                    updatedBudget.addExpense(amount);
+                } else { // Income
+                    double newSpent = std::max(0.0, b.getSpent() - amount);
+                    updatedBudget.setSpent(newSpent);
+                }
+                DatabaseManager::instance().budgetDAO()->update(linkedBudgetId, updatedBudget);
+                break;
+            }
+        }
+    } else if (typeIndex == 1) { // 1 = Expense default category sync
         DatabaseManager::instance().budgetDAO()->addExpenseToBudget(categoryId, amount);
     }
     
-    // Hub Architecture: Sync back to Bills / Savings
     if (linkedBillId != -1) {
         for (const Bill& b : DatabaseManager::instance().billDAO()->getAll()) {
             if (b.getId() == linkedBillId) {
@@ -219,7 +233,7 @@ void TransactionsController::addTransaction(int typeIndex, const QString& title,
     if (linkedSavingId != -1) {
         for (const Saving& s : DatabaseManager::instance().savingDAO()->getAll()) {
             if (s.getId() == linkedSavingId) {
-                double newCurrent = s.getCurrent() + (typeIndex == 1 ? amount : -amount);
+                double newCurrent = s.getCurrent() + amount;
                 Saving updatedSaving(s.getId(), s.getName(), s.getPriority(), s.getDueDate(), s.getTarget(), newCurrent, s.getCategoryId());
                 DatabaseManager::instance().savingDAO()->update(linkedSavingId, updatedSaving);
                 break;
@@ -231,7 +245,7 @@ void TransactionsController::addTransaction(int typeIndex, const QString& title,
     loadTransactions();
 }
 
-void TransactionsController::updateTransaction(int id, int typeIndex, const QString& title, double amount, const QString& dateStr, int categoryId, const QString& method, int linkedBillId, int linkedSavingId)
+void TransactionsController::updateTransaction(int id, int typeIndex, const QString& title, double amount, const QString& dateStr, int categoryId, const QString& method, int linkedBillId, int linkedSavingId, int linkedBudgetId)
 {
     QDate date = QDate::fromString(dateStr, "dd/MM/yyyy");
     if (!date.isValid()) {
@@ -263,7 +277,18 @@ void TransactionsController::updateTransaction(int id, int typeIndex, const QStr
 
     DatabaseManager::instance().transactionDAO()->update(id, newTx);
     
-    if (typeIndex == 1) {
+    if (linkedBudgetId != -1) {
+        for (const Budget& b : DatabaseManager::instance().budgetDAO()->getAll()) {
+            if (b.getId() == linkedBudgetId) {
+                Budget updatedBudget = b;
+                if (typeIndex == 1) {
+                    updatedBudget.addExpense(amount);
+                }
+                DatabaseManager::instance().budgetDAO()->update(linkedBudgetId, updatedBudget);
+                break;
+            }
+        }
+    } else if (typeIndex == 1) {
         DatabaseManager::instance().budgetDAO()->addExpenseToBudget(categoryId, amount);
     }
     
@@ -277,8 +302,6 @@ void TransactionsController::updateTransaction(int id, int typeIndex, const QStr
             }
         }
     }
-    
-    // For Saving, it's more complex (need delta), omitting for brevity unless needed.
     
     DatabaseManager::instance().triggerDataChanged();
     loadTransactions();

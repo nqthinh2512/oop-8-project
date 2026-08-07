@@ -343,7 +343,8 @@ Rectangle {
                     transactionDialog.transactionCategoryId,
                     transactionMethod,
                     transactionDialog.linkedBillId,
-                    transactionDialog.linkedSavingId
+                    transactionDialog.linkedSavingId,
+                    transactionDialog.linkedBudgetId
                 )
             } else {
                 transactionsController.addTransaction(
@@ -354,7 +355,8 @@ Rectangle {
                     transactionDialog.transactionCategoryId,
                     transactionMethod,
                     transactionDialog.linkedBillId,
-                    transactionDialog.linkedSavingId
+                    transactionDialog.linkedSavingId,
+                    transactionDialog.linkedBudgetId
                 )
             }
         }
