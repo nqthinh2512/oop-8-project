@@ -55,6 +55,7 @@ QVariantList BudgetsController::budgetsList() const
         m["startDateText"] = b.getStartDate().toString("dd/MM/yyyy");
         m["endDateText"] = b.getEndDate().toString("dd/MM/yyyy");
         m["isOverBudget"] = b.isOverBudget();
+        m["status"] = static_cast<int>(b.getStatus());
         // period (Weekly/Monthly/Yearly) chưa có field thật trong Budget backend,
         // tạm suy ra từ khoảng cách ngày. 0=Weekly, 1=Monthly, 2=Yearly.
         qint64 days = b.getStartDate().daysTo(b.getEndDate());

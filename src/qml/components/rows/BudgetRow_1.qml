@@ -16,7 +16,7 @@ Rectangle {
     property string startDate: "31/12/2012"
     property string endDate: "31/12/2013"
     property int periodVal: DateCycle_1.Period.Period_yearly
-    property bool isOverBudget: false
+    property int statusVal: 0
 
     signal editClicked()
     signal deleteClicked()
@@ -98,7 +98,13 @@ Rectangle {
                 limitText: budgetRow.limitText
                 progressFraction: budgetRow.progressFraction
                 subText: budgetRow.progressSubText
-                progressColor: budgetRow.isOverBudget ? AppTheme.danger : AppTheme.primary
+                progressColor: {
+                    if (budgetRow.statusVal === 0) return "#10b981"; // Safe - Green
+                    if (budgetRow.statusVal === 1) return "#eab308"; // Warning - Yellow
+                    if (budgetRow.statusVal === 2) return "#f97316"; // Danger - Orange
+                    if (budgetRow.statusVal === 3) return "#ef4444"; // Over - Red
+                    return "#3b82f6"; // Default Blue
+                }
             }
         }
 
