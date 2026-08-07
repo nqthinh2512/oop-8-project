@@ -1,41 +1,112 @@
-# 📊 Personal Finance Dashboard
+# 📊 FManagement - Personal Finance Dashboard
 
-* Tổng quan về cấu trúc của cái file này, mng nhớ đọc kĩ để hiểu cấu trúc và cái workflow nha
-* một vài hướng dẫn thêm tui có ghi vào docs: https://docs.google.com/document/d/1gSN3vh6dryw86OCvHgywqSVO04O7QHV6IxaESyr7VgY/edit?tab=t.zhbbnu9d614n
----
-
-* **Tầng GUI (Giao diện):** Chỉ lo việc hiển thị (Vẽ bảng, nút bấm, ô nhập dữ liệu). Không chứa thuật toán hay logic tính toán.
-* **Tầng Frontend (Điều khiển):** Bộ não trung gian. Lắng nghe sự kiện từ GUI (người dùng bấm nút), kiểm tra tính hợp lệ của dữ liệu, và gọi Backend để xử lý.
-* **Tầng Backend (Dữ liệu & File I/O):** Định nghĩa cấu trúc dữ liệu (`struct/class`) và chịu trách nhiệm lưu trữ, đọc/ghi dữ liệu ra file dữ liệu (CSV).
+**FManagement** is a cross-platform desktop personal finance management application developed using **C++17** and **Qt 6 (QML)**. The application allows users to track income and expenses, manage recurring monthly bills, set budget targets, accumulate savings goals, and analyze financial reports.
 
 ---
 
-## 📁 Chi Tiết Cấu Trúc Thư Mục & Mục Đích File
+## 🏗️ Software Architecture
+
+The system is structured into 3 distinct layers:
+
+1. **UI Layer (Presentation - `src/qml/`):**
+   * Built with Qt Quick / QML providing a modern, responsive user interface and a centralized theme system (`AppTheme.qml`).
+   * Contains 8 main view pages: `OverviewPage`, `TransactionsPage`, `BillsPage`, `BudgetsPage`, `SavingsPage`, `CategoriesPage`, `ReportsPage`, `SettingsPage`.
+   * **Principle:** The UI layer strictly handles visual rendering and user event capture without containing financial algorithms or calculations.
+
+2. **Controller Layer (Presentation Logic - `src/frontend/`):**
+   * C++ Controllers inheriting from `QObject` (`OverviewController`, `TransactionsController`, `BillsController`, `BudgetsController`, `SavingsController`, `CategoriesController`, `ReportsController`, `SettingsController`).
+   * Acts as a Mediator using Qt Signals & Slots to validate QML user input and invoke backend operations.
+
+3. **Data & Storage Layer (Backend - `src/backend/`):**
+   * **Models:** Pure C++ domain models (`Transaction`, `Income`, `Expense`, `Bill`, `Budget`, `Saving`, `Category`).
+   * **DAOs:** Data Access Objects managing local CSV file persistence (`TransactionDAO`, `BillDAO`, `BudgetDAO`, `SavingDAO`, `CategoryDAO`).
+   * **DatabaseManager:** Centralized memory cache manager and data coordinator.
+
+---
+
+## 📁 Directory Structure (`src/`)
 
 ```text
-📁 src/
-  ├── 📄 CMakeLists.txt              # File cấu hình biên dịch chính (Quản lý khai báo file)
-  ├── 📄 main.cpp                    # Điểm khởi chạy ứng dụng, nạp MainWindow
-  │
-  ├── 📁 gui/                        # TẦNG GIAO DIỆN (Chỉ chứa Layout C++)
-  │     ├── 📄 mainwindow.h/.cpp     # Khung xương chính: Chứa Sidebar điều hướng và bộ lật trang
-  │     ├── 📁 overview/             # Trang 1: Overview
-  │     ├── 📁 transactions/         # Trang 2: Lịch sử giao dịch
-  │     ├── 📁 bills/                # Trang 3: Quản lý hóa đơn
-  │     ├── 📁 categories/           # Trang 4: Quản lý danh mục
-  │     ├── 📁 budgets/              # Trang 5: Tiết kiệm & Ngân sách
-  │     └── 📁 reports/              # Trang 6: Báo cáo & Phân tích
-  │
-  ├── 📁 frontend/                   # TẦNG LOGIC ĐIỀU KHIỂN (Controllers)
-  │     # Chứa các file xử lý logic tương ứng cho từng trang để bắt sự kiện (Signals & Slots)
-  │     └── 📁 overview, transactions, bills, categories, budgets, reports/
-  │
-  └── 📁 backend/                    # TẦNG DỮ LIỆU THUẦN C++ (Không dính dáng tới đồ họa)
-        ├── 📁 models/               # Định nghĩa một vài cái class chung cho cả nhóm (mng tùy chỉnh vẫn được)
-        │     ├── 📄 transaction.h   # Cấu trúc một khoản thu nhập/chi tiêu
-        │     ├── 📄 bill.h          # Cấu trúc dữ liệu một hóa đơn
-        │     ├── 📄 category.h      # Cấu trúc dữ liệu một danh mục
-        │     └── 📄 budget.h        # Cấu trúc dữ liệu hạn mức ngân sách
+📁 oop-8-project/
+  └── 📁 src/                        # MAIN SOURCE CODE DIRECTORY
+        ├── 📄 CMakeLists.txt         # Main CMake build specification
+        ├── 📄 main.cpp               # C++ application entry point
         │
-        └── 📁 storage/              # Quản lý Đọc/Ghi dữ liệu
-              └── 📄 database_manager.h/.cpp # Đây sẽ là nơi xử lý dữ liệu và File I/O (CSV)
+        ├── 📁 backend/               # C++ BACKEND DATA LAYER
+        │     ├── 📁 models/          # Domain models (Income, Expense, Bill, Budget, Saving, Category)
+        │     ├── 📁 dao/             # IBaseDAO interface and implementations (TransactionDAO, etc.)
+        │     └── 📁 storage/         # DatabaseManager (Singleton & Facade)
+        │
+        ├── 📁 frontend/              # CONTROLLER LAYER
+        │     ├── 📄 overview_controller.h/.cpp
+        │     ├── 📄 transactions_controller.h/.cpp
+        │     ├── 📄 bills_controller.h/.cpp
+        │     ├── 📄 budgets_controller.h/.cpp
+        │     ├── 📄 savings_controller.h/.cpp
+        │     ├── 📄 categories_controller.h/.cpp
+        │     ├── 📄 reports_controller.h/.cpp
+        │     └── 📄 settings_controller.h/.cpp
+        │
+        ├── 📁 qml/                   # QML PRESENTATION LAYER
+        │     ├── 📄 Main.qml         # Root window container with Sidebar & PageStack
+        │     ├── 📄 core/            # System Theme (AppTheme.qml)
+        │     ├── 📄 pages/           # 8 main application view pages
+        │     ├── 📁 components/      # Reusable UI widgets, buttons, dropdowns, search bars
+        │     └── 📁 assets/          # Icons, logos, and visual assets
+        │
+        └── 📁 data/                  # CSV STORAGE DIRECTORY
+              ├── 📄 transactions.csv
+              ├── 📄 bills.csv
+              ├── 📄 budgets.csv
+              ├── 📄 savings.csv
+              └── 📄 categories.csv
+```
+
+---
+
+## 🛠️ Build & Execution Instructions
+
+### Prerequisites
+* **Qt 6.x** (Qt 6.5+ recommended with **Qt Quick** and **Qt Quick Controls** modules).
+* **CMake 3.16+**.
+* C++ compiler with **C++17** support (MSVC 2019+, GCC 10+, or Clang 12+).
+
+---
+
+### Step 1: Clone the GitHub Repository
+Clone the project repository to your local machine using Git:
+
+```bash
+# Clone the repository
+git clone https://github.com/nqthinh2512/oop-8-project.git
+
+# Navigate into the project directory
+cd oop-8-project
+```
+
+---
+
+### Step 2: Build & Run the Application
+
+#### Option A: Using Qt Creator (Recommended)
+1. Open **Qt Creator**.
+2. Select `File` $\rightarrow$ `Open File or Project...` and open `src/CMakeLists.txt`.
+3. Choose your configured Kit (e.g., `Desktop Qt 6.x.x MSVC2019 64bit` or `MinGW 64-bit`).
+4. Click **Build & Run** (`Ctrl + R`).
+
+#### Option B: Using Command Line (Terminal / PowerShell)
+```bash
+# 1. Navigate to the source directory
+cd src
+
+# 2. Create a build directory and configure CMake
+mkdir build
+cd build
+cmake .. -DCMAKE_BUILD_TYPE=Release
+
+# 3. Compile the project
+cmake --build .
+
+# 4. Run the compiled executable
+./appFinanceDashboard
+```
