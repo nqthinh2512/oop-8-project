@@ -1,35 +1,38 @@
 import QtQuick
-import QtQuick.Controls
-import QtQuick.Controls.impl
-import src
 import QtQuick.Layouts
+import src
 
 Item {
     id: sidebar_menu_app_name
 
-    implicitHeight: 30
-    implicitWidth: 60
+    implicitHeight: 60
+    implicitWidth: 260
 
     RowLayout {
         anchors.fill: parent
-        anchors.leftMargin: 8
-        spacing: 12
+        anchors.leftMargin: 24
+        spacing: 14
 
-        ColorImage {
-        color: AppTheme.textMain
-            id: ellipse_1
-            source: Qt.resolvedUrl("../../assets/ellipse_1.png")
-            fillMode: Image.PreserveAspectFit
-            Layout.alignment: Qt.AlignVCenter
+        // Blue circle logo
+        Rectangle {
+            id: appLogoCircle
+            Layout.preferredWidth: 36
+            Layout.preferredHeight: 36
+            radius: 18
+            color: AppTheme.primary // Modern blue or dark mode equivalent
         }
 
-        ColorImage {
-        color: AppTheme.textMain
-            id: fManagement
-            source: Qt.resolvedUrl("../../assets/fManagement.png")
-            fillMode: Image.PreserveAspectFit
-            Layout.alignment: Qt.AlignVCenter
+        // Crisp vector text
+        Text {
+            id: appNameText
+            text: "FManagement"
+            font.family: "Inter"
+            font.pixelSize: 26
+            font.weight: Font.ExtraBold
+            font.letterSpacing: -0.5
+            color: AppTheme.textMain // Dark modern slate or dark mode equivalent
             Layout.fillWidth: true
+            verticalAlignment: Text.AlignVCenter
         }
     }
 }

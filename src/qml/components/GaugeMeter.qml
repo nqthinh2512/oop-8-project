@@ -7,14 +7,14 @@ Item {
 
     property real currentValue: 12500
     property real maxValue: 20000
-    property color trackColor: "#e5e7eb"
+    property color trackColor: AppTheme.isDark ? "#334155" : "#e5e7eb"
     property color progressColor: "#0284c7"
-    property string minLabel: "$0"
-    property string currentLabel: "12K"
-    property string maxLabel: "$20k"
+    property string minLabel: "0%"
+    property string currentLabel: "50%"
+    property string maxLabel: "100%"
 
-    implicitWidth: 160
-    implicitHeight: 100
+    implicitWidth: 140
+    implicitHeight: 90
 
     Canvas {
         id: canvas
@@ -55,12 +55,17 @@ Item {
             var ctx = getContext("2d");
             ctx.reset();
 
-            var centerX = width / 2;
-            var centerY = height - 20;
-            var radius = Math.min(centerX - 10, centerY - 10);
-            var lineWidth = 12;
+            var w = width;
+            var h = height;
+            if (w <= 0 || h <= 0) return;
 
-            if (radius <= 0) return;
+            var bottomPadding = 20;
+            var centerX = w / 2;
+            var centerY = h - bottomPadding;
+            var radius = Math.min(centerX - 10, centerY - 10);
+            var lineWidth = Math.max(6, Math.min(12, radius * 0.2));
+
+            if (radius <= 5) return;
 
             // Background Arc (180deg to 0deg)
             ctx.beginPath();
@@ -88,17 +93,17 @@ Item {
         onHeightChanged: requestPaint()
     }
 
-    // Min label ($0)
+    // Min label (0%)
     Text {
         anchors.left: parent.left
         anchors.bottom: parent.bottom
         text: root.minLabel
         font.family: "Inter"
         font.pixelSize: 11
-        color: "#9ca3af"
+        color: AppTheme.textMuted
     }
 
-    // Current value label (12K)
+    // Current value label (50%)
     Text {
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.bottom: parent.bottom
@@ -109,14 +114,14 @@ Item {
         color: AppTheme.textMain
     }
 
-    // Max label ($20k)
+    // Max label (100%)
     Text {
         anchors.right: parent.right
         anchors.bottom: parent.bottom
         text: root.maxLabel
         font.family: "Inter"
         font.pixelSize: 11
-        color: "#9ca3af"
+        color: AppTheme.textMuted
     }
 
     Connections {

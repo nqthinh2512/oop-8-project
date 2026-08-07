@@ -121,7 +121,7 @@ Item {
                 x: 20
                 height: 64
                 width: 480
-                color: "#878787"
+                color: AppTheme.textSub
                 font.family: "Intel One Mono"
                 font.pixelSize: 16
                 font.weight: Font.DemiBold

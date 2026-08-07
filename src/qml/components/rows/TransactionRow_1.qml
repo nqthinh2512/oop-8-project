@@ -43,17 +43,17 @@ Rectangle {
             return {
                 label: "Income",
                 color: "#16a34a",
-                bg: "#dcfce7",
+                bg: AppTheme.isDark ? Qt.rgba(0.08, 0.64, 0.29, 0.2) : "#dcfce7",
                 arrow: "↙",
-                circleBg: "#dcfce7"
+                circleBg: AppTheme.isDark ? Qt.rgba(0.08, 0.64, 0.29, 0.25) : "#dcfce7"
             }
         }
         return {
             label: "Expense",
-            color: "#dc2626",
-            bg: "#fee2e2",
+            color: AppTheme.danger,
+            bg: AppTheme.isDark ? Qt.rgba(0.97, 0.44, 0.44, 0.2) : "#fee2e2",
             arrow: "↗",
-            circleBg: "#fee2e2"
+            circleBg: AppTheme.isDark ? Qt.rgba(0.97, 0.44, 0.44, 0.25) : "#fee2e2"
         }
     }
 
@@ -152,7 +152,7 @@ Rectangle {
             Text {
                 anchors.left: parent.left
                 anchors.verticalCenter: parent.verticalCenter
-                color: "#475569"
+                color: AppTheme.textSub
                 font.family: "Inter"
                 font.pixelSize: 14
                 font.weight: Font.Medium
@@ -172,7 +172,7 @@ Rectangle {
                 font.family: "Inter"
                 font.pixelSize: 14
                 font.weight: Font.Medium
-                color: "#1e293b"
+                color: AppTheme.textMain
                 text: transactionRow.methodText
                 elide: Text.ElideRight
             }
