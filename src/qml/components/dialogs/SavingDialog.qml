@@ -1,4 +1,5 @@
 import QtQuick
+import src
 import ".."
 
 Item {
@@ -102,7 +103,7 @@ Item {
         width: 500
         height: 510
         radius: 15
-        color: "#ffffff"
+        color: AppTheme.bgCard
         clip: true
         MouseArea { anchors.fill: parent } // block click-through
 
@@ -112,7 +113,7 @@ Item {
             anchors.top: parent.top
             width: parent.width
             height: 60
-            color: "#f8fafc"
+            color: AppTheme.bgApp
             radius: 15
             // square bottom corners
             Rectangle {
@@ -128,7 +129,7 @@ Item {
                 anchors.leftMargin: 20
                 anchors.verticalCenter: parent.verticalCenter
                 text: "Add Saving"
-                color: "#191919"
+                color: AppTheme.textMain
                 font.family: "Intel One Mono"
                 font.pixelSize: 22
                 font.weight: Font.DemiBold
@@ -182,7 +183,7 @@ Item {
                     anchors.leftMargin: 14
                     anchors.rightMargin: 14
                     verticalAlignment: Text.AlignVCenter
-                    color: "#191919"
+                    color: AppTheme.textMain
                     font.family: "Roboto"
                     font.pixelSize: 15
                     clip: true
@@ -262,7 +263,7 @@ Item {
                         id: amountFundedInput
                         anchors.fill: parent; anchors.leftMargin: 14; anchors.rightMargin: 14
                         verticalAlignment: Text.AlignVCenter
-                        color: "#191919"; font.family: "Roboto"; font.pixelSize: 15
+                        color: AppTheme.textMain; font.family: "Roboto"; font.pixelSize: 15
                         clip: true; selectByMouse: true
                         inputMethodHints: Qt.ImhFormattedNumbersOnly
                         onTextChanged: {
@@ -293,7 +294,7 @@ Item {
                         id: saveGoalInput
                         anchors.fill: parent; anchors.leftMargin: 14; anchors.rightMargin: 14
                         verticalAlignment: Text.AlignVCenter
-                        color: "#191919"; font.family: "Roboto"; font.pixelSize: 15
+                        color: AppTheme.textMain; font.family: "Roboto"; font.pixelSize: 15
                         clip: true; selectByMouse: true
                         inputMethodHints: Qt.ImhFormattedNumbersOnly
                         onTextChanged: {
@@ -328,6 +329,7 @@ Item {
             Text { text: "Due Date"; color: "#878787"; font.family: "Intel One Mono"; font.pixelSize: 14; font.weight: Font.DemiBold }
             Date_Input_Field_1 {
                 id: date_Input_Field
+                allowFutureDates: true
                 width: parent.width
                 height: 42
             }

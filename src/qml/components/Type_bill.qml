@@ -1,6 +1,10 @@
 import QtQuick
+import QtQuick.Controls
+import QtQuick.Controls.impl
+import src
 
-Image {
+ColorImage {
+        color: AppTheme.textMain
     id: type_bill
 
     source: Qt.resolvedUrl("../assets/type_bill_1.png")
@@ -20,7 +24,7 @@ Image {
             height: 24
             width: 147
 
-            color: "#191919"
+            color: AppTheme.textMain
             font.family: "Inter"
             font.pixelSize: 16
             font.weight: Font.DemiBold

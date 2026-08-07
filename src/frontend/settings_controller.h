@@ -16,6 +16,8 @@ class SettingsController : public QObject {
     Q_PROPERTY(QString avatarImagePath READ avatarImagePath NOTIFY profileChanged)
     Q_PROPERTY(QString avatarColor READ avatarColor NOTIFY profileChanged)
     Q_PROPERTY(QString initials READ initials NOTIFY profileChanged)
+    Q_PROPERTY(QString theme READ theme WRITE setTheme NOTIFY themeChanged)
+    Q_PROPERTY(bool autoBackup READ autoBackup WRITE setAutoBackup NOTIFY autoBackupChanged)
 
 private:
     bool m_isEditing;
@@ -27,6 +29,12 @@ private:
     // avatarColor: background color for the initials placeholder / preset swatch avatar
     QString m_avatarImagePath;
     QString m_avatarColor;
+
+    QString m_theme;
+    bool m_autoBackup;
+
+    void loadSettings();
+    void persistSettings() const;
 
     void loadAvatar();
     void persistAvatar() const;
@@ -43,19 +51,28 @@ public:
     QString avatarColor() const { return m_avatarColor; }
     QString initials() const;
 
+    QString theme() const { return m_theme; }
+    void setTheme(const QString &theme);
+
+    bool autoBackup() const { return m_autoBackup; }
+    void setAutoBackup(bool autoBackup);
+
     Q_INVOKABLE void toggleEdit();
     Q_INVOKABLE void cancelEdit();
     Q_INVOKABLE void saveChanges(const QString &newName, const QString &newEmail, const QString &newContact);
-
-    // Sets a custom uploaded image as the avatar (from the FileDialog).
+    
     Q_INVOKABLE void setAvatarImage(const QString &filePath);
-    // Picks one of the built-in colored-initials presets, clearing any custom image.
     Q_INVOKABLE void setAvatarPreset(const QString &colorHex);
+
     Q_INVOKABLE bool exportAllToCSV(const QString &folderPath);
+
+    Q_INVOKABLE void factoryReset();
 
 signals:
     void isEditingChanged();
     void profileChanged();
+    void themeChanged();
+    void autoBackupChanged();
 };
 
 #endif // SETTINGS_CONTROLLER_H

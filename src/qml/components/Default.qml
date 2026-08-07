@@ -1,4 +1,7 @@
 import QtQuick
+import QtQuick.Controls
+import QtQuick.Controls.impl
+import src
 
 Rectangle {
     id: _default
@@ -35,7 +38,8 @@ Rectangle {
             verticalAlignment: Text.AlignTop
             wrapMode: Text.Wrap
         }
-        Image {
+        ColorImage {
+        color: AppTheme.textMain
             id: line_2
 
             y: 98

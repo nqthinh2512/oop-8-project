@@ -1,11 +1,12 @@
 import QtQuick
+import src
 import QtQuick.Controls
 import QtQuick.Layouts
 
 Rectangle {
     id: overviewPage
 
-    color: "#f8fafc"
+    color: AppTheme.bgApp
     clip: true
 
     onVisibleChanged: {
@@ -46,13 +47,13 @@ Rectangle {
                     font.family: "Inter"
                     font.pixelSize: 32
                     font.weight: Font.Bold
-                    color: "#0f172a"
+                    color: AppTheme.textMain
                 }
 
                 Rectangle {
                     Layout.fillWidth: true
                     height: 1
-                    color: "#e2e8f0"
+                    color: AppTheme.border
                 }
             }
 
@@ -85,7 +86,7 @@ Rectangle {
                     showTrend: true
                     trendText: "Active"
                     isTrendUp: true
-                    accentLineColor: "#10b981"
+                    accentLineColor: AppTheme.success
                     onViewAllClicked: overviewPage.navigateTo(1)
                 }
 
@@ -99,7 +100,7 @@ Rectangle {
                     showTrend: true
                     trendText: "Active"
                     isTrendUp: false
-                    accentLineColor: "#ef4444"
+                    accentLineColor: AppTheme.danger
                     onViewAllClicked: overviewPage.navigateTo(1)
                 }
             }
@@ -125,7 +126,7 @@ Rectangle {
                             font.family: "Inter"
                             font.pixelSize: 20
                             font.weight: Font.DemiBold
-                            color: "#64748b"
+                            color: AppTheme.textSub
                             text: "Upcoming Bill"
                             Layout.fillWidth: true
                         }
@@ -139,9 +140,9 @@ Rectangle {
                         Layout.fillWidth: true
                         Layout.fillHeight: true
                         Layout.preferredHeight: 380
-                        color: "#ffffff"
+                        color: AppTheme.bgCard
                         radius: 12
-                        border.color: "#f1f5f9"
+                        border.color: AppTheme.bgHover
                         border.width: 1
 
                         ColumnLayout {
@@ -182,7 +183,7 @@ Rectangle {
                             font.family: "Inter"
                             font.pixelSize: 20
                             font.weight: Font.DemiBold
-                            color: "#64748b"
+                            color: AppTheme.textSub
                             text: "Statistics"
                             Layout.fillWidth: true
                         }
@@ -196,9 +197,9 @@ Rectangle {
                         Layout.fillWidth: true
                         Layout.fillHeight: true
                         Layout.preferredHeight: 380
-                        color: "#ffffff"
+                        color: AppTheme.bgCard
                         radius: 12
-                        border.color: "#f1f5f9"
+                        border.color: AppTheme.bgHover
                         border.width: 1
 
                         ColumnLayout {
@@ -212,13 +213,13 @@ Rectangle {
                                     font.family: "Inter"
                                     font.pixelSize: 18
                                     font.weight: Font.Bold
-                                    color: "#0f172a"
+                                    color: AppTheme.textMain
                                     text: "Income vs Expense"
                                 }
                                 Text {
                                     font.family: "Inter"
                                     font.pixelSize: 13
-                                    color: "#94a3b8"
+                                    color: AppTheme.textMuted
                                     text: "Last 6 Months"
                                 }
                             }
@@ -226,14 +227,14 @@ Rectangle {
                             Rectangle {
                                 Layout.fillWidth: true
                                 height: 1
-                                color: "#f1f5f9"
+                                color: AppTheme.bgHover
                             }
 
                             // Chart Canvas Placeholder
                             Rectangle {
                                 Layout.fillWidth: true
                                 Layout.fillHeight: true
-                                color: "#fafafa"
+                                color: AppTheme.bgCard
                                 radius: 8
 
                                 Canvas {
@@ -363,7 +364,7 @@ Rectangle {
                             font.family: "Inter"
                             font.pixelSize: 20
                             font.weight: Font.DemiBold
-                            color: "#64748b"
+                            color: AppTheme.textSub
                             text: "Recent Transaction"
                             Layout.fillWidth: true
                         }
@@ -377,9 +378,9 @@ Rectangle {
                         Layout.fillWidth: true
                         implicitHeight: txColumn.implicitHeight + 40
                         Layout.preferredHeight: implicitHeight
-                        color: "#ffffff"
+                        color: AppTheme.bgCard
                         radius: 12
-                        border.color: "#f1f5f9"
+                        border.color: AppTheme.bgHover
                         border.width: 1
 
                         ColumnLayout {
@@ -418,7 +419,7 @@ Rectangle {
                             font.family: "Inter"
                             font.pixelSize: 20
                             font.weight: Font.DemiBold
-                            color: "#64748b"
+                            color: AppTheme.textSub
                             text: "Savings"
                             Layout.fillWidth: true
                         }
@@ -431,9 +432,9 @@ Rectangle {
                     Rectangle {
                         Layout.fillWidth: true
                         Layout.preferredHeight: 240
-                        color: "#ffffff"
+                        color: AppTheme.bgCard
                         radius: 12
-                        border.color: "#f1f5f9"
+                        border.color: AppTheme.bgHover
                         border.width: 1
 
                         ColumnLayout {
@@ -448,15 +449,9 @@ Rectangle {
                                     font.family: "Inter"
                                     font.pixelSize: 22
                                     font.weight: Font.ExtraBold
-                                    color: "#0f172a"
+                                    color: AppTheme.textMain
                                     text: overviewController.topSaving.name || "No Savings"
                                     Layout.fillWidth: true
-                                }
-
-                                Edit_1 {
-                                    Layout.alignment: Qt.AlignRight | Qt.AlignVCenter
-                                    _vector_ShapePath0StrokeColor: "#64748b"
-                                    _vector_1_ShapePath0StrokeColor: "#64748b"
                                 }
                             }
 
@@ -469,14 +464,14 @@ Rectangle {
 
                                     ColumnLayout {
                                         spacing: 2
-                                        Text { text: "Saved money"; color: "#94a3b8"; font.pixelSize: 12; font.family: "Inter" }
-                                        Text { text: overviewController.topSaving.currentFormatted || "0 VND"; color: "#0f172a"; font.pixelSize: 18; font.weight: Font.Bold; font.family: "Inter" }
+                                        Text { text: "Saved money"; color: AppTheme.textMuted; font.pixelSize: 12; font.family: "Inter" }
+                                        Text { text: overviewController.topSaving.currentFormatted || "0 VND"; color: AppTheme.textMain; font.pixelSize: 18; font.weight: Font.Bold; font.family: "Inter" }
                                     }
 
                                     ColumnLayout {
                                         spacing: 2
-                                        Text { text: "Goal"; color: "#94a3b8"; font.pixelSize: 12; font.family: "Inter" }
-                                        Text { text: overviewController.topSaving.targetFormatted || "0 VND"; color: "#0f172a"; font.pixelSize: 16; font.weight: Font.DemiBold; font.family: "Inter" }
+                                        Text { text: "Goal"; color: AppTheme.textMuted; font.pixelSize: 12; font.family: "Inter" }
+                                        Text { text: overviewController.topSaving.targetFormatted || "0 VND"; color: AppTheme.textMain; font.pixelSize: 16; font.weight: Font.DemiBold; font.family: "Inter" }
                                     }
                                 }
 
@@ -509,7 +504,7 @@ Rectangle {
                             font.family: "Inter"
                             font.pixelSize: 20
                             font.weight: Font.DemiBold
-                            color: "#64748b"
+                            color: AppTheme.textSub
                             text: "Budgets"
                             Layout.fillWidth: true
                         }
@@ -522,9 +517,9 @@ Rectangle {
                     Rectangle {
                         Layout.fillWidth: true
                         Layout.preferredHeight: 240
-                        color: "#ffffff"
+                        color: AppTheme.bgCard
                         radius: 12
-                        border.color: "#f1f5f9"
+                        border.color: AppTheme.bgHover
                         border.width: 1
 
                         ColumnLayout {
@@ -539,15 +534,9 @@ Rectangle {
                                     font.family: "Inter"
                                     font.pixelSize: 22
                                     font.weight: Font.ExtraBold
-                                    color: "#0f172a"
+                                    color: AppTheme.textMain
                                     text: overviewController.topBudget.name || "No Budgets"
                                     Layout.fillWidth: true
-                                }
-
-                                Edit_1 {
-                                    Layout.alignment: Qt.AlignRight | Qt.AlignVCenter
-                                    _vector_ShapePath0StrokeColor: "#64748b"
-                                    _vector_1_ShapePath0StrokeColor: "#64748b"
                                 }
                             }
 
@@ -560,14 +549,14 @@ Rectangle {
 
                                     ColumnLayout {
                                         spacing: 2
-                                        Text { text: "Spent money"; color: "#94a3b8"; font.pixelSize: 12; font.family: "Inter" }
-                                        Text { text: overviewController.topBudget.spentFormatted || "0 VND"; color: "#0f172a"; font.pixelSize: 18; font.weight: Font.Bold; font.family: "Inter" }
+                                        Text { text: "Spent money"; color: AppTheme.textMuted; font.pixelSize: 12; font.family: "Inter" }
+                                        Text { text: overviewController.topBudget.spentFormatted || "0 VND"; color: AppTheme.textMain; font.pixelSize: 18; font.weight: Font.Bold; font.family: "Inter" }
                                     }
 
                                     ColumnLayout {
                                         spacing: 2
-                                        Text { text: "Limit"; color: "#94a3b8"; font.pixelSize: 12; font.family: "Inter" }
-                                        Text { text: overviewController.topBudget.limitFormatted || "0 VND"; color: "#0f172a"; font.pixelSize: 16; font.weight: Font.DemiBold; font.family: "Inter" }
+                                        Text { text: "Limit"; color: AppTheme.textMuted; font.pixelSize: 12; font.family: "Inter" }
+                                        Text { text: overviewController.topBudget.limitFormatted || "0 VND"; color: AppTheme.textMain; font.pixelSize: 16; font.weight: Font.DemiBold; font.family: "Inter" }
                                     }
                                 }
 
@@ -576,7 +565,7 @@ Rectangle {
                                 GaugeMeter {
                                     currentValue: overviewController.topBudget.spent || 0
                                     maxValue: overviewController.topBudget.limit || 1
-                                    progressColor: "#f97316"
+                                    progressColor: AppTheme.warning
                                     currentLabel: Math.round((overviewController.topBudget.progress || 0)) + "%"
                                     minLabel: "0%"
                                     maxLabel: "100%"

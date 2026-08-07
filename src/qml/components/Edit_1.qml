@@ -1,4 +1,5 @@
 import QtQuick
+import src
 import QtQuick.Shapes
 
 Rectangle {
@@ -38,7 +39,7 @@ Rectangle {
 
             fillColor: "#00000000"
             fillRule: ShapePath.WindingFill
-            strokeColor: "#ffffff"
+            strokeColor: AppTheme.textSub
             strokeWidth: 1.50
 
             PathSvg {
@@ -62,7 +63,7 @@ Rectangle {
 
             fillColor: "#00000000"
             fillRule: ShapePath.WindingFill
-            strokeColor: "#ffffff"
+            strokeColor: AppTheme.textSub
             strokeWidth: 1.50
 
             PathSvg {

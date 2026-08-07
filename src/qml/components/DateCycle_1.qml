@@ -1,4 +1,5 @@
 import QtQuick
+import src
 import QtQuick.Layouts
 
 Item {
@@ -32,14 +33,14 @@ Item {
             Text {
                 font.family: "Intel One Mono"
                 font.pixelSize: 12
-                color: "#64748b"
+                color: AppTheme.textSub
                 text: "Start: " + root.startDate
             }
 
             Text {
                 font.family: "Intel One Mono"
                 font.pixelSize: 12
-                color: "#64748b"
+                color: AppTheme.textSub
                 text: "End: " + root.endDate
             }
         }

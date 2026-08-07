@@ -1,4 +1,5 @@
 import QtQuick
+import src
 import QtQuick.Layouts
 
 Rectangle {
@@ -8,9 +9,9 @@ Rectangle {
     height: implicitHeight
     Layout.fillWidth: true
 
-    color: "#ffffff"
+    color: AppTheme.bgCard
     radius: 12
-    border.color: "#e2e8f0"
+    border.color: AppTheme.border
     border.width: 1
 
     // Exposed API Properties for Data Binding
@@ -26,7 +27,7 @@ Rectangle {
         // 1. Card Title (e.g., "TOTAL DUE", "TOTAL OVERDUE", "TOTAL PAID")
         Text {
             id: title
-            color: "#64748b"
+            color: AppTheme.textSub
             font.family: "Intel One Mono"
             font.pixelSize: 13
             font.weight: Font.Bold
@@ -42,7 +43,7 @@ Rectangle {
 
             Text {
                 id: amount_1
-                color: "#0f172a"
+                color: AppTheme.textMain
                 font.family: "Intel One Mono"
                 font.pixelSize: 24
                 font.weight: Font.Bold
@@ -53,7 +54,7 @@ Rectangle {
 
             Text {
                 id: label
-                color: "#94a3b8"
+                color: AppTheme.textMuted
                 font.family: "Inter"
                 font.pixelSize: 13
                 font.weight: Font.Medium

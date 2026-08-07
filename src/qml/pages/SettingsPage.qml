@@ -1,4 +1,5 @@
 import QtQuick
+import src
 import QtQuick.Controls
 import QtQuick.Layouts
 import QtQuick.Dialogs
@@ -9,7 +10,7 @@ Rectangle {
     height: 1117
     width: 1728
     clip: true
-    color: "#f8fafc"
+    color: AppTheme.bgApp
 
     FolderDialog {
         id: exportFolderDialog
@@ -29,12 +30,7 @@ Rectangle {
     property string currentEmail: settingsController.email
     property string currentContact: settingsController.contact
 
-    // Password State
-    property bool showCurrentPwd: false
-    property bool showNewPwd: false
-    property bool showConfirmPwd: false
-
-    // Sync input state when edit mode is activated/canceled
+        // Sync input state when edit mode is activated/canceled
     Connections {
         target: settingsController
         function onIsEditingChanged() {
@@ -43,14 +39,7 @@ Rectangle {
                 currentEmail = settingsController.email;
                 currentContact = settingsController.contact;
             } else {
-                // Clear passwords when edit mode is exited
-                currentPwdInput.text = "";
-                newPwdInput.text = "";
-                confirmPwdInput.text = "";
-                showCurrentPwd = false;
-                showNewPwd = false;
-                showConfirmPwd = false;
-            }
+                            }
         }
     }
 
@@ -86,13 +75,13 @@ Rectangle {
                     font.family: "Inter"
                     font.pixelSize: 32
                     font.weight: Font.Bold
-                    color: "#0f172a"
+                    color: AppTheme.textMain
                 }
 
                 Rectangle {
                     Layout.fillWidth: true
                     height: 1
-                    color: "#e2e8f0"
+                    color: AppTheme.border
                 }
             }
 
@@ -104,27 +93,11 @@ Rectangle {
                 
                 Item { Layout.fillWidth: true } // Push button to right
                 
-                Rectangle {
-                    width: 130
-                    height: 42
-                    radius: 6
-                    color: "#3b82f6" // Project's blue color
-                    
-                    Text {
-                        anchors.centerIn: parent
-                        text: isEditing ? "Cancel Edit" : "Edit Profile"
-                        color: "white"
-                        font.family: "Inter"
-                        font.pixelSize: 15
-                        font.weight: Font.Medium
-                    }
-
-                    MouseArea {
-                        anchors.fill: parent
-                        cursorShape: Qt.PointingHandCursor
-                        onClicked: {
-                            settingsController.toggleEdit();
-                        }
+                UniversalButton_1 {
+                    buttonText: isEditing ? "Cancel Edit" : "Edit Profile"
+                    _state: UniversalButton_1.State_1.State_1_selected
+                    onClicked: {
+                        settingsController.toggleEdit();
                     }
                 }
             }
@@ -136,8 +109,8 @@ Rectangle {
                 Layout.fillWidth: true
                 Layout.preferredHeight: profileInfoCol.implicitHeight + 48
                 radius: 12
-                color: "white"
-                border.color: "#e2e8f0"
+                color: AppTheme.bgCard
+                border.color: AppTheme.border
                 border.width: 1
                 
                 ColumnLayout {
@@ -154,7 +127,7 @@ Rectangle {
                         font.family: "Inter"
                         font.pixelSize: 22
                         font.weight: Font.Bold
-                        color: "#0f172a"
+                        color: AppTheme.textMain
                     }
 
                     // =========================================================
@@ -170,7 +143,7 @@ Rectangle {
                             height: 84
                             radius: 42
                             color: settingsController.avatarColor
-                            border.color: "#e2e8f0"
+                            border.color: AppTheme.border
                             border.width: 1
                             clip: true
 
@@ -186,7 +159,7 @@ Rectangle {
                                 anchors.centerIn: parent
                                 visible: settingsController.avatarImagePath === ""
                                 text: settingsController.initials
-                                color: "white"
+                                color: AppTheme.bgCard
                                 font.family: "Inter"
                                 font.pixelSize: 30
                                 font.weight: Font.Bold
@@ -200,14 +173,14 @@ Rectangle {
                                 width: 160
                                 height: 38
                                 radius: 6
-                                color: "#f1f5f9"
-                                border.color: "#e2e8f0"
+                                color: AppTheme.bgHover
+                                border.color: AppTheme.border
                                 border.width: 1
 
                                 Text {
                                     anchors.centerIn: parent
                                     text: "Đổi ảnh đại diện"
-                                    color: "#0f172a"
+                                    color: AppTheme.textMain
                                     font.family: "Inter"
                                     font.pixelSize: 14
                                     font.weight: Font.Medium
@@ -222,7 +195,7 @@ Rectangle {
 
                             Text {
                                 text: "PNG or JPG, or pick a preset color"
-                                color: "#94a3b8"
+                                color: AppTheme.textMuted
                                 font.family: "Inter"
                                 font.pixelSize: 12
                             }
@@ -238,9 +211,9 @@ Rectangle {
                         focus: true
                         padding: 20
                         background: Rectangle {
-                            color: "white"
+                            color: AppTheme.bgCard
                             radius: 12
-                            border.color: "#e2e8f0"
+                            border.color: AppTheme.border
                             border.width: 1
                         }
 
@@ -253,19 +226,19 @@ Rectangle {
                                 font.family: "Inter"
                                 font.pixelSize: 18
                                 font.weight: Font.Bold
-                                color: "#0f172a"
+                                color: AppTheme.textMain
                             }
 
                             Rectangle {
                                 Layout.fillWidth: true
                                 height: 40
                                 radius: 8
-                                color: "#3b82f6"
+                                color: AppTheme.primary
 
                                 Text {
                                     anchors.centerIn: parent
                                     text: "Upload From This Device"
-                                    color: "white"
+                                    color: AppTheme.bgCard
                                     font.family: "Inter"
                                     font.pixelSize: 14
                                     font.weight: Font.Medium
@@ -282,7 +255,7 @@ Rectangle {
                                 text: "Or pick a preset"
                                 font.family: "Inter"
                                 font.pixelSize: 13
-                                color: "#64748b"
+                                color: AppTheme.textSub
                             }
 
                             GridLayout {
@@ -301,7 +274,7 @@ Rectangle {
                                         radius: 18
                                         color: modelData
                                         border.width: settingsController.avatarColor === modelData && settingsController.avatarImagePath === "" ? 3 : 0
-                                        border.color: "#0f172a"
+                                        border.color: AppTheme.textMain
 
                                         MouseArea {
                                             anchors.fill: parent
@@ -339,17 +312,17 @@ Rectangle {
                         ColumnLayout {
                             spacing: 6
                             Layout.fillWidth: true
-                            Text { text: "Full Name"; font.pixelSize: 14; color: "#64748b"; font.family: "Inter" }
+                            Text { text: "Full Name"; font.pixelSize: 14; color: AppTheme.textSub; font.family: "Inter" }
                             Text { 
-                                text: settingsController.fullName; font.pixelSize: 16; color: "#0f172a"; font.family: "Inter"; font.weight: Font.Medium 
+                                text: settingsController.fullName; font.pixelSize: 16; color: AppTheme.textMain; font.family: "Inter"; font.weight: Font.Medium 
                                 visible: !isEditing
                             }
                             Rectangle {
                                 Layout.fillWidth: true
                                 height: 40
                                 radius: 8
-                                color: "#f8fafc"
-                                border.color: "#e2e8f0"
+                                color: AppTheme.bgApp
+                                border.color: AppTheme.border
                                 border.width: 1
                                 visible: isEditing
                                 TextInput {
@@ -359,7 +332,7 @@ Rectangle {
                                     verticalAlignment: TextInput.AlignVCenter
                                     font.pixelSize: 15
                                     font.family: "Inter"
-                                    color: "#0f172a"
+                                    color: AppTheme.textMain
                                     text: currentFullName
                                     onTextChanged: currentFullName = text
                                 }
@@ -370,8 +343,8 @@ Rectangle {
                             spacing: 6
                             Layout.fillWidth: true
                             Layout.alignment: Qt.AlignTop
-                            Text { text: "Employee ID"; font.pixelSize: 14; color: "#64748b"; font.family: "Inter" }
-                            Text { text: "EMP-2024-001"; font.pixelSize: 16; color: "#0f172a"; font.family: "Inter"; font.weight: Font.Medium }
+                            Text { text: "Employee ID"; font.pixelSize: 14; color: AppTheme.textSub; font.family: "Inter" }
+                            Text { text: "EMP-2024-001"; font.pixelSize: 16; color: AppTheme.textMain; font.family: "Inter"; font.weight: Font.Medium }
                         }
 
                         // --- Row 2 ---
@@ -379,17 +352,17 @@ Rectangle {
                         ColumnLayout {
                             spacing: 6
                             Layout.fillWidth: true
-                            Text { text: "Email"; font.pixelSize: 14; color: "#64748b"; font.family: "Inter" }
+                            Text { text: "Email"; font.pixelSize: 14; color: AppTheme.textSub; font.family: "Inter" }
                             Text { 
-                                text: settingsController.email; font.pixelSize: 16; color: "#0f172a"; font.family: "Inter"; font.weight: Font.Medium 
+                                text: settingsController.email; font.pixelSize: 16; color: AppTheme.textMain; font.family: "Inter"; font.weight: Font.Medium 
                                 visible: !isEditing
                             }
                             Rectangle {
                                 Layout.fillWidth: true
                                 height: 40
                                 radius: 8
-                                color: "#f8fafc"
-                                border.color: "#e2e8f0"
+                                color: AppTheme.bgApp
+                                border.color: AppTheme.border
                                 border.width: 1
                                 visible: isEditing
                                 TextInput {
@@ -399,7 +372,7 @@ Rectangle {
                                     verticalAlignment: TextInput.AlignVCenter
                                     font.pixelSize: 15
                                     font.family: "Inter"
-                                    color: "#0f172a"
+                                    color: AppTheme.textMain
                                     text: currentEmail
                                     onTextChanged: currentEmail = text
                                 }
@@ -409,17 +382,17 @@ Rectangle {
                         ColumnLayout {
                             spacing: 6
                             Layout.fillWidth: true
-                            Text { text: "Contact Number"; font.pixelSize: 14; color: "#64748b"; font.family: "Inter" }
+                            Text { text: "Contact Number"; font.pixelSize: 14; color: AppTheme.textSub; font.family: "Inter" }
                             Text { 
-                                text: settingsController.contact; font.pixelSize: 16; color: "#0f172a"; font.family: "Inter"; font.weight: Font.Medium 
+                                text: settingsController.contact; font.pixelSize: 16; color: AppTheme.textMain; font.family: "Inter"; font.weight: Font.Medium 
                                 visible: !isEditing
                             }
                             Rectangle {
                                 Layout.fillWidth: true
                                 height: 40
                                 radius: 8
-                                color: "#f8fafc"
-                                border.color: "#e2e8f0"
+                                color: AppTheme.bgApp
+                                border.color: AppTheme.border
                                 border.width: 1
                                 visible: isEditing
                                 TextInput {
@@ -429,60 +402,31 @@ Rectangle {
                                     verticalAlignment: TextInput.AlignVCenter
                                     font.pixelSize: 15
                                     font.family: "Inter"
-                                    color: "#0f172a"
+                                    color: AppTheme.textMain
                                     text: currentContact
                                     onTextChanged: currentContact = text
                                 }
                             }
                         }
 
-                        // --- Row 3 ---
-                        // Department (Read-only)
-                        ColumnLayout {
-                            spacing: 6
-                            Layout.fillWidth: true
-                            Layout.alignment: Qt.AlignTop
-                            Text { text: "Department"; font.pixelSize: 14; color: "#64748b"; font.family: "Inter" }
-                            Text { text: "IT Department"; font.pixelSize: 16; color: "#0f172a"; font.family: "Inter"; font.weight: Font.Medium }
-                        }
-                        // Role (Read-only)
-                        ColumnLayout {
-                            spacing: 6
-                            Layout.fillWidth: true
-                            Layout.alignment: Qt.AlignTop
-                            Text { text: "Role"; font.pixelSize: 14; color: "#64748b"; font.family: "Inter" }
-                            Text { text: "Administrator"; font.pixelSize: 16; color: "#0f172a"; font.family: "Inter"; font.weight: Font.Medium }
-                        }
-
-                        // --- Row 4 ---
-                        // Account Type (Read-only)
-                        ColumnLayout {
-                            spacing: 6
-                            Layout.fillWidth: true
-                            Layout.alignment: Qt.AlignTop
-                            Text { text: "Account Type"; font.pixelSize: 14; color: "#64748b"; font.family: "Inter" }
-                            Text { text: "Administrator"; font.pixelSize: 16; color: "#0f172a"; font.family: "Inter"; font.weight: Font.Medium }
-                        }
+                        
                     }
                 }
             }
 
             // =================================================================
-            // 3. CHANGE PASSWORD CARD
+            // 4. PREFERENCES CARD
             // =================================================================
             Rectangle {
                 Layout.fillWidth: true
-                Layout.preferredHeight: changePwdCol.implicitHeight + 48
+                Layout.preferredHeight: prefsCol.implicitHeight + 48
                 radius: 12
-                color: "white"
-                border.color: "#e2e8f0"
+                color: AppTheme.bgCard
+                border.color: AppTheme.border
                 border.width: 1
 
-                // Dim the entire card if not editing
-                opacity: isEditing ? 1.0 : 0.6
-
                 ColumnLayout {
-                    id: changePwdCol
+                    id: prefsCol
                     anchors.left: parent.left
                     anchors.right: parent.right
                     anchors.top: parent.top
@@ -490,210 +434,96 @@ Rectangle {
                     spacing: 24
 
                     Text {
-                        text: "Change Password"
+                        text: "Preferences"
                         font.family: "Inter"
                         font.pixelSize: 22
                         font.weight: Font.Bold
-                        color: "#0f172a"
+                        color: AppTheme.textMain
                     }
 
-                    ColumnLayout {
+                    // Theme
+                    RowLayout {
                         Layout.fillWidth: true
-                        Layout.maximumWidth: 600
-                        spacing: 20
-
-                        // Field 1: Current Password
-                        ColumnLayout {
-                            spacing: 8
-                            Layout.fillWidth: true
-                            Text { text: "Current Password"; font.pixelSize: 14; color: "#0f172a"; font.weight: Font.Medium; font.family: "Inter" }
-                            Rectangle {
-                                Layout.fillWidth: true
-                                height: 44
-                                radius: 8
-                                color: "#f8fafc"
-                                border.color: "#e2e8f0"
-                                border.width: 1
-                                TextInput {
-                                    id: currentPwdInput
-                                    anchors.fill: parent
-                                    anchors.leftMargin: 16
-                                    anchors.rightMargin: 40
-                                    verticalAlignment: TextInput.AlignVCenter
-                                    font.pixelSize: 15
-                                    font.family: "Inter"
-                                    color: "#0f172a"
-                                    echoMode: showCurrentPwd ? TextInput.Normal : TextInput.Password
-                                    enabled: isEditing
-                                    Text {
-                                        anchors.fill: parent
-                                        verticalAlignment: Text.AlignVCenter
-                                        text: "Enter current password"
-                                        color: "#94a3b8"
-                                        font.pixelSize: 15
-                                        font.family: "Inter"
-                                        visible: parent.text === "" && !currentPwdInput.activeFocus
-                                    }
-                                }
-                                Text {
-                                    anchors.right: parent.right
-                                    anchors.verticalCenter: parent.verticalCenter
-                                    anchors.rightMargin: 16
-                                    text: "👁"
-                                    color: showCurrentPwd ? "#3b82f6" : "#94a3b8"
-                                    font.pixelSize: 16
-                                    MouseArea {
-                                        anchors.fill: parent
-                                        anchors.margins: -10
-                                        cursorShape: isEditing ? Qt.PointingHandCursor : Qt.ArrowCursor
-                                        onClicked: {
-                                            if (isEditing) showCurrentPwd = !showCurrentPwd
-                                        }
-                                    }
-                                }
+                        Text {
+                            text: "Theme"
+                            font.family: "Inter"
+                            font.pixelSize: 14
+                            color: AppTheme.textMain
+                            font.weight: Font.Medium
+                            Layout.preferredWidth: 200
+                        }
+                        Dropdown_1 {
+                            Layout.preferredWidth: 200
+                            model: ["Light", "Dark"]
+                            selectedIndex: settingsController.theme === "Dark" ? 1 : 0
+                            selectedText: settingsController.theme
+                            onSelected: function(index, value) {
+                                settingsController.theme = value;
                             }
                         }
+                        Item { Layout.fillWidth: true }
+                    }
 
-                        // Field 2: New Password
+                    // Auto Backup
+                    RowLayout {
+                        Layout.fillWidth: true
+                        Text {
+                            text: "Auto-Backup on Exit"
+                            font.family: "Inter"
+                            font.pixelSize: 14
+                            color: AppTheme.textMain
+                            font.weight: Font.Medium
+                            Layout.preferredWidth: 200
+                        }
+                        ToggleSwitch_1 {
+                            checked: settingsController.autoBackup
+                            onToggled: function(val) { settingsController.autoBackup = val }
+                        }
+                        Item { Layout.fillWidth: true }
+                    }
+
+                    Rectangle { Layout.fillWidth: true; height: 1; color: AppTheme.border }
+
+                    // Factory Reset
+                    RowLayout {
+                        Layout.fillWidth: true
                         ColumnLayout {
-                            spacing: 8
                             Layout.fillWidth: true
-                            Text { text: "New Password"; font.pixelSize: 14; color: "#0f172a"; font.weight: Font.Medium; font.family: "Inter" }
-                            Rectangle {
+                            spacing: 4
+                            Text {
+                                text: "Factory Reset"
+                                font.family: "Inter"
+                                font.pixelSize: 14
+                                font.weight: Font.Bold
+                                color: AppTheme.danger
+                            }
+                            Text {
+                                text: "Permanently delete all your data and reset the app. This cannot be undone."
+                                font.family: "Inter"
+                                font.pixelSize: 12
+                                color: AppTheme.textSub
+                                wrapMode: Text.WordWrap
                                 Layout.fillWidth: true
-                                height: 44
-                                radius: 8
-                                color: "#f8fafc"
-                                border.color: "#e2e8f0"
-                                border.width: 1
-                                TextInput {
-                                    id: newPwdInput
-                                    anchors.fill: parent
-                                    anchors.leftMargin: 16
-                                    anchors.rightMargin: 40
-                                    verticalAlignment: TextInput.AlignVCenter
-                                    font.pixelSize: 15
-                                    font.family: "Inter"
-                                    color: "#0f172a"
-                                    echoMode: showNewPwd ? TextInput.Normal : TextInput.Password
-                                    enabled: isEditing
-                                    Text {
-                                        anchors.fill: parent
-                                        verticalAlignment: Text.AlignVCenter
-                                        text: "Enter new password"
-                                        color: "#94a3b8"
-                                        font.pixelSize: 15
-                                        font.family: "Inter"
-                                        visible: parent.text === "" && !newPwdInput.activeFocus
-                                    }
-                                }
-                                Text {
-                                    anchors.right: parent.right
-                                    anchors.verticalCenter: parent.verticalCenter
-                                    anchors.rightMargin: 16
-                                    text: "👁"
-                                    color: showNewPwd ? "#3b82f6" : "#94a3b8"
-                                    font.pixelSize: 16
-                                    MouseArea {
-                                        anchors.fill: parent
-                                        anchors.margins: -10
-                                        cursorShape: isEditing ? Qt.PointingHandCursor : Qt.ArrowCursor
-                                        onClicked: {
-                                            if (isEditing) showNewPwd = !showNewPwd
-                                        }
-                                    }
-                                }
                             }
                         }
-
-                        // Field 3: Confirm Password
-                        ColumnLayout {
-                            spacing: 8
-                            Layout.fillWidth: true
-                            Text { text: "Confirm Password"; font.pixelSize: 14; color: "#0f172a"; font.weight: Font.Medium; font.family: "Inter" }
-                            Rectangle {
-                                Layout.fillWidth: true
-                                height: 44
-                                radius: 8
-                                color: "#f8fafc"
-                                border.color: "#e2e8f0"
-                                border.width: 1
-                                TextInput {
-                                    id: confirmPwdInput
-                                    anchors.fill: parent
-                                    anchors.leftMargin: 16
-                                    anchors.rightMargin: 40
-                                    verticalAlignment: TextInput.AlignVCenter
-                                    font.pixelSize: 15
-                                    font.family: "Inter"
-                                    color: "#0f172a"
-                                    echoMode: showConfirmPwd ? TextInput.Normal : TextInput.Password
-                                    enabled: isEditing
-                                    Text {
-                                        anchors.fill: parent
-                                        verticalAlignment: Text.AlignVCenter
-                                        text: "Confirm new password"
-                                        color: "#94a3b8"
-                                        font.pixelSize: 15
-                                        font.family: "Inter"
-                                        visible: parent.text === "" && !confirmPwdInput.activeFocus
-                                    }
-                                }
-                                Text {
-                                    anchors.right: parent.right
-                                    anchors.verticalCenter: parent.verticalCenter
-                                    anchors.rightMargin: 16
-                                    text: "👁"
-                                    color: showConfirmPwd ? "#3b82f6" : "#94a3b8"
-                                    font.pixelSize: 16
-                                    MouseArea {
-                                        anchors.fill: parent
-                                        anchors.margins: -10
-                                        cursorShape: isEditing ? Qt.PointingHandCursor : Qt.ArrowCursor
-                                        onClicked: {
-                                            if (isEditing) showConfirmPwd = !showConfirmPwd
-                                        }
-                                    }
-                                }
-                            }
+                        UniversalButton_1 {
+                            buttonText: "Reset App"
+                            _state: UniversalButton_1.State_1.State_1_default
+                            onClicked: settingsController.factoryReset()
                         }
                     }
                 }
             }
 
-            // Save Changes Button (Only visible when editing)
-            Rectangle {
-                width: 140
-                height: 42
-                radius: 6
-                color: "#3b82f6" // Project's blue color
-                visible: isEditing
-                
-                Text {
-                    anchors.centerIn: parent
-                    text: "Save Changes"
-                    color: "white"
-                    font.family: "Inter"
-                    font.pixelSize: 15
-                    font.weight: Font.Medium
-                }
-
-                MouseArea {
-                    anchors.fill: parent
-                    cursorShape: Qt.PointingHandCursor
-                    onClicked: settingsController.saveChanges(currentFullName, currentEmail, currentContact)
-                }
-            }
-            
             // =================================================================
-            // DATA EXPORT CARD
+            // 5. DATA EXPORT CARD
             // =================================================================
             Rectangle {
                 Layout.fillWidth: true
                 Layout.preferredHeight: exportCol.implicitHeight + 48
                 radius: 12
-                color: "white"
-                border.color: "#e2e8f0"
+                color: AppTheme.bgCard
+                border.color: AppTheme.border
                 border.width: 1
 
                 ColumnLayout {
@@ -709,7 +539,7 @@ Rectangle {
                         font.family: "Inter"
                         font.pixelSize: 22
                         font.weight: Font.Bold
-                        color: "#0f172a"
+                        color: AppTheme.textMain
                     }
 
                     RowLayout {
@@ -720,7 +550,7 @@ Rectangle {
                             text: "Export all your financial records (categories, transactions, bills, budgets, savings) to CSV files."
                             font.family: "Inter"
                             font.pixelSize: 14
-                            color: "#64748b"
+                            color: AppTheme.textSub
                             elide: Text.ElideRight
                         }
 
@@ -734,75 +564,6 @@ Rectangle {
             }
 
             // =================================================================
-            // ACCOUNT CARD (Logout)
-            // =================================================================
-            Rectangle {
-                Layout.fillWidth: true
-                Layout.preferredHeight: accountCol.implicitHeight + 48
-                radius: 12
-                color: "white"
-                border.color: "#e2e8f0"
-                border.width: 1
-
-                ColumnLayout {
-                    id: accountCol
-                    anchors.left: parent.left
-                    anchors.right: parent.right
-                    anchors.top: parent.top
-                    anchors.margins: 24
-                    spacing: 16
-
-                    Text {
-                        text: "Account"
-                        font.family: "Inter"
-                        font.pixelSize: 22
-                        font.weight: Font.Bold
-                        color: "#0f172a"
-                    }
-
-                    RowLayout {
-                        Layout.fillWidth: true
-
-                        Text {
-                            Layout.fillWidth: true
-                            text: "Signed in as " + settingsController.email
-                            font.family: "Inter"
-                            font.pixelSize: 14
-                            color: "#64748b"
-                            elide: Text.ElideRight
-                        }
-
-                        Rectangle {
-                            width: 120
-                            height: 42
-                            radius: 6
-                            color: "#fee2e2"
-
-                            Text {
-                                anchors.centerIn: parent
-                                text: "Đăng xuất"
-                                color: "#dc2626"
-                                font.family: "Inter"
-                                font.pixelSize: 15
-                                font.weight: Font.Medium
-                            }
-
-                            MouseArea {
-                                anchors.fill: parent
-                                cursorShape: Qt.PointingHandCursor
-                                onClicked: {
-                                    sessionController.logout()
-                                    if (typeof sidebarMenu !== "undefined") {
-                                        sidebarMenu.selectedIndex = 0
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
-            // Bottom Spacing Buffer
             Item {
                 Layout.preferredWidth: 1
                 Layout.preferredHeight: 32

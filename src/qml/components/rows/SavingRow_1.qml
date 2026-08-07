@@ -1,4 +1,5 @@
 import QtQuick
+import src
 import QtQuick.Layouts
 import QtQuick.Shapes
 
@@ -22,9 +23,9 @@ Rectangle {
     height: implicitHeight
     Layout.fillWidth: true
 
-    border.color: "#f1f5f9"
+    border.color: AppTheme.bgHover
     border.width: 1
-    color: "#ffffff"
+    color: AppTheme.bgCard
 
     RowLayout {
         anchors.fill: parent
@@ -41,7 +42,7 @@ Rectangle {
             Text {
                 anchors.left: parent.left
                 anchors.verticalCenter: parent.verticalCenter
-                color: "#0f172a"
+                color: AppTheme.textMain
                 font.family: "Inter"
                 font.pixelSize: 14
                 font.weight: Font.Bold
@@ -107,7 +108,7 @@ Rectangle {
                 spacing: 4
 
                 Text {
-                    color: "#64748b"
+                    color: AppTheme.textSub
                     font.family: "Intel One Mono"
                     font.pixelSize: 14
                     font.weight: Font.Normal
@@ -116,7 +117,7 @@ Rectangle {
                 }
 
                 Text {
-                    color: "#2563eb" // Blue color for planner
+                    color: AppTheme.primary // Use primary color for planner
                     font.family: "Inter"
                     font.pixelSize: 12
                     font.weight: Font.Medium

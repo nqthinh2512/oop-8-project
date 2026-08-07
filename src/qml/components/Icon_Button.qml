@@ -1,4 +1,5 @@
 import QtQuick
+import src
 
 Rectangle {
     enum Variant { Variant_Primary, Variant_Neutral, Variant_Subtle}
@@ -208,7 +209,7 @@ Rectangle {
                 target: icon_Button
             }
             PropertyChanges {
-                border.color: "white"
+                border.color: AppTheme.bgCard
                 target: icon_Button
             }
             PropertyChanges {
@@ -249,7 +250,7 @@ Rectangle {
                 target: icon_Button
             }
             PropertyChanges {
-                border.color: "white"
+                border.color: AppTheme.bgCard
                 target: icon_Button
             }
             PropertyChanges {
@@ -454,7 +455,7 @@ Rectangle {
                 target: icon_Button
             }
             PropertyChanges {
-                border.color: "white"
+                border.color: AppTheme.bgCard
                 target: icon_Button
             }
             PropertyChanges {
@@ -495,7 +496,7 @@ Rectangle {
                 target: icon_Button
             }
             PropertyChanges {
-                border.color: "white"
+                border.color: AppTheme.bgCard
                 target: icon_Button
             }
             PropertyChanges {

@@ -1,4 +1,5 @@
 import QtQuick
+import src
 import QtQuick.Layouts
 import QtQuick.Controls
 import QtQuick.Dialogs
@@ -7,7 +8,7 @@ import QtCore
 Rectangle {
     id: budgetsPage
 
-    color: "#f8fafc"
+    color: AppTheme.bgApp
     clip: true
 
     FileDialog {
@@ -38,9 +39,9 @@ Rectangle {
                 font.family: "Inter"
                 font.pixelSize: 32
                 font.weight: Font.Bold
-                color: "#0f172a"
+                color: AppTheme.textMain
             }
-            Rectangle { Layout.fillWidth: true; height: 1; color: "#e2e8f0" }
+            Rectangle { Layout.fillWidth: true; height: 1; color: AppTheme.border }
         }
 
         RowLayout {
@@ -72,8 +73,8 @@ Rectangle {
             Rectangle {
                 Layout.fillWidth: true
                 implicitHeight: 70
-                color: "#ffffff"
-                border.color: "#e2e8f0"
+                color: AppTheme.bgCard
+                border.color: AppTheme.border
                 border.width: 1
                 topLeftRadius: 12
                 topRightRadius: 12
@@ -114,18 +115,18 @@ Rectangle {
                         }
                     }
 
-                    Rectangle { Layout.preferredWidth: 1; Layout.preferredHeight: 24; color: "#cbd5e1" }
+                    Rectangle { Layout.preferredWidth: 1; Layout.preferredHeight: 24; color: AppTheme.divider }
 
                     // ===== Dropdown_1 thật cho category filter =====
                     Dropdown_1 {
                         id: categoryFilterDropdown
                         Layout.preferredWidth: 200
-                        selectedText: "All Main Categories"
+                        selectedText: "All Categories"
                         selectedIndex: 0
 
                         // categoryOptionsFull giữ nguyên object {id, name} để tra ngược categoryId khi chọn
                         property var categoryOptionsFull: {
-                            var opts = [{id: 0, name: "All Main Categories"}]
+                            var opts = [{id: 0, name: "All Categories"}]
                             var cats = budgetsController.categoryOptions
                             for (var i = 0; i < cats.length; i++) opts.push(cats[i])
                             return opts
@@ -163,8 +164,8 @@ Rectangle {
             Rectangle {
                 Layout.fillWidth: true
                 implicitHeight: 48
-                color: "#f1f5f9"
-                border.color: "#e2e8f0"
+                color: AppTheme.bgHover
+                border.color: AppTheme.border
                 border.width: 1
 
                 RowLayout {
@@ -174,17 +175,17 @@ Rectangle {
                     spacing: 0
 
                     Item { Layout.fillWidth: true; Layout.preferredWidth: 260; Layout.fillHeight: true
-                        Text { anchors.left: parent.left; anchors.verticalCenter: parent.verticalCenter; text: "BUDGET"; font.family: "Inter"; font.pixelSize: 12; font.weight: Font.Bold; color: "#64748b" } }
+                        Text { anchors.left: parent.left; anchors.verticalCenter: parent.verticalCenter; text: "BUDGET"; font.family: "Inter"; font.pixelSize: 12; font.weight: Font.Bold; color: AppTheme.textSub } }
                     Item { Layout.preferredWidth: 100; Layout.fillHeight: true
-                        Text { anchors.left: parent.left; anchors.verticalCenter: parent.verticalCenter; text: "PRIORITY"; font.family: "Inter"; font.pixelSize: 12; font.weight: Font.Bold; color: "#64748b" } }
+                        Text { anchors.left: parent.left; anchors.verticalCenter: parent.verticalCenter; text: "PRIORITY"; font.family: "Inter"; font.pixelSize: 12; font.weight: Font.Bold; color: AppTheme.textSub } }
                     Item { Layout.preferredWidth: 160; Layout.fillHeight: true
-                        Text { anchors.left: parent.left; anchors.verticalCenter: parent.verticalCenter; text: "CATEGORY"; font.family: "Inter"; font.pixelSize: 12; font.weight: Font.Bold; color: "#64748b" } }
+                        Text { anchors.left: parent.left; anchors.verticalCenter: parent.verticalCenter; text: "CATEGORY"; font.family: "Inter"; font.pixelSize: 12; font.weight: Font.Bold; color: AppTheme.textSub } }
                     Item { Layout.preferredWidth: 280; Layout.fillHeight: true
-                        Text { anchors.left: parent.left; anchors.verticalCenter: parent.verticalCenter; text: "PROGRESS"; font.family: "Inter"; font.pixelSize: 12; font.weight: Font.Bold; color: "#64748b" } }
+                        Text { anchors.left: parent.left; anchors.verticalCenter: parent.verticalCenter; text: "PROGRESS"; font.family: "Inter"; font.pixelSize: 12; font.weight: Font.Bold; color: AppTheme.textSub } }
                     Item { Layout.preferredWidth: 240; Layout.fillHeight: true
-                        Text { anchors.left: parent.left; anchors.verticalCenter: parent.verticalCenter; text: "DATE & CYCLE"; font.family: "Inter"; font.pixelSize: 12; font.weight: Font.Bold; color: "#64748b" } }
+                        Text { anchors.left: parent.left; anchors.verticalCenter: parent.verticalCenter; text: "DATE & CYCLE"; font.family: "Inter"; font.pixelSize: 12; font.weight: Font.Bold; color: AppTheme.textSub } }
                     Item { Layout.preferredWidth: 100; Layout.fillHeight: true
-                        Text { anchors.right: parent.right; anchors.rightMargin: 8; anchors.verticalCenter: parent.verticalCenter; text: "ACTIONS"; font.family: "Inter"; font.pixelSize: 12; font.weight: Font.Bold; color: "#64748b" } }
+                        Text { anchors.right: parent.right; anchors.rightMargin: 8; anchors.verticalCenter: parent.verticalCenter; text: "ACTIONS"; font.family: "Inter"; font.pixelSize: 12; font.weight: Font.Bold; color: AppTheme.textSub } }
                 }
             }
 

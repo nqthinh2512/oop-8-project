@@ -1,4 +1,5 @@
 import QtQuick
+import src
 import QtQuick.Controls
 
 Rectangle {
@@ -7,8 +8,18 @@ Rectangle {
     height: 42
     width: 460
 
-    color: "#e9e9e9"
+    color: AppTheme.bgInput
     radius: 8
+
+    property bool allowFutureDates: false
+    property bool showValidationError: false
+    property bool isInstantlyInvalid: {
+        if (dayInput.text === "" || monthInput.text === "" || yearInput.text.length < 4) return false;
+        return selectedDate === "";
+    }
+
+    border.color: (showValidationError || isInstantlyInvalid) ? "red" : "transparent"
+    border.width: (showValidationError || isInstantlyInvalid) ? 1 : 0
 
     property string text: ""
     property string selectedDate: ""
@@ -25,7 +36,6 @@ Rectangle {
             yearInput.text = ""
             selectedDate = ""
         } else {
-            selectedDate = text
             var parts = text.split("/")
             if (parts.length === 3) {
                 dayInput.text = parts[0]
@@ -34,6 +44,7 @@ Rectangle {
             }
         }
         _internalChange = false
+        updateDateFromInputs()
     }
 
     function updateTextFromInputs() {
@@ -44,9 +55,10 @@ Rectangle {
         var y = yearInput.text.trim()
 
         var formatted = d + "/" + m + "/" + y
-        selectedDate = formatted
         text = formatted
         _internalChange = false
+        
+        updateDateFromInputs()
     }
 
     // Helper to format date numbers to 2 digits
@@ -69,15 +81,28 @@ Rectangle {
     }
 
     function clear() {
-        dayInput.text = ""
-        monthInput.text = ""
-        yearInput.text = ""
-        selectedDate = ""
+        var d = new Date()
+        setDate(d.getDate(), d.getMonth() + 1, d.getFullYear())
     }
 
     function updateDateFromInputs() {
         if (dayInput.text !== "" && monthInput.text !== "" && yearInput.text !== "") {
-            selectedDate = pad(parseInt(dayInput.text || 0)) + "/" + pad(parseInt(monthInput.text || 0)) + "/" + yearInput.text;
+            var d = parseInt(dayInput.text || 0)
+            var m = parseInt(monthInput.text || 0)
+            var y = parseInt(yearInput.text || 0)
+            var dateObj = new Date(y, m - 1, d)
+            var today = new Date()
+            today.setHours(23, 59, 59, 999)
+            
+            var isYearValid = y >= 2000;
+            var isDateObjValid = (dateObj.getDate() === d && dateObj.getMonth() === m - 1);
+            var isFutureValid = allowFutureDates ? true : (dateObj <= today);
+
+            if (isYearValid && isDateObjValid && isFutureValid) {
+                selectedDate = pad(d) + "/" + pad(m) + "/" + y;
+            } else {
+                selectedDate = ""; // Invalid
+            }
         } else {
             selectedDate = "";
         }
@@ -97,7 +122,7 @@ Rectangle {
             height: 24
             verticalAlignment: Text.AlignVCenter
             horizontalAlignment: Text.AlignHCenter
-            color: "#1e1e1e"
+            color: AppTheme.textMain
             font.family: "Roboto"
             font.pixelSize: 16
             font.weight: Font.Medium
@@ -107,7 +132,7 @@ Rectangle {
 
             Text {
                 text: "DD"
-                color: "#8049454f"
+                color: AppTheme.textMuted
                 font: parent.font
                 visible: !parent.text && !parent.activeFocus
                 anchors.fill: parent
@@ -118,13 +143,12 @@ Rectangle {
             onTextChanged: {
                 if (text.length === 2) monthInput.forceActiveFocus()
                 date_Input_Field.updateTextFromInputs()
-                updateDateFromInputs()
             }
         }
 
         Text {
             text: "/"
-            color: "#878787"
+            color: AppTheme.textMuted
             font.family: "Roboto"
             font.pixelSize: 16
             anchors.verticalCenter: parent.verticalCenter
@@ -137,7 +161,7 @@ Rectangle {
             height: 24
             verticalAlignment: Text.AlignVCenter
             horizontalAlignment: Text.AlignHCenter
-            color: "#1e1e1e"
+            color: AppTheme.textMain
             font.family: "Roboto"
             font.pixelSize: 16
             font.weight: Font.Medium
@@ -147,7 +171,7 @@ Rectangle {
 
             Text {
                 text: "MM"
-                color: "#8049454f"
+                color: AppTheme.textMuted
                 font: parent.font
                 visible: !parent.text && !parent.activeFocus
                 anchors.fill: parent
@@ -163,7 +187,7 @@ Rectangle {
 
         Text {
             text: "/"
-            color: "#878787"
+            color: AppTheme.textMuted
             font.family: "Roboto"
             font.pixelSize: 16
             anchors.verticalCenter: parent.verticalCenter
@@ -176,7 +200,7 @@ Rectangle {
             height: 24
             verticalAlignment: Text.AlignVCenter
             horizontalAlignment: Text.AlignHCenter
-            color: "#1e1e1e"
+            color: AppTheme.textMain
             font.family: "Roboto"
             font.pixelSize: 16
             font.weight: Font.Medium
@@ -186,7 +210,7 @@ Rectangle {
 
             Text {
                 text: "YYYY"
-                color: "#8049454f"
+                color: AppTheme.textMuted
                 font: parent.font
                 visible: !parent.text && !parent.activeFocus
                 anchors.fill: parent
@@ -234,9 +258,9 @@ Rectangle {
         focus: true
 
         background: Rectangle {
-            color: "#ffffff"
+            color: AppTheme.bgCard
             radius: 12
-            border.color: "#cbd5e1"
+            border.color: AppTheme.divider
             border.width: 1
         }
 
@@ -255,13 +279,13 @@ Rectangle {
                     font.family: "Inter"
                     font.pixelSize: 14
                     font.weight: Font.Bold
-                    color: "#1e293b"
+                    color: AppTheme.textMain
                     verticalAlignment: Text.AlignVCenter
                 }
 
                 Rectangle {
-                    width: 28; height: 28; radius: 6; color: "#f1f5f9"
-                    Text { text: "◀"; anchors.centerIn: parent; font.pixelSize: 10; color: "#475569" }
+                    width: 28; height: 28; radius: 6; color: AppTheme.bgHover
+                    Text { text: "◀"; anchors.centerIn: parent; font.pixelSize: 10; color: AppTheme.textMain }
                     MouseArea {
                         anchors.fill: parent
                         cursorShape: Qt.PointingHandCursor
@@ -270,8 +294,8 @@ Rectangle {
                 }
 
                 Rectangle {
-                    width: 28; height: 28; radius: 6; color: "#f1f5f9"
-                    Text { text: "▶"; anchors.centerIn: parent; font.pixelSize: 10; color: "#475569" }
+                    width: 28; height: 28; radius: 6; color: AppTheme.bgHover
+                    Text { text: "▶"; anchors.centerIn: parent; font.pixelSize: 10; color: AppTheme.textMain }
                     MouseArea {
                         anchors.fill: parent
                         cursorShape: Qt.PointingHandCursor
@@ -291,7 +315,7 @@ Rectangle {
                         text: modelData
                         font.pixelSize: 11
                         font.weight: Font.Bold
-                        color: "#94a3b8"
+                        color: AppTheme.textMuted
                         horizontalAlignment: Text.AlignHCenter
                         verticalAlignment: Text.AlignVCenter
                     }
@@ -308,24 +332,39 @@ Rectangle {
 
                     Rectangle {
                         width: 30; height: 30; radius: 15
-                        color: (index + 1 === currentDay) ? "#3b82f6" : (dayMouse.containsMouse ? "#eff6ff" : "transparent")
+                        property var itemDate: new Date(currentYear, currentMonthIndex, index + 1)
+                        property var today: new Date()
+                        property bool isValidDate: {
+                            today.setHours(23, 59, 59, 999);
+                            return itemDate.getFullYear() >= 2000 && (allowFutureDates ? true : itemDate <= today);
+                        }
+
+                        property bool isToday: {
+                            var t = new Date();
+                            return (index + 1 === currentDay) && (currentMonthIndex === t.getMonth()) && (currentYear === t.getFullYear());
+                        }
+
+                        color: isToday ? AppTheme.primary : (dayMouse.containsMouse && isValidDate ? AppTheme.bgHover : "transparent")
+                        opacity: isValidDate ? 1.0 : 0.3
 
                         Text {
                             text: (index + 1).toString()
                             anchors.centerIn: parent
                             font.pixelSize: 12
-                            font.weight: (index + 1 === currentDay) ? Font.Bold : Font.Normal
-                            color: (index + 1 === currentDay) ? "#ffffff" : "#334155"
+                            font.weight: isToday ? Font.Bold : Font.Normal
+                            color: isToday ? "#ffffff" : AppTheme.textMain
                         }
 
                         MouseArea {
                             id: dayMouse
                             anchors.fill: parent
-                            hoverEnabled: true
-                            cursorShape: Qt.PointingHandCursor
+                            hoverEnabled: isValidDate
+                            cursorShape: isValidDate ? Qt.PointingHandCursor : Qt.ForbiddenCursor
                             onClicked: {
-                                setDate(index + 1, currentMonthIndex + 1, currentYear)
-                                datePickerPopup.close()
+                                if (isValidDate) {
+                                    setDate(index + 1, currentMonthIndex + 1, currentYear)
+                                    datePickerPopup.close()
+                                }
                             }
                         }
                     }

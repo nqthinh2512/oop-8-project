@@ -1,4 +1,7 @@
 import QtQuick
+import QtQuick.Controls
+import QtQuick.Controls.impl
+import src
 import ".."
 
 Item {
@@ -58,7 +61,7 @@ Item {
         height: 217
         width: 500
 
-        color: "#ffffff"
+        color: AppTheme.bgCard
         radius: 15
         clip: true
 
@@ -66,7 +69,8 @@ Item {
         MouseArea { anchors.fill: parent }
 
         // Header Title
-        Image {
+        ColorImage {
+        color: AppTheme.textMain
             id: title
             source: Qt.resolvedUrl("../../assets/title_15.png")
 
@@ -76,7 +80,7 @@ Item {
                 y: 9
                 height: 32
                 width: 461
-                color: "#191919"
+                color: AppTheme.textMain
                 font.family: "Intel One Mono"
                 font.pixelSize: 24
                 font.weight: Font.DemiBold
@@ -119,7 +123,8 @@ Item {
         }
 
         // Action Buttons
-        Image {
+        ColorImage {
+        color: AppTheme.textMain
             id: choice
             y: 164
             source: Qt.resolvedUrl("../../assets/choice_6.png")

@@ -5,6 +5,7 @@
 #include <QDir>
 #include <QDebug>
 #include <QUrl>
+#include <QDateTime>
 
 SavingDAO::SavingDAO() {
     loadFromCSV();
@@ -25,19 +26,20 @@ const QVector<Saving>& SavingDAO::getAll() const {
 }
 
 void SavingDAO::add(const Saving& item) {
-    Saving newSaving = item;
-    if (newSaving.getId() <= 0) {
-        newSaving.setId(generateNextId());
+    Saving newItem = item;
+    if (newItem.getId() <= 0) {
+        newItem.setId(generateNextId());
     }
-    m_savings.append(newSaving);
+    m_savings.append(newItem);
     saveToCSV();
 }
 
 bool SavingDAO::update(int id, const Saving& item) {
     for (int i = 0; i < m_savings.size(); ++i) {
         if (m_savings[i].getId() == id) {
-            m_savings[i] = item;
-            m_savings[i].setId(id);
+            Saving s = item;
+            s.setId(id); // Ensure ID doesn't change
+            m_savings[i] = s;
             saveToCSV();
             return true;
         }
@@ -67,71 +69,85 @@ bool SavingDAO::contributeToSaving(int savingId, double amount) {
     return false;
 }
 
+static QStringList parseCSVLine(const QString& line) {
+    QStringList fields;
+    QString current;
+    bool inQuotes = false;
+    for (int i = 0; i < line.length(); ++i) {
+        QChar c = line[i];
+        if (c == '"') {
+            if (inQuotes && i + 1 < line.length() && line[i + 1] == '"') {
+                current += '"';
+                i++;
+            } else {
+                inQuotes = !inQuotes;
+            }
+        } else if ((c == ';' || c == ',') && !inQuotes) {
+            fields.append(current.trimmed());
+            current.clear();
+        } else {
+            current += c;
+        }
+    }
+    fields.append(current.trimmed());
+    return fields;
+}
+
 void SavingDAO::loadFromCSV() {
     m_savings.clear();
-
-    QString fullPath = DatabaseManager::getDataDirectoryPath() + "/savings.csv";
-    QFile file(fullPath);
+    QString filePath = DatabaseManager::getDataDirectoryPath() + "/savings.csv";
+    QFile file(filePath);
 
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        qWarning() << "Không mở được file:" << fullPath << "- sẽ dùng dữ liệu mẫu tạm thời.";
-    } else {
-        QTextStream in(&file);
-        while (!in.atEnd()) {
-            QString line = in.readLine();
-            if (line.trimmed().isEmpty())
-                continue;
+        qWarning() << "Cannot open savings.csv for reading at:" << filePath;
+        return;
+    }
 
-            QStringList f = line.split(';');
-            if (f.size() >= 7) {
-                int id            = f[0].toInt();
-                QString name      = f[1];
-                Priority p        = static_cast<Priority>(f[2].toInt());
-                int categoryId    = f[3].toInt();
-                double target     = f[4].toDouble();
-                double current    = f[5].toDouble();
-                QDate dueDate     = QDate::fromString(f[6], Qt::ISODate);
+    QTextStream in(&file);
+    if (!in.atEnd()) {
+        in.readLine(); // Skip header
+    }
 
-                m_savings.append(Saving(id, name, p, dueDate, target, current, categoryId));
-            } else if (f.size() >= 6) {
-                int id            = f[0].toInt();
-                QString name      = f[1];
-                QDate dueDate     = QDate::fromString(f[2], Qt::ISODate);
-                double target     = f[3].toDouble();
-                double current    = f[4].toDouble();
-                int categoryId    = f[5].toInt();
+    while (!in.atEnd()) {
+        QString line = in.readLine().trimmed();
+        if (line.isEmpty()) continue;
 
-                m_savings.append(Saving(id, name, Priority::High, dueDate, target, current, categoryId));
-            }
+        QStringList fields = parseCSVLine(line);
+        if (fields.size() >= 7) {
+            int id = fields[0].toInt();
+            QString name = fields[1];
+            Priority priority = static_cast<Priority>(fields[2].toInt());
+            int categoryId = fields[3].toInt();
+            double targetAmount = fields[4].toDouble();
+            double currentAmount = fields[5].toDouble();
+            QDate dueDate = QDate::fromString(fields[6], Qt::ISODate);
+            if (!dueDate.isValid()) dueDate = QDate::fromString(fields[6], "dd/MM/yyyy");
+
+            m_savings.append(Saving(id, name, priority, dueDate, targetAmount, currentAmount, categoryId));
         }
-        file.close();
     }
-
-    if (m_savings.isEmpty()) {
-        QDate today = QDate::currentDate();
-
-        m_savings.append(Saving(1, "Emergency Fund", Priority::High, today.addMonths(6), 20000000.0, 1000000.0, 17));
-        m_savings.append(Saving(2, "Summer Vacation Fund", Priority::Medium, today.addMonths(3), 5000000.0, 2000000.0, 18));
-
-        saveToCSV();
-    }
+    file.close();
 }
 
 void SavingDAO::saveToCSV() const {
-    QString fullPath = DatabaseManager::getDataDirectoryPath() + "/savings.csv";
-    QFile file(fullPath);
-    if (!file.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Truncate)) {
+    QString filePath = DatabaseManager::getDataDirectoryPath() + "/savings.csv";
+    QFile file(filePath);
+
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+        qWarning() << "Cannot open savings.csv for writing at:" << filePath;
         return;
     }
 
     QTextStream out(&file);
+    out << "id,name,priority,categoryId,targetAmount,currentAmount,dueDate\n";
     for (const Saving& s : m_savings) {
-        out << s.getId() << ";"
-            << s.getName() << ";"
-            << static_cast<int>(s.getPriority()) << ";"
-            << s.getCategoryId() << ";"
-            << QString::number(s.getTarget(), 'f', 2) << ";"
-            << QString::number(s.getCurrent(), 'f', 2) << ";"
+        QString escapedName = QString(s.getName()).replace("\"", "\"\"");
+        out << s.getId() << ",\""
+            << escapedName << "\","
+            << static_cast<int>(s.getPriority()) << ","
+            << s.getCategoryId() << ","
+            << QString::number(s.getTarget(), 'f', 2) << ","
+            << QString::number(s.getCurrent(), 'f', 2) << ","
             << s.getDueDate().toString(Qt::ISODate) << "\n";
     }
     file.close();
@@ -155,15 +171,35 @@ bool SavingDAO::exportToCSV(const QString& targetFilePath) const {
         return false;
     }
 
+    const auto& categories = DatabaseManager::instance().categoryDAO()->getAll();
+    auto getCatName = [&categories](int catId) -> QString {
+        for (const auto& c : categories) {
+            if (c.getId() == catId) return c.getName();
+        }
+        return "Uncategorized";
+    };
+
     QTextStream out(&file);
+    out << "=== SAVINGS EXPORT REPORT ===\n";
+    out << "Generated Date,\"" << QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss") << "\"\n\n";
+    out << "ID,Goal Pot Name,Priority,Category Name,Target Amount (VND),Current Saved (VND),Due Date,Progress (%),Status\n";
+
     for (const Saving& s : m_savings) {
-        out << s.getId() << ";"
-            << s.getName() << ";"
-            << static_cast<int>(s.getPriority()) << ";"
-            << s.getCategoryId() << ";"
-            << QString::number(s.getTarget(), 'f', 2) << ";"
-            << QString::number(s.getCurrent(), 'f', 2) << ";"
-            << s.getDueDate().toString(Qt::ISODate) << "\n";
+        QString escapedName = QString(s.getName()).replace("\"", "\"\"");
+        QString priorityStr = (s.getPriority() == Priority::High) ? "High" :
+                              (s.getPriority() == Priority::Medium) ? "Medium" : "Low";
+        QString catName = QString(getCatName(s.getCategoryId())).replace("\"", "\"\"");
+        double pct = s.getProgressPercent();
+
+        out << s.getId() << ",\""
+            << escapedName << "\",\""
+            << priorityStr << "\",\""
+            << catName << "\","
+            << QString::number(s.getTarget(), 'f', 2) << ","
+            << QString::number(s.getCurrent(), 'f', 2) << ","
+            << s.getDueDate().toString("yyyy-MM-dd") << ",\""
+            << QString::number(pct, 'f', 1) << "%\",\""
+            << (s.isCompleted() ? "Completed" : "In Progress") << "\"\n";
     }
     file.close();
     return true;

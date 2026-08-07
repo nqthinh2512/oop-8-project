@@ -1,4 +1,5 @@
 import QtQuick
+import src
 import QtQuick.Layouts
 
 Rectangle {
@@ -15,8 +16,8 @@ Rectangle {
     Layout.preferredWidth: 1
     clip: true
 
-    color: "#ffffff"
-    border.color: "#e2e8f0"
+    color: AppTheme.bgCard
+    border.color: AppTheme.border
     border.width: 1
     radius: 12
 
@@ -30,7 +31,7 @@ Rectangle {
             font.family: "Intel One Mono"
             font.pixelSize: 12
             font.weight: Font.Bold
-            color: "#64748b"
+            color: AppTheme.textSub
             text: root.titleText.toUpperCase()
             elide: Text.ElideRight
             Layout.fillWidth: true
@@ -41,7 +42,7 @@ Rectangle {
             font.family: "Intel One Mono"
             font.pixelSize: 20
             font.weight: Font.Bold
-            color: "#0f172a"
+            color: AppTheme.textMain
             text: root.amountText
             elide: Text.ElideRight
             Layout.fillWidth: true
@@ -50,7 +51,7 @@ Rectangle {
         Text {
             font.family: "Inter"
             font.pixelSize: 12
-            color: "#64748b"
+            color: AppTheme.textSub
             text: root.labelText
             elide: Text.ElideRight
             Layout.fillWidth: true

@@ -1,4 +1,5 @@
 #include "settings_controller.h"
+#include "reports_controller.h"
 #include <QCoreApplication>
 #include <QDir>
 #include <QFile>
@@ -16,9 +17,12 @@ SettingsController::SettingsController(QObject *parent)
       m_email("admin.user@phinma.edu.ph"),
       m_contact("09123456789"),
       m_avatarImagePath(""),
-      m_avatarColor(kDefaultAvatarColor)
+      m_avatarColor(kDefaultAvatarColor),
+      m_theme("Light"),
+      m_autoBackup(false)
 {
     loadAvatar();
+    loadSettings();
 }
 
 void SettingsController::toggleEdit()
@@ -32,8 +36,6 @@ void SettingsController::cancelEdit()
     if (m_isEditing) {
         m_isEditing = false;
         emit isEditingChanged();
-        // Since we didn't save, the properties remain unchanged.
-        // QML will reset its temporary state to these bound properties.
     }
 }
 
@@ -42,9 +44,7 @@ void SettingsController::saveChanges(const QString &newName, const QString &newE
     m_fullName = newName;
     m_email = newEmail;
     m_contact = newContact;
-    
     m_isEditing = false;
-    
     emit profileChanged();
     emit isEditingChanged();
 }
@@ -59,7 +59,6 @@ QString SettingsController::initials() const
 
 void SettingsController::setAvatarImage(const QString &filePath)
 {
-    // filePath arrives as a "file:///..." URL from the QML FileDialog
     m_avatarImagePath = filePath;
     persistAvatar();
     emit profileChanged();
@@ -73,54 +72,113 @@ void SettingsController::setAvatarPreset(const QString &colorHex)
     emit profileChanged();
 }
 
+
+
+void SettingsController::setTheme(const QString &theme)
+{
+    if (m_theme != theme) {
+        m_theme = theme;
+        persistSettings();
+        emit themeChanged();
+    }
+}
+
+void SettingsController::setAutoBackup(bool autoBackup)
+{
+    if (m_autoBackup != autoBackup) {
+        m_autoBackup = autoBackup;
+        persistSettings();
+        emit autoBackupChanged();
+    }
+}
+
+void SettingsController::loadSettings()
+{
+    QString dirPath = DatabaseManager::getDataDirectoryPath();
+    QString fullPath = dirPath + "/settings.ini";
+    QFile file(fullPath);
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) return;
+    QTextStream in(&file);
+    m_theme = in.readLine();
+    m_autoBackup = (in.readLine() == "true");
+    file.close();
+}
+
+void SettingsController::persistSettings() const
+{
+    QString dirPath = DatabaseManager::getDataDirectoryPath();
+    QDir dir(dirPath);
+    if (!dir.exists()) dir.mkpath(".");
+    QString fullPath = dirPath + "/settings.ini";
+    QFile file(fullPath);
+    if (file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+        QTextStream out(&file);
+        out << m_theme << "\n";
+        out << (m_autoBackup ? "true" : "false") << "\n";
+        file.close();
+    }
+}
+
 void SettingsController::loadAvatar()
 {
     QString dirPath = DatabaseManager::getDataDirectoryPath();
     QString fullPath = dirPath + "/avatar.txt";
-
     QFile file(fullPath);
-    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        return; // no saved avatar yet - keep the defaults
-    }
-
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) return;
     QTextStream in(&file);
     QString imagePath = in.readLine();
     QString color = in.readLine();
     file.close();
-
     if (!imagePath.isNull() && !imagePath.isEmpty()) {
-        // Only trust the saved path if the image file still exists on disk
         QUrl url(imagePath);
         QString localPath = url.isLocalFile() ? url.toLocalFile() : imagePath;
-        if (QFile::exists(localPath)) {
-            m_avatarImagePath = imagePath;
-        }
+        if (QFile::exists(localPath)) m_avatarImagePath = imagePath;
     }
-    if (!color.isNull() && !color.isEmpty()) {
-        m_avatarColor = color;
-    }
+    if (!color.isNull() && !color.isEmpty()) m_avatarColor = color;
 }
-
-#include "../backend/storage/database_manager.h"
 
 void SettingsController::persistAvatar() const
 {
     QString dirPath = DatabaseManager::getDataDirectoryPath();
     QDir dir(dirPath);
     if (!dir.exists()) dir.mkpath(".");
-
-    QFile file(dirPath + "/avatar.txt");
-    if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
-        return;
+    QString fullPath = dirPath + "/avatar.txt";
+    QFile file(fullPath);
+    if (file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+        QTextStream out(&file);
+        out << m_avatarImagePath << "\n";
+        out << m_avatarColor << "\n";
+        file.close();
     }
-
-    QTextStream out(&file);
-    out << m_avatarImagePath << "\n";
-    out << m_avatarColor << "\n";
-    file.close();
 }
 
 bool SettingsController::exportAllToCSV(const QString &folderPath)
 {
-    return DatabaseManager::instance().exportAllToCSV(folderPath);
+    QUrl url(folderPath);
+    QString localPath = url.isLocalFile() ? url.toLocalFile() : folderPath;
+
+    // Remove any trailing slashes to be safe
+    if (localPath.endsWith("/")) {
+        localPath.chop(1);
+    }
+    // Convert to native separators
+    localPath = QDir::toNativeSeparators(localPath);
+
+    bool res = DatabaseManager::instance().exportAllToCSV(localPath);
+    
+    // Also export the comprehensive Financial Summary Report
+    ReportsController reportsCtrl;
+    res &= reportsCtrl.exportToCSV(localPath + "/financial_summary_report.csv");
+
+    return res;
+}
+
+void SettingsController::factoryReset()
+{
+    DatabaseManager::instance().factoryReset();
+    m_theme = "Light";
+    m_autoBackup = false;
+    persistSettings();
+    emit themeChanged();
+    emit autoBackupChanged();
 }

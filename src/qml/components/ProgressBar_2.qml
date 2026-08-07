@@ -1,4 +1,5 @@
 import QtQuick
+import src
 
 Rectangle {
     enum State_1 { State_1_morehalf, State_1_almosthalf, State_1_barelyhal}

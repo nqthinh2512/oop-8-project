@@ -1,4 +1,5 @@
 import QtQuick
+import src
 
 Rectangle {
     enum Align { Align_Justify, Align_Start, Align_End, Align_Center, Align_Stack}

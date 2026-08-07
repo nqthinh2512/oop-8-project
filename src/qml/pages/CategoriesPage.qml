@@ -1,4 +1,5 @@
 import QtQuick
+import src
 import QtQuick.Layouts
 import QtQuick.Controls
 import QtQuick.Dialogs
@@ -9,21 +10,9 @@ import "../components"
 Rectangle {
     id: categoriesPage
 
-    color: "#f8fafc"
+    color: AppTheme.bgApp
     clip: true
 
-    FileDialog {
-        id: exportFileDialog
-        title: "Export Categories to CSV"
-        fileMode: FileDialog.SaveFile
-        nameFilters: ["CSV Files (*.csv)", "All Files (*)"]
-        defaultSuffix: "csv"
-        currentFolder: StandardPaths.standardLocations(StandardPaths.DocumentsLocation)[0]
-        currentFile: "file:///" + StandardPaths.writableLocation(StandardPaths.DocumentsLocation) + "/categories_export.csv"
-        onAccepted: {
-            categoriesController.exportToCSV(selectedFile.toString())
-        }
-    }
 
     onVisibleChanged: {
         if (!visible) {
@@ -78,13 +67,13 @@ Rectangle {
                 font.family: "Inter"
                 font.pixelSize: 32
                 font.weight: Font.Bold
-                color: "#0f172a"
+                color: AppTheme.textMain
             }
 
             Rectangle {
                 Layout.fillWidth: true
                 height: 1
-                color: "#e2e8f0"
+                color: AppTheme.border
             }
         }
 
@@ -100,8 +89,8 @@ Rectangle {
             Rectangle {
                 Layout.fillWidth: true
                 implicitHeight: 70
-                color: "#ffffff"
-                border.color: "#e2e8f0"
+                color: AppTheme.bgCard
+                border.color: AppTheme.border
                 border.width: 1
                 topLeftRadius: 12
                 topRightRadius: 12
@@ -146,13 +135,13 @@ Rectangle {
                         }
                     }
 
-                    Rectangle { Layout.preferredWidth: 1; Layout.preferredHeight: 24; color: "#cbd5e1" }
+                    Rectangle { Layout.preferredWidth: 1; Layout.preferredHeight: 24; color: AppTheme.divider }
 
                     // Consolidated Category Group Filter Dropdown
                     Dropdown_1 {
                         id: toolbarDropdown
                         Layout.preferredWidth: 200
-                        model: ["All Categories", "Income (Parent 1)", "Expense (Parent 2)", "Bill (Parent 3)", "Budget (Parent 4)", "Saving (Parent 5)"]
+                        model: ["All Main Categories", "Income", "Expense", "Bill", "Budget", "Saving"]
                         selectedIndex: categoriesController.parentFilter
 
                         onSelected: (idx, val) => {
@@ -162,11 +151,6 @@ Rectangle {
 
                     Item {
                         Layout.fillWidth: true
-                    }
-
-                    UniversalButton_1 {
-                        buttonText: "Export CSV"
-                        onClicked: exportFileDialog.open()
                     }
 
                     UniversalButton_1 {
@@ -182,8 +166,8 @@ Rectangle {
             Rectangle {
                 Layout.fillWidth: true
                 implicitHeight: 48
-                color: "#f1f5f9"
-                border.color: "#e2e8f0"
+                color: AppTheme.bgHover
+                border.color: AppTheme.border
                 border.width: 1
 
                 RowLayout {
@@ -204,7 +188,7 @@ Rectangle {
                             font.family: "Inter"
                             font.pixelSize: 12
                             font.weight: Font.Bold
-                            color: "#64748b"
+                            color: AppTheme.textSub
                         }
                     }
 
@@ -220,7 +204,7 @@ Rectangle {
                             font.family: "Inter"
                             font.pixelSize: 12
                             font.weight: Font.Bold
-                            color: "#64748b"
+                            color: AppTheme.textSub
                         }
                     }
 
@@ -236,7 +220,7 @@ Rectangle {
                             font.family: "Inter"
                             font.pixelSize: 12
                             font.weight: Font.Bold
-                            color: "#64748b"
+                            color: AppTheme.textSub
                         }
                     }
 
@@ -251,7 +235,7 @@ Rectangle {
                             font.family: "Inter"
                             font.pixelSize: 12
                             font.weight: Font.Bold
-                            color: "#64748b"
+                            color: AppTheme.textSub
                         }
                     }
 
@@ -267,7 +251,7 @@ Rectangle {
                             font.family: "Inter"
                             font.pixelSize: 12
                             font.weight: Font.Bold
-                            color: "#64748b"
+                            color: AppTheme.textSub
                         }
                     }
                 }

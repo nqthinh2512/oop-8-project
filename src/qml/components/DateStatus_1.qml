@@ -1,4 +1,5 @@
 import QtQuick
+import src
 
 Rectangle {
     enum State_1 { State_1_overdue, State_1_default}

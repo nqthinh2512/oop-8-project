@@ -2,6 +2,25 @@
 #include <QLocale>
 #include <QDate>
 #include <QDebug>
+#include <QFile>
+#include <QTextStream>
+#include <QDateTime>
+#include <QUrl>
+
+namespace {
+static QString resolveLocalPath(const QString& path) {
+    if (path.startsWith("file:///")) {
+        return QUrl(path).toLocalFile();
+    }
+    return path;
+}
+
+static QString escapeCSV(const QString& str) {
+    QString res = str;
+    res.replace("\"", "\"\"");
+    return "\"" + res + "\"";
+}
+}
 
 ReportsController::ReportsController(QObject *parent)
     : QObject(parent) {
@@ -414,5 +433,110 @@ void ReportsController::refresh() {
 }
 
 bool ReportsController::exportToCSV(const QString &filePath) {
-    return DatabaseManager::instance().transactionDAO()->exportToCSV(filePath);
+    QString cleanPath = resolveLocalPath(filePath);
+    QFile file(cleanPath);
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+        return false;
+    }
+
+    QTextStream out(&file);
+
+    // 1. Title & Timestamp
+    out << "=== FINANCIAL ANALYTICS & SUMMARY REPORT ===\n";
+    out << "Generated Date," << escapeCSV(QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss")) << "\n\n";
+
+    // 2. Key Executive Metrics
+    out << "--- KEY FINANCIAL METRICS ---\n";
+    out << "Metric,Value\n";
+    out << "Monthly Income," << escapeCSV(monthlyIncomeFormatted()) << "\n";
+    out << "Monthly Expense," << escapeCSV(monthlyExpenseFormatted()) << "\n";
+    out << "Net Worth," << escapeCSV(netWorthFormatted()) << "\n";
+    out << "Savings Rate," << escapeCSV(savingsRateFormatted()) << "\n\n";
+
+    // 3. Category Expense Breakdown
+    out << "--- CATEGORY EXPENSE BREAKDOWN ---\n";
+    out << "Category Name,Amount (VND),Percentage (%)\n";
+    QVariantList expList = categoryExpenseReport();
+    for (const QVariant& item : expList) {
+        QVariantMap map = item.toMap();
+        double pct = map["percentage"].toDouble();
+        out << escapeCSV(map["name"].toString()) << ","
+            << escapeCSV(map["amountFormatted"].toString()) << ","
+            << escapeCSV(QString::number(pct, 'f', 1) + "%") << "\n";
+    }
+    if (expList.isEmpty()) {
+        out << "No Expense Data,0 VND,0.0%\n";
+    }
+    out << "\n";
+
+    // 4. Category Income Breakdown
+    out << "--- CATEGORY INCOME BREAKDOWN ---\n";
+    out << "Category Name,Amount (VND),Percentage (%)\n";
+    QVariantList incList = categoryIncomeReport();
+    for (const QVariant& item : incList) {
+        QVariantMap map = item.toMap();
+        double pct = map["percentage"].toDouble();
+        out << escapeCSV(map["name"].toString()) << ","
+            << escapeCSV(map["amountFormatted"].toString()) << ","
+            << escapeCSV(QString::number(pct, 'f', 1) + "%") << "\n";
+    }
+    if (incList.isEmpty()) {
+        out << "No Income Data,0 VND,0.0%\n";
+    }
+    out << "\n";
+
+    // 5. System Module Snapshots
+    out << "--- MODULE SNAPSHOTS SUMMARY ---\n";
+    out << "Module,Detail 1,Detail 2,Detail 3\n";
+    QVariantMap bSnap = billsSnapshot();
+    out << "Bills," << escapeCSV("Due: " + bSnap["dueFormatted"].toString()) << ","
+                    << escapeCSV("Overdue: " + bSnap["overdueFormatted"].toString()) << ","
+                    << escapeCSV("Paid: " + bSnap["paidFormatted"].toString()) << "\n";
+
+    QVariantMap bgSnap = budgetsSnapshot();
+    out << "Budgets," << escapeCSV("Spent: " + bgSnap["spentFormatted"].toString()) << ","
+                      << escapeCSV("Limit: " + bgSnap["limitFormatted"].toString()) << ","
+                      << escapeCSV("Remaining: " + bgSnap["remainingFormatted"].toString()) << "\n";
+
+    QVariantMap sSnap = savingsSnapshot();
+    out << "Savings," << escapeCSV("Saved: " + sSnap["savedFormatted"].toString()) << ","
+                     << escapeCSV("Target: " + sSnap["targetFormatted"].toString()) << ","
+                     << escapeCSV("Remaining: " + sSnap["remainingFormatted"].toString()) << "\n\n";
+
+    // 6. 6-Month Income, Expense & Net Worth Trend
+    out << "--- 6-MONTH COMPARISON & NET WORTH TREND ---\n";
+    out << "Month,Income (VND),Expense (VND),Cumulative Net Worth (VND)\n";
+
+    QDate today = QDate::currentDate();
+    const auto& transactions = DatabaseManager::instance().transactionDAO()->getAll();
+
+    for (int i = 5; i >= 0; --i) {
+        QDate d = today.addMonths(-i);
+        QString monthLabel = d.toString("MMM yyyy");
+        
+        double incSum = 0.0;
+        double expSum = 0.0;
+        double cumNet = 0.0;
+        QDate monthEnd(d.year(), d.month(), d.daysInMonth());
+
+        for (const Transaction* t : transactions) {
+            if (!t) continue;
+            QDate td = t->getDateTime().date();
+            if (td.year() == d.year() && td.month() == d.month()) {
+                if (t->getSignedAmount() > 0) incSum += t->getAmount();
+                else if (t->getSignedAmount() < 0) expSum += t->getAmount();
+            }
+            if (td <= monthEnd) {
+                cumNet += t->getSignedAmount();
+            }
+        }
+
+        out << escapeCSV(monthLabel) << ","
+            << escapeCSV(formatVND(incSum)) << ","
+            << escapeCSV(formatVND(expSum)) << ","
+            << escapeCSV(formatVND(cumNet)) << "\n";
+    }
+
+    file.close();
+    return true;
 }

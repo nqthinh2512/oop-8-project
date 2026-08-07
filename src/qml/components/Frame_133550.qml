@@ -1,4 +1,5 @@
 import QtQuick
+import src
 
 Rectangle {
     id: frame_133550
@@ -8,7 +9,7 @@ Rectangle {
 
     border.color: "#7e7e7e"
     border.width: 1
-    color: "#ffffff"
+    color: AppTheme.bgCard
     radius: 12
 
     Text {

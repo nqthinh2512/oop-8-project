@@ -1,4 +1,5 @@
 import QtQuick
+import src
 import QtQuick.Layouts
 import QtQuick.Shapes
 
@@ -24,9 +25,9 @@ Rectangle {
     height: implicitHeight
     Layout.fillWidth: true
 
-    border.color: "#f1f5f9"
+    border.color: AppTheme.bgHover
     border.width: 1
-    color: "#ffffff"
+    color: AppTheme.bgCard
 
     RowLayout {
         anchors.fill: parent
@@ -45,7 +46,7 @@ Rectangle {
                 anchors.right: parent.right
                 anchors.rightMargin: 8
                 anchors.verticalCenter: parent.verticalCenter
-                color: "#0f172a"
+                color: AppTheme.textMain
                 font.family: "Inter"
                 font.pixelSize: 14
                 font.weight: Font.Bold

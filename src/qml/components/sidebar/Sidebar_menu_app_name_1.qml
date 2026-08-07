@@ -1,4 +1,7 @@
 import QtQuick
+import QtQuick.Controls
+import QtQuick.Controls.impl
+import src
 import QtQuick.Layouts
 
 Item {
@@ -12,14 +15,16 @@ Item {
         anchors.leftMargin: 8
         spacing: 12
 
-        Image {
+        ColorImage {
+        color: AppTheme.textMain
             id: ellipse_1
             source: Qt.resolvedUrl("../../assets/ellipse_1.png")
             fillMode: Image.PreserveAspectFit
             Layout.alignment: Qt.AlignVCenter
         }
 
-        Image {
+        ColorImage {
+        color: AppTheme.textMain
             id: fManagement
             source: Qt.resolvedUrl("../../assets/fManagement.png")
             fillMode: Image.PreserveAspectFit

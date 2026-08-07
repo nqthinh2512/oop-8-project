@@ -1,4 +1,5 @@
 import QtQuick
+import src
 import QtQuick.Layouts
 import QtQuick.Shapes
 
@@ -19,8 +20,8 @@ Rectangle {
     height: implicitHeight
 
     clip: true
-    color: "#f8fafc"
-    border.color: "#e2e8f0"
+    color: AppTheme.bgApp
+    border.color: AppTheme.border
     border.width: 1
     radius: height / 2
 
@@ -36,7 +37,7 @@ Rectangle {
             Layout.fillWidth: true
             Layout.alignment: Qt.AlignVCenter
 
-            color: "#0f172a"
+            color: AppTheme.textMain
             font.family: "Inter"
             font.pixelSize: 14
             selectByMouse: true
@@ -50,7 +51,7 @@ Rectangle {
 
             Text {
                 anchors.fill: parent
-                color: "#94a3b8"
+                color: AppTheme.textMuted
                 font: parent.font
                 verticalAlignment: Text.AlignVCenter
                 text: searchBar.placeholderText
@@ -71,7 +72,7 @@ Rectangle {
 
                 ShapePath {
                     fillColor: "#00000000"
-                    strokeColor: "#64748b"
+                    strokeColor: AppTheme.textSub
                     strokeWidth: 2
 
                     PathSvg {

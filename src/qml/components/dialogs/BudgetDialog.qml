@@ -1,4 +1,7 @@
 import QtQuick
+import QtQuick.Controls
+import QtQuick.Controls.impl
+import src
 import ".."
 
 Item {
@@ -118,7 +121,7 @@ Item {
         height: 683
         width: 500
 
-        color: "#ffffff"
+        color: AppTheme.bgCard
         radius: 15
         clip: true
 
@@ -126,7 +129,8 @@ Item {
         MouseArea { anchors.fill: parent }
 
         // 1. Title Header
-        Image {
+        ColorImage {
+        color: AppTheme.textMain
             id: title
             source: Qt.resolvedUrl("../../assets/title_9.png")
 
@@ -136,7 +140,7 @@ Item {
                 y: 9
                 height: 32
                 width: 300
-                color: "#191919"
+                color: AppTheme.textMain
                 font.capitalization: Font.Capitalize
                 font.family: "Intel One Mono"
                 font.pixelSize: 24
@@ -209,7 +213,7 @@ Item {
                     anchors.leftMargin: 15
                     anchors.rightMargin: 15
                     verticalAlignment: Text.AlignVCenter
-                    color: "#191919"
+                    color: AppTheme.textMain
                     font.family: "Roboto"
                     font.pixelSize: 16
                     font.weight: Font.Normal
@@ -358,7 +362,7 @@ Item {
                         anchors.leftMargin: 15
                         anchors.rightMargin: 15
                         verticalAlignment: Text.AlignVCenter
-                        color: "#191919"
+                        color: AppTheme.textMain
                         font.family: "Roboto"
                         font.pixelSize: 16
                         font.weight: Font.Normal
@@ -431,7 +435,7 @@ Item {
                         anchors.leftMargin: 15
                         anchors.rightMargin: 15
                         verticalAlignment: Text.AlignVCenter
-                        color: "#191919"
+                        color: AppTheme.textMain
                         font.family: "Roboto"
                         font.pixelSize: 16
                         font.weight: Font.Normal
@@ -492,6 +496,7 @@ Item {
 
             Date_Input_Field_1 {
                 id: date_Input_Field
+                allowFutureDates: true
                 x: 20
                 y: 32
                 height: 42
@@ -527,6 +532,7 @@ Item {
 
             Date_Input_Field_1 {
                 id: date_Input_Field_1
+                allowFutureDates: true
                 x: 20
                 y: 32
                 height: 42
@@ -576,7 +582,8 @@ Item {
         }
 
         // 7. Footer Action Buttons
-        Image {
+        ColorImage {
+        color: AppTheme.textMain
             id: choice
             y: 630
             source: Qt.resolvedUrl("../../assets/choice.png")

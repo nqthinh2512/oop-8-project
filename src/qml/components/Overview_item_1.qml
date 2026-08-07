@@ -1,4 +1,7 @@
 import QtQuick
+import QtQuick.Controls
+import QtQuick.Controls.impl
+import src
 import QtQuick.Layouts
 
 Item {
@@ -25,19 +28,19 @@ Item {
     readonly property var typeConfig: {
         if (type_1 === Overview_item_1.Type.Type_income) {
             return {
-                amountColor: "#10b981",
+                amountColor: AppTheme.success,
                 dateColor: "#9ca3af",
                 dateWeight: Font.Normal
             }
         } else if (type_1 === Overview_item_1.Type.Type_expense) {
             return {
-                amountColor: "#ef4444",
+                amountColor: AppTheme.danger,
                 dateColor: "#9ca3af",
                 dateWeight: Font.Normal
             }
         }
         return {
-            amountColor: "#191919",
+            amountColor: AppTheme.textMain,
             dateColor: "#8c7653",
             dateWeight: Font.DemiBold
         }
@@ -54,7 +57,8 @@ Item {
         spacing: 12
 
         // Optional Icon
-        Image {
+        ColorImage {
+        color: AppTheme.textMain
             visible: root.showIcon && root.iconSource.toString() !== ""
             source: root.iconSource
             Layout.preferredWidth: 36
@@ -73,7 +77,7 @@ Item {
                 font.family: "Inter"
                 font.pixelSize: 15
                 font.weight: Font.Bold
-                color: "#191919"
+                color: AppTheme.textMain
                 text: root.itemTitle
                 elide: Text.ElideRight
                 Layout.fillWidth: true

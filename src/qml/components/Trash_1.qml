@@ -1,4 +1,5 @@
 import QtQuick
+import src
 import QtQuick.Shapes
 
 Rectangle {
@@ -35,11 +36,11 @@ Rectangle {
                 target: trash
             }
             PropertyChanges {
-                strokeColor: "#1e1e1e"
+                strokeColor: AppTheme.textSub
                 target: icon_ShapePath0
             }
             PropertyChanges {
-                strokeColor: "#1e1e1e"
+                strokeColor: AppTheme.textSub
                 target: icon_ShapePath1
             }
         },
@@ -77,7 +78,7 @@ Rectangle {
 
             fillColor: "#00000000"
             fillRule: ShapePath.WindingFill
-            strokeColor: "#1e1e1e"
+            strokeColor: AppTheme.textSub
             strokeWidth: 1.50
 
             PathSvg {
@@ -91,7 +92,7 @@ Rectangle {
 
             fillColor: "#00000000"
             fillRule: ShapePath.WindingFill
-            strokeColor: "#1e1e1e"
+            strokeColor: AppTheme.textSub
             strokeWidth: 1.50
 
             PathSvg {

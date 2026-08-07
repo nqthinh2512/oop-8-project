@@ -1,4 +1,7 @@
 import QtQuick
+import QtQuick.Controls
+import QtQuick.Controls.impl
+import src
 
 Rectangle {
     id: calendar_Month_Field
@@ -44,7 +47,7 @@ Rectangle {
 
         border.color: "#d9d9d9"
         border.width: 1
-        color: "#ffffff"
+        color: AppTheme.bgCard
         radius: 8
 
         Text {
@@ -75,7 +78,8 @@ Rectangle {
 
             clip: true
         }
-        Image {
+        ColorImage {
+        color: AppTheme.textMain
             id: options
 
             x: 8

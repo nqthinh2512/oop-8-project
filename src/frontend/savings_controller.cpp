@@ -4,6 +4,8 @@
 #include <QLocale>
 #include <cmath>
 #include <QDebug>
+#include "../backend/storage/database_manager.h"
+#include "../backend/models/transaction_factory.h"
 
 namespace {
 QString formatVnd(double amount) {
@@ -120,7 +122,7 @@ QVariantList SavingsController::categoryOptions() const
 
     QVariantMap allMap;
     allMap["id"] = 0;
-    allMap["name"] = "All Main Categories";
+    allMap["name"] = "All Categories";
     options.append(allMap);
 
     for (const auto &c : allCats) {
@@ -211,6 +213,20 @@ bool SavingsController::addSaving(const QString &name, int priority, int categor
     int catId = (categoryId == 0 ? Saving::parentCategory : categoryId);
     Saving s(0, name, p, dueDate, target, current, catId);
     DatabaseManager::instance().savingDAO()->add(s);
+    
+    if (current > 0) {
+        // Find the new Saving ID (assume it's the last one added)
+        const auto& allSavings = DatabaseManager::instance().savingDAO()->getAll();
+        int newId = allSavings.isEmpty() ? 0 : allSavings.last().getId();
+        
+        QString autoTitle = QString("[Auto-Saving ID:%1] Deposit to %2").arg(newId).arg(name);
+        Transaction* newTx = TransactionFactory::createTransaction(
+            1, 0, autoTitle, current, QDateTime::currentDateTime(), "Saving Deposit", catId
+        );
+        DatabaseManager::instance().transactionDAO()->add(newTx);
+        DatabaseManager::instance().budgetDAO()->addExpenseToBudget(catId, current);
+    }
+    
     DatabaseManager::instance().triggerDataChanged();
 
     refresh();
@@ -231,6 +247,8 @@ bool SavingsController::updateSaving(int id, const QString &name, int priority, 
     for (const Saving& s : DatabaseManager::instance().savingDAO()->getAll()) {
         if (s.getId() == id) {
             Saving updatedS = s;
+            double delta = current - s.getCurrent();
+            
             updatedS.setName(name);
             updatedS.setPriority(p);
             if (categoryId != 0) updatedS.setCategoryId(categoryId);
@@ -238,6 +256,22 @@ bool SavingsController::updateSaving(int id, const QString &name, int priority, 
             updatedS.setCurrent(current);
             updatedS.setDueDate(dueDate);
             success = DatabaseManager::instance().savingDAO()->update(id, updatedS);
+            
+            if (success && delta != 0) {
+                QString autoTitle = QString("[Auto-Saving ID:%1] %2 %3").arg(id).arg(delta > 0 ? "Deposit to" : "Withdraw from").arg(name);
+                int typeIndex = (delta > 0) ? 1 : 0; // 1 = Expense (Deposit to saving), 0 = Income (Withdraw from saving)
+                Transaction* newTx = TransactionFactory::createTransaction(
+                    typeIndex, 0, autoTitle, std::abs(delta), QDateTime::currentDateTime(), "Saving Transfer", updatedS.getCategoryId()
+                );
+                DatabaseManager::instance().transactionDAO()->add(newTx);
+                
+                if (typeIndex == 1) {
+                    DatabaseManager::instance().budgetDAO()->addExpenseToBudget(updatedS.getCategoryId(), std::abs(delta));
+                } else {
+                    // Income doesn't affect budgets typically, but if it was an expense refund, it could.
+                    // For now, Income just adds to Net Balance.
+                }
+            }
             break;
         }
     }

@@ -1,4 +1,5 @@
 import QtQuick
+import src
 import QtQuick.Layouts
 import QtQuick.Shapes
 
@@ -11,9 +12,9 @@ Rectangle {
     height: implicitHeight
     Layout.fillWidth: true
 
-    border.color: "#f1f5f9"
+    border.color: AppTheme.bgHover
     border.width: 1
-    color: "#ffffff"
+    color: AppTheme.bgCard
 
     // Exposed Data Properties
     property int type_1: TransactionRow_1.Type.Type_expense
@@ -89,7 +90,7 @@ Rectangle {
                     Layout.fillWidth: true
 
                     Text {
-                        color: "#0f172a"
+                        color: AppTheme.textMain
                         font.family: "Inter"
                         font.pixelSize: 14
                         font.weight: Font.Bold
@@ -176,7 +177,7 @@ Rectangle {
             Text {
                 anchors.left: parent.left
                 anchors.verticalCenter: parent.verticalCenter
-                color: "#64748b"
+                color: AppTheme.textSub
                 font.family: "Inter"
                 font.pixelSize: 14
                 font.weight: Font.Normal
