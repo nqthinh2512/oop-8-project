@@ -179,7 +179,7 @@ Rectangle {
 
                                 Text {
                                     anchors.centerIn: parent
-                                    text: "Đổi ảnh đại diện"
+                                    text: "Change your avatar"
                                     color: AppTheme.textMain
                                     font.family: "Inter"
                                     font.pixelSize: 14
@@ -337,14 +337,6 @@ Rectangle {
                                     onTextChanged: currentFullName = text
                                 }
                             }
-                        }
-                        // Employee ID (Read-only)
-                        ColumnLayout {
-                            spacing: 6
-                            Layout.fillWidth: true
-                            Layout.alignment: Qt.AlignTop
-                            Text { text: "Employee ID"; font.pixelSize: 14; color: AppTheme.textSub; font.family: "Inter" }
-                            Text { text: "EMP-2024-001"; font.pixelSize: 16; color: AppTheme.textMain; font.family: "Inter"; font.weight: Font.Medium }
                         }
 
                         // --- Row 2 ---
