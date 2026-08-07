@@ -209,6 +209,7 @@ Rectangle {
                     startDate: modelData.startDateText
                     endDate: modelData.endDateText
                     periodVal: modelData.period
+                    statusVal: modelData.status
 
                     onEditClicked: {
                         budgetDialogContent.openForEdit(modelData)
