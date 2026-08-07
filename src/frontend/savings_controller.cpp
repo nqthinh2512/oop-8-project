@@ -277,6 +277,7 @@ bool SavingsController::updateSaving(int id, const QString &name, int priority, 
     }
 
     if (success) {
+        DatabaseManager::instance().triggerDataChanged();
         refresh();
     }
     return success;
