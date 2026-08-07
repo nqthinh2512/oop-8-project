@@ -83,15 +83,15 @@ ColumnLayout {
                 }
 
                 // Date Text
-                Text {
-                    font.family: "Inter"
-                    font.pixelSize: 12
-                    font.weight: Font.Medium
-                    color: AppTheme.textMuted
-                    text: root.dateText
-                    verticalAlignment: Text.AlignVCenter
-                    Layout.alignment: Qt.AlignVCenter
-                }
+            //    Text {
+            //        font.family: "Inter"
+            //        font.pixelSize: 12
+            //        font.weight: Font.Medium
+            //        color: AppTheme.textMuted
+            //        text: root.dateText
+            //        verticalAlignment: Text.AlignVCenter
+            //        Layout.alignment: Qt.AlignVCenter
+            //    }
 
                 // Optional Trend Badge (e.g. ↑ 8% or ↓ 5%)
                 Rectangle {

@@ -28,7 +28,7 @@ Rectangle {
     border.color: AppTheme.bgHover
     border.width: 1
 
-    color: hoverHandler.hovered ? "#EEEEEE" : AppTheme.bgCard
+    color: hoverHandler.hovered ? AppTheme.bgHover : AppTheme.bgCard
     Behavior on color {
         ColorAnimation { duration: 150 }
     }
