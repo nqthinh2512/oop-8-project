@@ -1,7 +1,24 @@
-type,id,title,amount,dateTime,method,categoryId
-Income,1,Monthly Salary,15000000.00,2026-07-19T22:21:52,Bank Transfer,1
-Income,2,Freelance Web Design,3500000.00,2026-07-29T01:57:27,Bank Transfer,2
-Expense,3,Monthly Apartment Rent,3500000.00,2026-07-24T01:57:27,Cash,6
-Expense,4,Weekly Grocery & Dining,850000.00,2026-07-31T01:57:27,Cash,5
-Expense,5,Fiber Internet Service,250000.00,2026-08-01T01:57:27,Credit Card,8
-Expense,6,Fuel & Transportation,200000.00,2026-08-02T01:57:27,Cash,7
+type,id,title,amount,dateTime,method,categoryId,linkedBillId,linkedSavingId,linkedBudgetId
+Income,1,Monthly Tech Salary,17500000.00,2026-03-01T09:00:00,Bank Transfer,1,-1,-1,-1
+Expense,2,Apartment Rent Payment,3500000.00,2026-03-05T10:00:00,Bank Transfer,6,1,-1,2
+Expense,3,Supermarket Groceries & Dining,1850000.00,2026-03-15T18:00:00,Credit Card,5,-1,-1,1
+Income,4,Monthly Tech Salary,17500000.00,2026-04-01T09:00:00,Bank Transfer,1,-1,-1,-1
+Income,5,Freelance Design Project,3000000.00,2026-04-10T14:00:00,Bank Transfer,2,-1,-1,-1
+Expense,6,Apartment Rent Payment,3500000.00,2026-04-05T10:00:00,Bank Transfer,6,1,-1,2
+Expense,7,Deposit to Emergency Savings,3500000.00,2026-04-25T15:00:00,Bank Transfer,21,-1,1,-1
+Income,8,Monthly Tech Salary,18000000.00,2026-05-01T09:00:00,Bank Transfer,1,-1,-1,-1
+Expense,9,Apartment Rent Payment,3500000.00,2026-05-05T10:00:00,Bank Transfer,6,1,-1,2
+Expense,10,Deposit to Japan Vacation Fund,3000000.00,2026-05-20T16:00:00,Bank Transfer,22,-1,2,-1
+Income,11,Monthly Tech Salary,18000000.00,2026-06-01T09:00:00,Bank Transfer,1,-1,-1,-1
+Income,12,Investment Dividend Payout,2000000.00,2026-06-15T11:00:00,Bank Transfer,3,-1,-1,-1
+Expense,13,Supermarket Groceries & Dining,2100000.00,2026-06-18T19:00:00,Credit Card,5,-1,-1,1
+Income,14,Monthly Tech Salary,18500000.00,2026-07-01T09:00:00,Bank Transfer,1,-1,-1,-1
+Expense,15,Apartment Rent Payment,3500000.00,2026-07-05T10:00:00,Bank Transfer,6,1,-1,2
+Expense,16,High-Speed Fiber Internet,250000.00,2026-07-10T14:00:00,E-Wallet,8,2,-1,2
+Income,17,Monthly Tech Salary,18500000.00,2026-08-01T09:00:00,Bank Transfer,1,-1,-1,-1
+Income,18,UI/UX Freelance Project,4200000.00,2026-08-05T16:00:00,Bank Transfer,2,-1,-1,-1
+Expense,19,Apartment Rent Payment,3500000.00,2026-08-02T10:30:00,Bank Transfer,6,1,-1,2
+Expense,20,Supermarket Groceries & Dining,1850000.00,2026-08-03T18:15:00,Credit Card,5,-1,-1,1
+Expense,21,High-Speed Fiber Internet,250000.00,2026-08-04T14:20:00,E-Wallet,8,2,-1,2
+Expense,22,Deposit to Emergency Savings,2000000.00,2026-08-05T17:00:00,Bank Transfer,21,-1,1,-1
+Expense,23,Gym Membership Payment,450000.00,2026-08-07T08:30:00,Credit Card,10,5,-1,4
