@@ -165,7 +165,7 @@ Item {
 
             Text {
                 text: "Saving Title"
-                color: "#878787"
+                color: AppTheme.textSub
                 font.family: "Intel One Mono"
                 font.pixelSize: 14
                 font.weight: Font.DemiBold
@@ -174,7 +174,9 @@ Item {
             Rectangle {
                 width: parent.width
                 height: 40
-                color: "#e9e9e9"
+                color: AppTheme.bgInput
+                border.color: AppTheme.border
+                border.width: 1
                 radius: 10
 
                 TextInput {
@@ -191,7 +193,7 @@ Item {
 
                     Text {
                         text: "Nhập tên mục tiêu tiết kiệm..."
-                        color: "#aab0bb"
+                        color: AppTheme.textMuted
                         font: parent.font
                         visible: !parent.text && !parent.activeFocus
                         anchors.fill: parent
@@ -213,7 +215,7 @@ Item {
             Column {
                 width: 220
                 spacing: 6
-                Text { text: "Priority"; color: "#878787"; font.family: "Intel One Mono"; font.pixelSize: 14; font.weight: Font.DemiBold }
+                Text { text: "Priority"; color: AppTheme.textSub; font.family: "Intel One Mono"; font.pixelSize: 14; font.weight: Font.DemiBold }
                 Dropdown_1 {
                     id: dropdown_1
                     width: 220; height: 36
@@ -226,12 +228,10 @@ Item {
             Column {
                 width: 220
                 spacing: 6
-                Text { text: "Categories"; color: "#878787"; font.family: "Intel One Mono"; font.pixelSize: 14; font.weight: Font.DemiBold }
+                Text { text: "Categories"; color: AppTheme.textSub; font.family: "Intel One Mono"; font.pixelSize: 14; font.weight: Font.DemiBold }
                 Dropdown_1 {
                     id: dropdown_3
                     width: 220; height: 36
-                    // SỬA: dùng root.realCategoryList (đã lọc bỏ "All Main Categories")
-                    // thay vì root.categoryList thô
                     model: {
                         var names = []
                         for (var i = 0; i < root.realCategoryList.length; i++) names.push(root.realCategoryList[i].name)
@@ -255,10 +255,13 @@ Item {
             Column {
                 width: 220
                 spacing: 6
-                Text { text: "Amount Funded"; color: "#878787"; font.family: "Intel One Mono"; font.pixelSize: 14; font.weight: Font.DemiBold }
+                Text { text: "Amount Funded"; color: AppTheme.textSub; font.family: "Intel One Mono"; font.pixelSize: 14; font.weight: Font.DemiBold }
                 Rectangle {
                     width: 220; height: 36
-                    color: "#e9e9e9"; radius: 10
+                    color: AppTheme.bgInput
+                    border.color: AppTheme.border
+                    border.width: 1
+                    radius: 10
                     TextInput {
                         id: amountFundedInput
                         anchors.fill: parent; anchors.leftMargin: 14; anchors.rightMargin: 14
@@ -278,7 +281,7 @@ Item {
                                 }
                             }
                         }
-                        Text { text: "0"; color: "#aab0bb"; font: parent.font; visible: !parent.text && !parent.activeFocus; anchors.fill: parent; verticalAlignment: Text.AlignVCenter }
+                        Text { text: "0"; color: AppTheme.textMuted; font: parent.font; visible: !parent.text && !parent.activeFocus; anchors.fill: parent; verticalAlignment: Text.AlignVCenter }
                     }
                 }
             }
@@ -286,10 +289,13 @@ Item {
             Column {
                 width: 220
                 spacing: 6
-                Text { text: "Save Goal"; color: "#878787"; font.family: "Intel One Mono"; font.pixelSize: 14; font.weight: Font.DemiBold }
+                Text { text: "Save Goal"; color: AppTheme.textSub; font.family: "Intel One Mono"; font.pixelSize: 14; font.weight: Font.DemiBold }
                 Rectangle {
                     width: 220; height: 36
-                    color: "#e9e9e9"; radius: 10
+                    color: AppTheme.bgInput
+                    border.color: AppTheme.border
+                    border.width: 1
+                    radius: 10
                     TextInput {
                         id: saveGoalInput
                         anchors.fill: parent; anchors.leftMargin: 14; anchors.rightMargin: 14
@@ -309,7 +315,7 @@ Item {
                                 }
                             }
                         }
-                        Text { text: "0"; color: "#aab0bb"; font: parent.font; visible: !parent.text && !parent.activeFocus; anchors.fill: parent; verticalAlignment: Text.AlignVCenter }
+                        Text { text: "0"; color: AppTheme.textMuted; font: parent.font; visible: !parent.text && !parent.activeFocus; anchors.fill: parent; verticalAlignment: Text.AlignVCenter }
                     }
                 }
             }
@@ -326,7 +332,7 @@ Item {
             anchors.rightMargin: 20
             spacing: 6
 
-            Text { text: "Due Date"; color: "#878787"; font.family: "Intel One Mono"; font.pixelSize: 14; font.weight: Font.DemiBold }
+            Text { text: "Due Date"; color: AppTheme.textSub; font.family: "Intel One Mono"; font.pixelSize: 14; font.weight: Font.DemiBold }
             Date_Input_Field_1 {
                 id: date_Input_Field
                 allowFutureDates: true

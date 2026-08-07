@@ -20,22 +20,23 @@ ColumnLayout {
 
     signal viewAllClicked()
 
-    spacing: 9
+    spacing: 8
     Layout.fillWidth: true
 
     // 1. Header (Title + Optional View All Link)
     RowLayout {
         Layout.fillWidth: true
-        Layout.preferredHeight: 32
+        Layout.preferredHeight: 28
 
         Text {
             font.family: "Inter"
-            font.pixelSize: 22
-            font.weight: Font.Normal
-            color: "#878787"
+            font.pixelSize: 18
+            font.weight: Font.DemiBold
+            color: AppTheme.textSub
             text: root.cardTitle
             Layout.fillWidth: true
             verticalAlignment: Text.AlignVCenter
+            elide: Text.ElideRight
         }
 
         View_all_1 {
@@ -45,60 +46,66 @@ ColumnLayout {
         }
     }
 
-    // 2. White Card Box
+    // 2. White / Dark Card Box
     Rectangle {
         Layout.fillWidth: true
-        Layout.preferredHeight: 96
+        Layout.preferredHeight: 90
         color: AppTheme.bgCard
         radius: 12
+        border.color: AppTheme.bgHover
+        border.width: 1
+        clip: true
 
         ColumnLayout {
             anchors.fill: parent
-            anchors.leftMargin: 24
-            anchors.rightMargin: 24
-            anchors.topMargin: 16
-            anchors.bottomMargin: 16
-            spacing: 12
+            anchors.leftMargin: 20
+            anchors.rightMargin: 20
+            anchors.topMargin: 14
+            anchors.bottomMargin: 12
+            spacing: 10
 
             RowLayout {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
-                spacing: 16
+                spacing: 8
 
                 // Amount Text
                 Text {
                     font.family: "Inter"
-                    font.pixelSize: 26
+                    font.pixelSize: 21
                     font.weight: Font.Bold
                     color: AppTheme.textMain
                     text: root.amountText
                     verticalAlignment: Text.AlignVCenter
+                    elide: Text.ElideRight
+                    Layout.fillWidth: true
+                    Layout.minimumWidth: 60
                 }
 
                 // Date Text
                 Text {
                     font.family: "Inter"
-                    font.pixelSize: 14
+                    font.pixelSize: 12
                     font.weight: Font.Medium
-                    color: "#878787"
+                    color: AppTheme.textMuted
                     text: root.dateText
                     verticalAlignment: Text.AlignVCenter
-                }
-
-                // Spacer pushing trend badge to right edge
-                Item {
-                    Layout.fillWidth: true
+                    Layout.alignment: Qt.AlignVCenter
                 }
 
                 // Optional Trend Badge (e.g. ↑ 8% or ↓ 5%)
                 Rectangle {
                     visible: root.showTrend
-                    implicitWidth: trendRow.implicitWidth + 20
-                    implicitHeight: 34
-                    radius: 17
-                    border.color: root.isTrendUp ? "#d1fae5" : "#fee2e2"
+                    implicitWidth: trendRow.implicitWidth + 16
+                    implicitHeight: 28
+                    radius: 14
+                    border.color: root.isTrendUp 
+                        ? (AppTheme.isDark ? Qt.rgba(0.08, 0.64, 0.29, 0.4) : "#d1fae5") 
+                        : (AppTheme.isDark ? Qt.rgba(0.97, 0.44, 0.44, 0.4) : "#fee2e2")
                     border.width: 1
-                    color: root.isTrendUp ? "#ecfdf5" : "#fef2f2"
+                    color: root.isTrendUp 
+                        ? (AppTheme.isDark ? Qt.rgba(0.08, 0.64, 0.29, 0.2) : "#ecfdf5") 
+                        : (AppTheme.isDark ? Qt.rgba(0.97, 0.44, 0.44, 0.2) : "#fef2f2")
                     Layout.alignment: Qt.AlignRight | Qt.AlignVCenter
 
                     RowLayout {
@@ -108,14 +115,14 @@ ColumnLayout {
 
                         Text {
                             text: root.isTrendUp ? "↑" : "↓"
-                            font.pixelSize: 15
+                            font.pixelSize: 13
                             font.weight: Font.Bold
                             color: root.isTrendUp ? "#10b981" : "#ef4444"
                         }
 
                         Text {
                             font.family: "Inter"
-                            font.pixelSize: 15
+                            font.pixelSize: 13
                             font.weight: Font.DemiBold
                             color: root.isTrendUp ? "#10b981" : "#ef4444"
                             text: root.trendText
@@ -127,9 +134,10 @@ ColumnLayout {
             // Accent Underline under amount/date
             Rectangle {
                 Layout.fillWidth: true
-                Layout.preferredHeight: 2
+                Layout.preferredHeight: 3
+                radius: 1.5
                 color: root.accentLineColor
-                opacity: 0.6
+                opacity: 0.8
             }
         }
     }

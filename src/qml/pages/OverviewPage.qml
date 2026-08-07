@@ -83,9 +83,7 @@ Rectangle {
                     showViewAll: true
                     amountText: overviewController.totalIncomeFormatted
                     dateText: "Current Month"
-                    showTrend: true
-                    trendText: "Active"
-                    isTrendUp: true
+                    showTrend: false
                     accentLineColor: AppTheme.success
                     onViewAllClicked: overviewPage.navigateTo(1)
                 }
@@ -97,9 +95,7 @@ Rectangle {
                     showViewAll: true
                     amountText: overviewController.totalExpenseFormatted
                     dateText: "Current Month"
-                    showTrend: true
-                    trendText: "Active"
-                    isTrendUp: false
+                    showTrend: false
                     accentLineColor: AppTheme.danger
                     onViewAllClicked: overviewPage.navigateTo(1)
                 }
@@ -436,6 +432,7 @@ Rectangle {
                         radius: 12
                         border.color: AppTheme.bgHover
                         border.width: 1
+                        clip: true
 
                         ColumnLayout {
                             anchors.fill: parent
@@ -451,41 +448,46 @@ Rectangle {
                                     font.weight: Font.ExtraBold
                                     color: AppTheme.textMain
                                     text: overviewController.topSaving.name || "No Savings"
+                                    elide: Text.ElideRight
                                     Layout.fillWidth: true
                                 }
                             }
 
                             RowLayout {
                                 Layout.fillWidth: true
-                                spacing: 16
+                                spacing: 12
 
                                 ColumnLayout {
                                     spacing: 8
+                                    Layout.fillWidth: true
 
                                     ColumnLayout {
                                         spacing: 2
+                                        Layout.fillWidth: true
                                         Text { text: "Saved money"; color: AppTheme.textMuted; font.pixelSize: 12; font.family: "Inter" }
-                                        Text { text: overviewController.topSaving.currentFormatted || "0 VND"; color: AppTheme.textMain; font.pixelSize: 18; font.weight: Font.Bold; font.family: "Inter" }
+                                        Text { text: overviewController.topSaving.currentFormatted || "0 VND"; color: AppTheme.textMain; font.pixelSize: 17; font.weight: Font.Bold; font.family: "Inter"; elide: Text.ElideRight; Layout.fillWidth: true }
                                     }
 
                                     ColumnLayout {
                                         spacing: 2
+                                        Layout.fillWidth: true
                                         Text { text: "Goal"; color: AppTheme.textMuted; font.pixelSize: 12; font.family: "Inter" }
-                                        Text { text: overviewController.topSaving.targetFormatted || "0 VND"; color: AppTheme.textMain; font.pixelSize: 16; font.weight: Font.DemiBold; font.family: "Inter" }
+                                        Text { text: overviewController.topSaving.targetFormatted || "0 VND"; color: AppTheme.textMain; font.pixelSize: 15; font.weight: Font.DemiBold; font.family: "Inter"; elide: Text.ElideRight; Layout.fillWidth: true }
                                     }
                                 }
-
-                                Item { Layout.fillWidth: true }
 
                                 GaugeMeter {
                                     currentValue: overviewController.topSaving.current || 0
                                     maxValue: overviewController.topSaving.target || 1
-                                    progressColor: "#0284c7"
+                                    progressColor: AppTheme.primary
                                     currentLabel: Math.round((overviewController.topSaving.progress || 0)) + "%"
                                     minLabel: "0%"
                                     maxLabel: "100%"
-                                    Layout.preferredWidth: 140
-                                    Layout.preferredHeight: 90
+                                    Layout.preferredWidth: 130
+                                    Layout.maximumWidth: 140
+                                    Layout.minimumWidth: 80
+                                    Layout.preferredHeight: 85
+                                    Layout.alignment: Qt.AlignRight | Qt.AlignVCenter
                                 }
                             }
                         }
@@ -521,6 +523,7 @@ Rectangle {
                         radius: 12
                         border.color: AppTheme.bgHover
                         border.width: 1
+                        clip: true
 
                         ColumnLayout {
                             anchors.fill: parent
@@ -536,31 +539,33 @@ Rectangle {
                                     font.weight: Font.ExtraBold
                                     color: AppTheme.textMain
                                     text: overviewController.topBudget.name || "No Budgets"
+                                    elide: Text.ElideRight
                                     Layout.fillWidth: true
                                 }
                             }
 
                             RowLayout {
                                 Layout.fillWidth: true
-                                spacing: 16
+                                spacing: 12
 
                                 ColumnLayout {
                                     spacing: 8
+                                    Layout.fillWidth: true
 
                                     ColumnLayout {
                                         spacing: 2
+                                        Layout.fillWidth: true
                                         Text { text: "Spent money"; color: AppTheme.textMuted; font.pixelSize: 12; font.family: "Inter" }
-                                        Text { text: overviewController.topBudget.spentFormatted || "0 VND"; color: AppTheme.textMain; font.pixelSize: 18; font.weight: Font.Bold; font.family: "Inter" }
+                                        Text { text: overviewController.topBudget.spentFormatted || "0 VND"; color: AppTheme.textMain; font.pixelSize: 17; font.weight: Font.Bold; font.family: "Inter"; elide: Text.ElideRight; Layout.fillWidth: true }
                                     }
 
                                     ColumnLayout {
                                         spacing: 2
+                                        Layout.fillWidth: true
                                         Text { text: "Limit"; color: AppTheme.textMuted; font.pixelSize: 12; font.family: "Inter" }
-                                        Text { text: overviewController.topBudget.limitFormatted || "0 VND"; color: AppTheme.textMain; font.pixelSize: 16; font.weight: Font.DemiBold; font.family: "Inter" }
+                                        Text { text: overviewController.topBudget.limitFormatted || "0 VND"; color: AppTheme.textMain; font.pixelSize: 15; font.weight: Font.DemiBold; font.family: "Inter"; elide: Text.ElideRight; Layout.fillWidth: true }
                                     }
                                 }
-
-                                Item { Layout.fillWidth: true }
 
                                 GaugeMeter {
                                     currentValue: overviewController.topBudget.spent || 0
@@ -569,8 +574,11 @@ Rectangle {
                                     currentLabel: Math.round((overviewController.topBudget.progress || 0)) + "%"
                                     minLabel: "0%"
                                     maxLabel: "100%"
-                                    Layout.preferredWidth: 140
-                                    Layout.preferredHeight: 90
+                                    Layout.preferredWidth: 130
+                                    Layout.maximumWidth: 140
+                                    Layout.minimumWidth: 80
+                                    Layout.preferredHeight: 85
+                                    Layout.alignment: Qt.AlignRight | Qt.AlignVCenter
                                 }
                             }
                         }
