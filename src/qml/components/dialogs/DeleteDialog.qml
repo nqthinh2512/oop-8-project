@@ -42,7 +42,7 @@ Item {
     // --- Dimmed background overlay ---
     Rectangle {
         anchors.fill: parent
-        color: "#66000000"
+        color: "#CC000000"
 
         MouseArea {
             anchors.fill: parent
