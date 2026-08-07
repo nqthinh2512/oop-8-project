@@ -25,7 +25,6 @@ bool DatabaseManager::exportAllToCSV(const QString& targetFolderPath) const {
         if (!dir.mkpath(".")) return false;
     }
     bool success = true;
-    success &= m_categoryDAO->exportToCSV(targetFolderPath + "/categories_export.csv");
     success &= m_transactionDAO->exportToCSV(targetFolderPath + "/transactions_export.csv");
     success &= m_billDAO->exportToCSV(targetFolderPath + "/bills_export.csv");
     success &= m_budgetDAO->exportToCSV(targetFolderPath + "/budgets_export.csv");

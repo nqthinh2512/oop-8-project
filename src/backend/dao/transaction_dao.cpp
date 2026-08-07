@@ -171,19 +171,33 @@ bool TransactionDAO::exportToCSV(const QString& targetFilePath) const {
         return false;
     }
 
+    const auto& categories = DatabaseManager::instance().categoryDAO()->getAll();
+    auto getCatName = [&categories](int catId) -> QString {
+        for (const auto& c : categories) {
+            if (c.getId() == catId) return c.getName();
+        }
+        return "Uncategorized";
+    };
+
     QTextStream out(&file);
-    out << "type,id,title,amount,dateTime,method,categoryId\n";
+    out << "=== TRANSACTIONS EXPORT REPORT ===\n";
+    out << "Generated Date,\"" << QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss") << "\"\n\n";
+    out << "Type,ID,Title,Amount (VND),Date & Time,Payment Method,Category Name\n";
 
     for (const Transaction* t : m_transactions) {
         if (!t) continue;
         QString type = (dynamic_cast<const Income*>(t) != nullptr) ? "Income" : "Expense";
+        QString escapedTitle = QString(t->getTitle()).replace("\"", "\"\"");
+        QString escapedMethod = QString(t->getMethod()).replace("\"", "\"\"");
+        QString catName = QString(getCatName(t->getCategoryId())).replace("\"", "\"\"");
+
         out << type << ","
-            << t->getId() << ","
-            << t->getTitle() << ","
-            << QString::number(t->getAmount(), 'f', 2) << ","
-            << t->getDateTime().toString(Qt::ISODate) << ","
-            << t->getMethod() << ","
-            << t->getCategoryId() << "\n";
+            << t->getId() << ",\""
+            << escapedTitle << "\","
+            << QString::number(t->getAmount(), 'f', 2) << ",\""
+            << t->getDateTime().toString("yyyy-MM-dd HH:mm:ss") << ",\""
+            << escapedMethod << "\",\""
+            << catName << "\"\n";
     }
     file.close();
     return true;

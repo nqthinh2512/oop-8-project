@@ -13,18 +13,6 @@ Rectangle {
     color: AppTheme.bgApp
     clip: true
 
-    FileDialog {
-        id: exportFileDialog
-        title: "Export Categories to CSV"
-        fileMode: FileDialog.SaveFile
-        nameFilters: ["CSV Files (*.csv)", "All Files (*)"]
-        defaultSuffix: "csv"
-        currentFolder: StandardPaths.standardLocations(StandardPaths.DocumentsLocation)[0]
-        currentFile: "file:///" + StandardPaths.writableLocation(StandardPaths.DocumentsLocation) + "/categories_export.csv"
-        onAccepted: {
-            categoriesController.exportToCSV(selectedFile.toString())
-        }
-    }
 
     onVisibleChanged: {
         if (!visible) {
@@ -153,7 +141,7 @@ Rectangle {
                     Dropdown_1 {
                         id: toolbarDropdown
                         Layout.preferredWidth: 200
-                        model: ["All Categories", "Income (Parent 1)", "Expense (Parent 2)", "Bill (Parent 3)", "Budget (Parent 4)", "Saving (Parent 5)"]
+                        model: ["All Main Categories", "Income", "Expense", "Bill", "Budget", "Saving"]
                         selectedIndex: categoriesController.parentFilter
 
                         onSelected: (idx, val) => {
@@ -163,11 +151,6 @@ Rectangle {
 
                     Item {
                         Layout.fillWidth: true
-                    }
-
-                    UniversalButton_1 {
-                        buttonText: "Export CSV"
-                        onClicked: exportFileDialog.open()
                     }
 
                     UniversalButton_1 {

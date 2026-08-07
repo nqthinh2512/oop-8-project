@@ -122,7 +122,7 @@ QVariantList SavingsController::categoryOptions() const
 
     QVariantMap allMap;
     allMap["id"] = 0;
-    allMap["name"] = "All Main Categories";
+    allMap["name"] = "All Categories";
     options.append(allMap);
 
     for (const auto &c : allCats) {

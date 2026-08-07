@@ -121,12 +121,12 @@ Rectangle {
                     Dropdown_1 {
                         id: categoryFilterDropdown
                         Layout.preferredWidth: 200
-                        selectedText: "All Main Categories"
+                        selectedText: "All Categories"
                         selectedIndex: 0
 
                         // categoryOptionsFull giữ nguyên object {id, name} để tra ngược categoryId khi chọn
                         property var categoryOptionsFull: {
-                            var opts = [{id: 0, name: "All Main Categories"}]
+                            var opts = [{id: 0, name: "All Categories"}]
                             var cats = budgetsController.categoryOptions
                             for (var i = 0; i < cats.length; i++) opts.push(cats[i])
                             return opts

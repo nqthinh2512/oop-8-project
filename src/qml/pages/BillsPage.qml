@@ -146,9 +146,9 @@ Rectangle {
                         
                         property var allCats: categoriesController.categoriesList
                         property var filteredCats: allCats.filter(function(c) { return c.parentId === 3; })
-                        property var catData: [{id: 0, name: "All Main Categories"}].concat(filteredCats)
+                        property var catData: [{id: 0, name: "All Categories"}].concat(filteredCats)
                         model: catData.map(function(c) { return c.name; })
-                        selectedText: "All Main Categories"
+                        selectedText: "All Categories"
                         
                         onSelected: function(index, value) {
                             if (index >= 0 && index < catData.length) {

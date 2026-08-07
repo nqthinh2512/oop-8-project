@@ -1,4 +1,5 @@
 #include "settings_controller.h"
+#include "reports_controller.h"
 #include <QCoreApplication>
 #include <QDir>
 #include <QFile>
@@ -160,10 +161,16 @@ bool SettingsController::exportAllToCSV(const QString &folderPath)
     if (localPath.endsWith("/")) {
         localPath.chop(1);
     }
-    // Convert to native separators (Windows specific fix just in case, though Qt usually handles it)
+    // Convert to native separators
     localPath = QDir::toNativeSeparators(localPath);
 
-    return DatabaseManager::instance().exportAllToCSV(localPath);
+    bool res = DatabaseManager::instance().exportAllToCSV(localPath);
+    
+    // Also export the comprehensive Financial Summary Report
+    ReportsController reportsCtrl;
+    res &= reportsCtrl.exportToCSV(localPath + "/financial_summary_report.csv");
+
+    return res;
 }
 
 void SettingsController::factoryReset()

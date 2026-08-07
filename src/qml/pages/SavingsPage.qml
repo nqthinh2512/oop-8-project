@@ -153,7 +153,7 @@ Rectangle {
                     Dropdown_1 {
                         id: categoryFilterDropdown
                         Layout.preferredWidth: 200
-                        selectedText: "All Main Categories"
+                        selectedText: "All Categories"
                         selectedIndex: 0
 
                         property var categoryOptionsFull: savingsController.categoryOptions

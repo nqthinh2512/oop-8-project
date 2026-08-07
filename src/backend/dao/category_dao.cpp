@@ -5,6 +5,7 @@
 #include <QDir>
 #include <QDebug>
 #include <QUrl>
+#include <QDateTime>
 
 CategoryDAO::CategoryDAO() {
     loadFromCSV();
@@ -83,90 +84,47 @@ static QStringList parseCSVLine(const QString& line) {
 
 void CategoryDAO::loadFromCSV() {
     m_categories.clear();
+    QString filePath = DatabaseManager::getDataDirectoryPath() + "/categories.csv";
+    QFile file(filePath);
 
-    QString dirPath = DatabaseManager::getDataDirectoryPath();
-    QDir dir(dirPath);
-    if (!dir.exists()) {
-        dir.mkpath(".");
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        qWarning() << "Cannot open categories.csv for reading at:" << filePath;
+        return;
     }
 
-    QString fullPath = dirPath + "/categories.csv";
-    QFile file(fullPath);
+    QTextStream in(&file);
+    if (!in.atEnd()) {
+        in.readLine(); // Skip header
+    }
 
-    if (file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        QTextStream in(&file);
-        if (!in.atEnd()) {
-            in.readLine(); // Bỏ qua dòng tiêu đề
+    while (!in.atEnd()) {
+        QString line = in.readLine().trimmed();
+        if (line.isEmpty()) continue;
+
+        QStringList fields = parseCSVLine(line);
+        if (fields.size() >= 4) {
+            int id = fields[0].toInt();
+            QString name = fields[1];
+            int parentId = fields[2].toInt();
+            bool active = (fields[3].toInt() != 0);
+
+            m_categories.append(Category(id, parentId, name, active));
         }
-
-        while (!in.atEnd()) {
-            QString line = in.readLine().trimmed();
-            if (line.isEmpty()) continue;
-
-            QStringList fields = parseCSVLine(line);
-            if (fields.size() >= 3) {
-                int id = fields[0].toInt();
-                QString name = fields[1];
-                int parentId = fields[2].toInt();
-                bool active = (fields.size() >= 4) ? (fields[3].toInt() != 0) : true;
-
-                Category cat(id, parentId, name);
-                cat.setActive(active);
-                m_categories.append(cat);
-            }
-        }
-        file.close();
     }
-
-    if (m_categories.isEmpty()) {
-        qDebug() << "Khởi tạo danh mục mặc định ban đầu...";
-        int id = 1;
-        
-        auto addCat = [&](int pId, const QString& n) {
-            Category c(id++, pId, n);
-            c.setActive(true);
-            m_categories.append(c);
-        };
-
-        addCat(1, "Salary");
-        addCat(1, "Freelance & Side Income");
-        addCat(1, "Investment Returns");
-        addCat(1, "Gifts & Allowances");
-        addCat(2, "Food & Dining");
-        addCat(2, "Housing & Rent");
-        addCat(2, "Transportation & Fuel");
-        addCat(2, "Utilities & Services");
-        addCat(2, "Entertainment & Leisure");
-        addCat(2, "Healthcare & Medical");
-        addCat(3, "Electricity Bill");
-        addCat(3, "Water Bill");
-        addCat(3, "Internet & Cable");
-        addCat(3, "Credit Card Bill");
-        addCat(4, "Monthly Living Budget");
-        addCat(4, "Discretionary Budget");
-        addCat(5, "Emergency Savings");
-        addCat(5, "Vacation Fund");
-
-        saveToCSV();
-    }
+    file.close();
 }
 
 void CategoryDAO::saveToCSV() const {
-    QString dirPath = DatabaseManager::getDataDirectoryPath();
-    QDir dir(dirPath);
-    if (!dir.exists()) {
-        dir.mkpath(".");
-    }
+    QString filePath = DatabaseManager::getDataDirectoryPath() + "/categories.csv";
+    QFile file(filePath);
 
-    QString fullPath = dirPath + "/categories.csv";
-    QFile file(fullPath);
     if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+        qWarning() << "Cannot open categories.csv for writing at:" << filePath;
         return;
     }
 
     QTextStream out(&file);
     out << "id,name,parentId,active\n";
-
     for (const Category& cat : m_categories) {
         QString escapedName = QString(cat.getName()).replace("\"", "\"\"");
         out << cat.getId() << ",\""
@@ -181,10 +139,10 @@ void CategoryDAO::deactivate(int id) {
     for (Category& cat : m_categories) {
         if (cat.getId() == id) {
             cat.setActive(false);
+            saveToCSV();
             break;
         }
     }
-    saveToCSV();
 }
 
 static QString resolveLocalPath(const QString& path) {
@@ -206,14 +164,17 @@ bool CategoryDAO::exportToCSV(const QString& targetFilePath) const {
     }
 
     QTextStream out(&file);
-    out << "id,name,parentId,active\n";
+    out << "=== CATEGORIES EXPORT REPORT ===\n";
+    out << "Generated Date,\"" << QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss") << "\"\n\n";
+    out << "ID,Category Name,Parent Section,Status\n";
 
     for (const Category& cat : m_categories) {
         QString escapedName = QString(cat.getName()).replace("\"", "\"\"");
+        QString parentName = Category::parentCategoryName(cat.getParentId());
         out << cat.getId() << ",\""
-            << escapedName << "\","
-            << cat.getParentId() << ","
-            << (cat.isActive() ? 1 : 0) << "\n";
+            << escapedName << "\",\""
+            << parentName << "\","
+            << (cat.isActive() ? "Active" : "Inactive") << "\n";
     }
     
     file.close();
