@@ -198,24 +198,50 @@ void BillsController::updateBill(int id, const QString& title, double amount, co
     DatabaseManager::instance().billDAO()->update(id, b);
     
     if (currentIsPaid) {
-        // Find the linked transaction and update its amount
+        // Find the linked transaction and update its amount & category while preserving linked ids
         const auto& transactions = DatabaseManager::instance().transactionDAO()->getAll();
         for (const Transaction* t : transactions) {
-            if (t->getLinkedBillId() == id) {
+            if (t && t->getLinkedBillId() == id) {
                 double oldAmount = t->getAmount();
+                int oldCatId = t->getCategoryId();
                 int txId = t->getId();
+                int oldLinkedBudgetId = t->getLinkedBudgetId();
+                int oldLinkedSavingId = t->getLinkedSavingId();
                 
                 // Reverse old budget deduction
-                DatabaseManager::instance().budgetDAO()->addExpenseToBudget(t->getCategoryId(), -oldAmount);
+                if (oldLinkedBudgetId != -1) {
+                    for (const Budget& b : DatabaseManager::instance().budgetDAO()->getAll()) {
+                        if (b.getId() == oldLinkedBudgetId) {
+                            Budget updatedB = b;
+                            double newSpent = std::max(0.0, b.getSpent() - oldAmount);
+                            updatedB.setSpent(newSpent);
+                            DatabaseManager::instance().budgetDAO()->update(oldLinkedBudgetId, updatedB);
+                            break;
+                        }
+                    }
+                } else {
+                    DatabaseManager::instance().budgetDAO()->addExpenseToBudget(oldCatId, -oldAmount);
+                }
                 
-                // Update transaction
+                // Update transaction preserving linked saving and budget
                 Transaction* newTx = TransactionFactory::createTransaction(
-                    1, txId, t->getTitle(), amount, t->getDateTime(), t->getMethod(), categoryId, id, -1
+                    1, txId, title, amount, t->getDateTime(), t->getMethod(), categoryId, id, oldLinkedSavingId, oldLinkedBudgetId
                 );
                 DatabaseManager::instance().transactionDAO()->update(txId, newTx);
                 
                 // Apply new budget deduction
-                DatabaseManager::instance().budgetDAO()->addExpenseToBudget(categoryId, amount);
+                if (oldLinkedBudgetId != -1) {
+                    for (const Budget& b : DatabaseManager::instance().budgetDAO()->getAll()) {
+                        if (b.getId() == oldLinkedBudgetId) {
+                            Budget updatedB = b;
+                            updatedB.addExpense(amount);
+                            DatabaseManager::instance().budgetDAO()->update(oldLinkedBudgetId, updatedB);
+                            break;
+                        }
+                    }
+                } else {
+                    DatabaseManager::instance().budgetDAO()->addExpenseToBudget(categoryId, amount);
+                }
                 break;
             }
         }
@@ -239,8 +265,34 @@ void BillsController::deleteBill(int id)
     if (currentIsPaid) {
         const auto& transactions = DatabaseManager::instance().transactionDAO()->getAll();
         for (const Transaction* t : transactions) {
-            if (t->getLinkedBillId() == id) {
-                DatabaseManager::instance().budgetDAO()->addExpenseToBudget(t->getCategoryId(), -t->getAmount());
+            if (t && t->getLinkedBillId() == id) {
+                // Revert Budget Impact
+                if (t->getLinkedBudgetId() != -1) {
+                    for (const Budget& b : DatabaseManager::instance().budgetDAO()->getAll()) {
+                        if (b.getId() == t->getLinkedBudgetId()) {
+                            Budget updatedB = b;
+                            double newSpent = std::max(0.0, b.getSpent() - t->getAmount());
+                            updatedB.setSpent(newSpent);
+                            DatabaseManager::instance().budgetDAO()->update(t->getLinkedBudgetId(), updatedB);
+                            break;
+                        }
+                    }
+                } else {
+                    DatabaseManager::instance().budgetDAO()->addExpenseToBudget(t->getCategoryId(), -t->getAmount());
+                }
+
+                // Revert Saving Impact
+                if (t->getLinkedSavingId() != -1) {
+                    for (const Saving& s : DatabaseManager::instance().savingDAO()->getAll()) {
+                        if (s.getId() == t->getLinkedSavingId()) {
+                            double newCurrent = std::max(0.0, s.getCurrent() - t->getAmount());
+                            Saving updatedS(s.getId(), s.getName(), s.getPriority(), s.getDueDate(), s.getTarget(), newCurrent, s.getCategoryId());
+                            DatabaseManager::instance().savingDAO()->update(t->getLinkedSavingId(), updatedS);
+                            break;
+                        }
+                    }
+                }
+
                 DatabaseManager::instance().transactionDAO()->remove(t->getId());
                 break;
             }
@@ -260,34 +312,64 @@ void BillsController::togglePaidStatus(int id)
             Bill updatedBill(existingBill.getId(), existingBill.getName(), existingBill.getAmount(), existingBill.getDueDate(), existingBill.getCategoryId(), newStatus);
             DatabaseManager::instance().billDAO()->update(id, updatedBill);
             
-            QString autoTitle = existingBill.getName(); // Clean title without ugly prefix
+            QString autoTitle = existingBill.getName();
             
             if (newStatus) {
-                // Bill marked as Paid -> Create an Expense Transaction (typeIndex = 1)
-                Transaction* newTx = TransactionFactory::createTransaction(
-                    1, 0, autoTitle, existingBill.getAmount(), QDateTime::currentDateTime(), "Bill Payment", existingBill.getCategoryId(), existingBill.getId(), -1
-                );
-                DatabaseManager::instance().transactionDAO()->add(newTx);
-                DatabaseManager::instance().budgetDAO()->addExpenseToBudget(existingBill.getCategoryId(), existingBill.getAmount());
-            } else {
-                // Bill marked as Unpaid -> Find the auto-transaction and delete it
-                const auto& transactions = DatabaseManager::instance().transactionDAO()->getAll();
-                int txIdToDelete = -1;
-                double txAmount = 0;
-                int txCategoryId = 0;
-                
-                for (const Transaction* t : transactions) {
-                    if (t->getLinkedBillId() == id) { // Robust linking
-                        txIdToDelete = t->getId();
-                        txAmount = t->getAmount();
-                        txCategoryId = t->getCategoryId();
+                // Bill marked as Paid -> Check if linked transaction already exists
+                bool alreadyExists = false;
+                for (const Transaction* t : DatabaseManager::instance().transactionDAO()->getAll()) {
+                    if (t && t->getLinkedBillId() == id) {
+                        alreadyExists = true;
                         break;
                     }
                 }
-                
-                if (txIdToDelete != -1) {
-                    DatabaseManager::instance().budgetDAO()->addExpenseToBudget(txCategoryId, -txAmount);
-                    DatabaseManager::instance().transactionDAO()->remove(txIdToDelete);
+
+                if (!alreadyExists) {
+                    int maxId = 0;
+                    for (const auto* t : DatabaseManager::instance().transactionDAO()->getAll()) {
+                        if (t && t->getId() > maxId) maxId = t->getId();
+                    }
+                    int newTxId = maxId + 1;
+
+                    Transaction* newTx = TransactionFactory::createTransaction(
+                        1, newTxId, autoTitle, existingBill.getAmount(), QDateTime::currentDateTime(), "Bill Payment", existingBill.getCategoryId(), existingBill.getId(), -1, -1
+                    );
+                    DatabaseManager::instance().transactionDAO()->add(newTx);
+                    DatabaseManager::instance().budgetDAO()->addExpenseToBudget(existingBill.getCategoryId(), existingBill.getAmount());
+                }
+            } else {
+                // Bill marked as Unpaid -> Find the linked transaction and delete it cleanly
+                const auto& transactions = DatabaseManager::instance().transactionDAO()->getAll();
+                for (const Transaction* t : transactions) {
+                    if (t && t->getLinkedBillId() == id) {
+                        if (t->getLinkedBudgetId() != -1) {
+                            for (const Budget& b : DatabaseManager::instance().budgetDAO()->getAll()) {
+                                if (b.getId() == t->getLinkedBudgetId()) {
+                                    Budget updatedB = b;
+                                    double newSpent = std::max(0.0, b.getSpent() - t->getAmount());
+                                    updatedB.setSpent(newSpent);
+                                    DatabaseManager::instance().budgetDAO()->update(t->getLinkedBudgetId(), updatedB);
+                                    break;
+                                }
+                            }
+                        } else {
+                            DatabaseManager::instance().budgetDAO()->addExpenseToBudget(t->getCategoryId(), -t->getAmount());
+                        }
+
+                        if (t->getLinkedSavingId() != -1) {
+                            for (const Saving& s : DatabaseManager::instance().savingDAO()->getAll()) {
+                                if (s.getId() == t->getLinkedSavingId()) {
+                                    double newCurrent = std::max(0.0, s.getCurrent() - t->getAmount());
+                                    Saving updatedS(s.getId(), s.getName(), s.getPriority(), s.getDueDate(), s.getTarget(), newCurrent, s.getCategoryId());
+                                    DatabaseManager::instance().savingDAO()->update(t->getLinkedSavingId(), updatedS);
+                                    break;
+                                }
+                            }
+                        }
+
+                        DatabaseManager::instance().transactionDAO()->remove(t->getId());
+                        break;
+                    }
                 }
             }
             
