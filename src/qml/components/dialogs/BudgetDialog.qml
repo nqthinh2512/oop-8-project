@@ -185,7 +185,7 @@ Item {
                 x: 20
                 height: 32
                 width: 461
-                color: "#878787"
+                color: AppTheme.textSub
                 font.family: "Intel One Mono"
                 font.pixelSize: 20
                 font.weight: Font.DemiBold
@@ -204,7 +204,9 @@ Item {
                 y: 32
                 height: 42
                 width: 460
-                color: "#e9e9e9"
+                color: AppTheme.bgInput
+                border.color: AppTheme.border
+                border.width: 1
                 radius: 10
 
                 TextInput {
@@ -222,7 +224,7 @@ Item {
 
                     Text {
                         text: "Enter budget title..."
-                        color: "#8049454f"
+                        color: AppTheme.textMuted
                         font: parent.font
                         visible: !parent.text && !parent.activeFocus
                         anchors.fill: parent
@@ -252,7 +254,7 @@ Item {
                     id: priority
                     height: 32
                     width: 226
-                    color: "#878787"
+                    color: AppTheme.textSub
                     font.family: "Intel One Mono"
                     font.pixelSize: 20
                     font.weight: Font.DemiBold
@@ -272,7 +274,6 @@ Item {
                     width: 225
                     _state: Dropdown_1.State_1.State_1_default
                     clip: true
-                    // ===== THÊM: model cho Priority, nếu không có model thì bấm vào không mở menu =====
                     model: ["Low", "Medium", "High"]
                     selectedText: "Medium"
                     selectedIndex: 1
@@ -291,7 +292,7 @@ Item {
                     id: categories
                     height: 32
                     width: 226
-                    color: "#878787"
+                    color: AppTheme.textSub
                     font.family: "Intel One Mono"
                     font.pixelSize: 20
                     font.weight: Font.DemiBold
@@ -311,7 +312,6 @@ Item {
                     width: 225
                     _state: Dropdown_1.State_1.State_1_default
                     clip: true
-                    // ===== THÊM: model lấy từ root.categoryList (do BudgetsPage truyền vào) =====
                     model: {
                         var names = []
                         for (var i = 0; i < root.categoryList.length; i++) names.push(root.categoryList[i].name)
@@ -335,7 +335,7 @@ Item {
                     id: amount_Spent
                     height: 32
                     width: 226
-                    color: "#878787"
+                    color: AppTheme.textSub
                     font.family: "Intel One Mono"
                     font.pixelSize: 20
                     font.weight: Font.DemiBold
@@ -353,7 +353,9 @@ Item {
                     y: 32
                     height: 34
                     width: 225
-                    color: "#e9e9e9"
+                    color: AppTheme.bgInput
+                    border.color: AppTheme.border
+                    border.width: 1
                     radius: 10
 
                     TextInput {
@@ -385,7 +387,7 @@ Item {
 
                         Text {
                             text: "0"
-                            color: "#8049454f"
+                            color: AppTheme.textMuted
                             font: parent.font
                             visible: !parent.text && !parent.activeFocus
                             anchors.fill: parent
@@ -408,7 +410,7 @@ Item {
                     id: budget_Limit
                     height: 32
                     width: 226
-                    color: "#878787"
+                    color: AppTheme.textSub
                     font.family: "Intel One Mono"
                     font.pixelSize: 20
                     font.weight: Font.DemiBold
@@ -426,7 +428,9 @@ Item {
                     y: 32
                     height: 34
                     width: 225
-                    color: "#e9e9e9"
+                    color: AppTheme.bgInput
+                    border.color: AppTheme.border
+                    border.width: 1
                     radius: 10
 
                     TextInput {
@@ -457,7 +461,7 @@ Item {
 
                         Text {
                             text: "1,000,000"
-                            color: "#8049454f"
+                            color: AppTheme.textMuted
                             font: parent.font
                             visible: !parent.text && !parent.activeFocus
                             anchors.fill: parent
@@ -481,7 +485,7 @@ Item {
                 x: 20
                 height: 32
                 width: 461
-                color: "#878787"
+                color: AppTheme.textSub
                 font.family: "Intel One Mono"
                 font.pixelSize: 20
                 font.weight: Font.DemiBold
@@ -517,7 +521,7 @@ Item {
                 x: 20
                 height: 32
                 width: 461
-                color: "#878787"
+                color: AppTheme.textSub
                 font.family: "Intel One Mono"
                 font.pixelSize: 20
                 font.weight: Font.DemiBold
@@ -553,7 +557,7 @@ Item {
                 x: 20
                 height: 32
                 width: 461
-                color: "#878787"
+                color: AppTheme.textSub
                 font.family: "Intel One Mono"
                 font.pixelSize: 20
                 font.weight: Font.DemiBold

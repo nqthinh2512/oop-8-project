@@ -147,7 +147,7 @@ Item {
                 x: 20
                 height: 32
                 width: 461
-                color: "#878787"
+                color: AppTheme.textSub
                 font.family: "Intel One Mono"
                 font.pixelSize: 20
                 font.weight: Font.DemiBold
@@ -166,10 +166,10 @@ Item {
                 y: 32
                 height: 42
                 width: 460
-                color: "#e9e9e9"
+                color: AppTheme.bgInput
                 radius: 10
-                border.color: (root.isValidating && root.billTitle.trim() === "") ? "red" : "transparent"
-                border.width: (root.isValidating && root.billTitle.trim() === "") ? 1 : 0
+                border.color: (root.isValidating && root.billTitle.trim() === "") ? AppTheme.danger : AppTheme.border
+                border.width: 1
 
                 TextInput {
                     id: titleField
@@ -189,7 +189,7 @@ Item {
 
                     Text {
                         text: "input text"
-                        color: "#8049454f"
+                        color: AppTheme.textMuted
                         font: parent.font
                         visible: !parent.text && !parent.activeFocus
                         anchors.fill: parent
@@ -219,7 +219,7 @@ Item {
                     id: amount
                     height: 32
                     width: 226
-                    color: "#878787"
+                    color: AppTheme.textSub
                     font.family: "Intel One Mono"
                     font.pixelSize: 20
                     font.weight: Font.DemiBold
@@ -237,10 +237,10 @@ Item {
                     y: 32
                     height: 34
                     width: 225
-                    color: "#e9e9e9"
+                    color: AppTheme.bgInput
                     radius: 10
-                    border.color: (root.isValidating && root.billAmount.trim() === "") ? "red" : "transparent"
-                    border.width: (root.isValidating && root.billAmount.trim() === "") ? 1 : 0
+                    border.color: (root.isValidating && root.billAmount.trim() === "") ? AppTheme.danger : AppTheme.border
+                    border.width: 1
 
                     TextInput {
                         id: amountField
@@ -271,7 +271,7 @@ Item {
 
                         Text {
                             text: "input text"
-                            color: "#8049454f"
+                            color: AppTheme.textMuted
                             font: parent.font
                             visible: !parent.text && !parent.activeFocus
                             anchors.fill: parent
@@ -293,7 +293,7 @@ Item {
                     id: categories
                     height: 32
                     width: 226
-                    color: "#878787"
+                    color: AppTheme.textSub
                     font.family: "Intel One Mono"
                     font.pixelSize: 20
                     font.weight: Font.DemiBold
@@ -341,7 +341,7 @@ Item {
                 x: 20
                 height: 32
                 width: 461
-                color: "#878787"
+                color: AppTheme.textSub
                 font.family: "Intel One Mono"
                 font.pixelSize: 20
                 font.weight: Font.DemiBold

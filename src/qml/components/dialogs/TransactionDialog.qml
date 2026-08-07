@@ -186,7 +186,7 @@ Item {
                 x: 20
                 height: 32
                 width: 461
-                color: "#878787"
+                color: AppTheme.textSub
                 font.family: "Intel One Mono"
                 font.pixelSize: 20
                 font.weight: Font.DemiBold
@@ -259,7 +259,7 @@ Item {
                     id: type
                     height: 32
                     width: 226
-                    color: "#878787"
+                    color: AppTheme.textSub
                     font.family: "Intel One Mono"
                     font.pixelSize: 20
                     font.weight: Font.DemiBold
@@ -304,7 +304,7 @@ Item {
                     id: categories
                     height: 32
                     width: 226
-                    color: "#878787"
+                    color: AppTheme.textSub
                     font.family: "Intel One Mono"
                     font.pixelSize: 20
                     font.weight: Font.DemiBold
@@ -356,7 +356,7 @@ Item {
                     id: amount
                     height: 32
                     width: 226
-                    color: "#878787"
+                    color: AppTheme.textSub
                     font.family: "Intel One Mono"
                     font.pixelSize: 20
                     font.weight: Font.DemiBold
@@ -448,7 +448,7 @@ Item {
                     id: methodLabel
                     height: 32
                     width: 226
-                    color: "#878787"
+                    color: AppTheme.textSub
                     font.family: "Intel One Mono"
                     font.pixelSize: 20
                     font.weight: Font.DemiBold
@@ -496,7 +496,7 @@ Item {
                 Text {
                     height: 32
                     width: 226
-                    color: "#878787"
+                    color: AppTheme.textSub
                     font.family: "Intel One Mono"
                     font.pixelSize: 20
                     font.weight: Font.DemiBold
@@ -544,7 +544,7 @@ Item {
                 Text {
                     height: 32
                     width: 226
-                    color: "#878787"
+                    color: AppTheme.textSub
                     font.family: "Intel One Mono"
                     font.pixelSize: 20
                     font.weight: Font.DemiBold
@@ -591,7 +591,7 @@ Item {
                 x: 20
                 height: 32
                 width: 461
-                color: "#878787"
+                color: AppTheme.textSub
                 font.family: "Intel One Mono"
                 font.pixelSize: 20
                 font.weight: Font.DemiBold

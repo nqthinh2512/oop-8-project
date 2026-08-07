@@ -28,11 +28,11 @@ Rectangle {
 
     readonly property var statusConfig: {
         if (status_1 === BillRow_1.Status.Status_paid) {
-            return { text: "Paid", color: "#16a34a", bg: "#dcfce7", dateColor: "#475569", icon: "✓" }
+            return { text: "Paid", color: "#16a34a", bg: AppTheme.isDark ? Qt.rgba(0.08, 0.64, 0.29, 0.2) : "#dcfce7", dateColor: AppTheme.textSub, icon: "✓" }
         } else if (status_1 === BillRow_1.Status.Status_overdue) {
-            return { text: "Overdue", color: "#dc2626", bg: "#fee2e2", dateColor: "#dc2626", icon: "!" }
+            return { text: "Overdue", color: AppTheme.danger, bg: AppTheme.isDark ? Qt.rgba(0.97, 0.44, 0.44, 0.2) : "#fee2e2", dateColor: AppTheme.danger, icon: "!" }
         }
-        return { text: "Upcoming", color: "#2563eb", bg: "#dbeafe", dateColor: "#2563eb", icon: "🕒" }
+        return { text: "Upcoming", color: AppTheme.primary, bg: AppTheme.isDark ? Qt.rgba(0.37, 0.65, 0.98, 0.2) : "#dbeafe", dateColor: AppTheme.primary, icon: "🕒" }
     }
 
     RowLayout {
@@ -85,7 +85,7 @@ Rectangle {
             Text {
                 anchors.left: parent.left
                 anchors.verticalCenter: parent.verticalCenter
-                color: "#475569"
+                color: AppTheme.textSub
                 font.family: "Inter"
                 font.pixelSize: 14
                 font.weight: Font.Medium

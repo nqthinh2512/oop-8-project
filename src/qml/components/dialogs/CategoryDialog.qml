@@ -121,7 +121,7 @@ Item {
                 x: 20
                 height: 32
                 width: 461
-                color: "#878787"
+                color: AppTheme.textSub
                 font.family: "Intel One Mono"
                 font.pixelSize: 20
                 font.weight: Font.DemiBold
@@ -140,10 +140,10 @@ Item {
                 y: 32
                 height: 42
                 width: 460
-                color: "#e9e9e9"
+                color: AppTheme.bgInput
                 radius: 10
-                border.color: (root.trySave && textField.text.trim() === "") ? "red" : "transparent"
-                border.width: (root.trySave && textField.text.trim() === "") ? 2 : 0
+                border.color: (root.trySave && textField.text.trim() === "") ? AppTheme.danger : AppTheme.border
+                border.width: 1
 
                 TextInput {
                     id: textField
@@ -161,7 +161,7 @@ Item {
 
                     Text {
                         text: "input text"
-                        color: "#8049454f"
+                        color: AppTheme.textMuted
                         font: parent.font
                         visible: !parent.text && !parent.activeFocus
                         anchors.fill: parent
@@ -202,7 +202,7 @@ Item {
                     id: page
                     height: 32
                     width: 226
-                    color: "#878787"
+                    color: AppTheme.textSub
                     font.family: "Intel One Mono"
                     font.pixelSize: 20
                     font.weight: Font.DemiBold
@@ -241,7 +241,7 @@ Item {
                     id: status
                     height: 32
                     width: 226
-                    color: "#878787"
+                    color: AppTheme.textSub
                     font.family: "Intel One Mono"
                     font.pixelSize: 20
                     font.weight: Font.DemiBold

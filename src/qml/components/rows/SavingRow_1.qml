@@ -71,7 +71,7 @@ Rectangle {
             Text {
                 anchors.left: parent.left
                 anchors.verticalCenter: parent.verticalCenter
-                color: "#475569"
+                color: AppTheme.textSub
                 font.family: "Inter"
                 font.pixelSize: 14
                 font.weight: Font.Medium

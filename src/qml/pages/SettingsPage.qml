@@ -564,6 +564,75 @@ Rectangle {
             }
 
             // =================================================================
+            // 6. ACCOUNT CARD (Logout)
+            // =================================================================
+            Rectangle {
+                Layout.fillWidth: true
+                Layout.preferredHeight: accountCol.implicitHeight + 48
+                radius: 12
+                color: AppTheme.bgCard
+                border.color: AppTheme.border
+                border.width: 1
+
+                ColumnLayout {
+                    id: accountCol
+                    anchors.left: parent.left
+                    anchors.right: parent.right
+                    anchors.top: parent.top
+                    anchors.margins: 24
+                    spacing: 16
+
+                    Text {
+                        text: "Account"
+                        font.family: "Inter"
+                        font.pixelSize: 22
+                        font.weight: Font.Bold
+                        color: AppTheme.textMain
+                    }
+
+                    RowLayout {
+                        Layout.fillWidth: true
+
+                        Text {
+                            Layout.fillWidth: true
+                            text: "Signed in as " + settingsController.email
+                            font.family: "Inter"
+                            font.pixelSize: 14
+                            color: AppTheme.textSub
+                            elide: Text.ElideRight
+                        }
+
+                        Rectangle {
+                            width: 120
+                            height: 42
+                            radius: 6
+                            color: AppTheme.isDark ? Qt.rgba(AppTheme.danger.r, AppTheme.danger.g, AppTheme.danger.b, 0.2) : "#fee2e2"
+
+                            Text {
+                                anchors.centerIn: parent
+                                text: "Đăng xuất"
+                                color: AppTheme.danger
+                                font.family: "Inter"
+                                font.pixelSize: 15
+                                font.weight: Font.Medium
+                            }
+
+                            MouseArea {
+                                anchors.fill: parent
+                                cursorShape: Qt.PointingHandCursor
+                                onClicked: {
+                                    sessionController.logout()
+                                    if (typeof sidebarMenu !== "undefined") {
+                                        sidebarMenu.selectedIndex = 0
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            // =================================================================
             Item {
                 Layout.preferredWidth: 1
                 Layout.preferredHeight: 32
