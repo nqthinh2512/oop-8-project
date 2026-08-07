@@ -43,16 +43,38 @@ Item {
 
         // Middle Row: Progress Bar Track
         Rectangle {
+            id: fillBarBackground
+
             Layout.fillWidth: true
             implicitHeight: 6
             radius: 3
             color: AppTheme.border
 
             Rectangle {
-                width: parent.width * Math.min(Math.max(root.progressFraction, 0), 1)
+                id: fillBar
+
                 height: parent.height
                 radius: 3
                 color: root.progressColor
+
+                readonly property real targetWidth: parent.width * Math.min(Math.max(root.progressFraction, 0), 1)
+
+                NumberAnimation on width {
+                    id: fillAnimation
+                    from: 0
+                    to: fillBar.targetWidth
+                    duration: 600
+                    easing.type: Easing.OutCubic
+                    running: false
+                }
+
+                Component.onCompleted: fillAnimation.restart()
+
+                onVisibleChanged: {
+                    if (visible) {
+                        fillAnimation.restart()
+                    }
+                }
             }
         }
 

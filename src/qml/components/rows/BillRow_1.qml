@@ -24,7 +24,16 @@ Rectangle {
 
     border.color: AppTheme.bgHover
     border.width: 1
-    color: AppTheme.bgCard
+
+    color: hoverHandler.hovered ? "#EEEEEE" : AppTheme.bgCard
+    Behavior on color {
+        ColorAnimation { duration: 150 }
+    }
+
+    HoverHandler {
+        id: hoverHandler
+        // cursorShape: Qt.PointingHandCursor
+    }
 
     readonly property var statusConfig: {
         if (status_1 === BillRow_1.Status.Status_paid) {

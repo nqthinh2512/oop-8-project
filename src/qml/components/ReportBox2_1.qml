@@ -12,6 +12,7 @@ Rectangle {
 
     property string row2Label: "Overdue"
     property string row2Amount: "2,000,000 VND"
+    property string row2Color: "#000000"
 
     property string row3Label: "Paid"
     property string row3Amount: "1,000 VND"
@@ -94,7 +95,8 @@ Rectangle {
                     font.family: "Intel One Mono"
                     font.pixelSize: 13
                     font.weight: Font.Bold
-                    color: AppTheme.textMain
+                    // color: AppTheme.textMain
+                    color: root.row2Color
                     text: root.row2Amount
                     elide: Text.ElideRight
                 }

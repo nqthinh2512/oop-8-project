@@ -25,7 +25,16 @@ Rectangle {
 
     border.color: AppTheme.bgHover
     border.width: 1
-    color: AppTheme.bgCard
+
+    color: hoverHandler.hovered ? "#EEEEEE" : AppTheme.bgCard
+    Behavior on color {
+        ColorAnimation { duration: 150 }
+    }
+
+    HoverHandler {
+        id: hoverHandler
+        // cursorShape: Qt.PointingHandCursor
+    }
 
     RowLayout {
         anchors.fill: parent

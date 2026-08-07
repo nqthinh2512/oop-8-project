@@ -122,6 +122,18 @@ ColumnLayout {
                         }
                     }
                 }
+
+                Layout.bottomMargin: -12
+            }
+
+            // Date Text
+            Text {
+                font.family: "Inter"
+                font.pixelSize: 14
+                font.weight: Font.Medium
+                color: "#878787"
+                text: root.dateText
+                verticalAlignment: Text.AlignVCenter
             }
 
             // Accent Underline under amount/date
