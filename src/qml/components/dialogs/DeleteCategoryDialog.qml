@@ -23,8 +23,8 @@ Item {
         deletingCategoryId = catId
         label.text = "Choose category to move items from \"" + catName + "\" to:"
 
-        var names = []
-        var ids = []
+        var names = ["Uncategorized (Default)"]
+        var ids = [0]
         var targetParentId = 0
 
         // Fetch candidate categories from controller belonging to the SAME main parent category group
@@ -37,7 +37,7 @@ Item {
                 }
             }
 
-            var candidates = categoriesController.categoriesForParent(targetParentId, 0)
+            var candidates = (targetParentId > 0) ? categoriesController.categoriesForParent(targetParentId, 0) : list
             for (var i = 0; i < candidates.length; i++) {
                 var cat = candidates[i]
                 if (cat.id !== catId) {
@@ -45,11 +45,6 @@ Item {
                     ids.push(cat.id)
                 }
             }
-        }
-
-        if (names.length === 0) {
-            names = ["None (Keep Unassigned)"]
-            ids = [0]
         }
 
         targetCategoryIds = ids

@@ -53,7 +53,7 @@ QVariantList CategoriesController::categoriesForParent(int parentId, int include
     QVariantList list;
     const QVector<Category>& categories = DatabaseManager::instance().categoryDAO()->getAll();
     for (const auto &cat : categories) {
-        if (cat.getParentId() == parentId) {
+        if (parentId == 0 || cat.getParentId() == parentId) {
             if (cat.isActive() || cat.getId() == includeCategoryId) {
                 QVariantMap item;
                 item["id"] = cat.getId();
