@@ -18,6 +18,11 @@ ColumnLayout {
     property bool isTrendUp: true
     property color accentLineColor: "#5186f8"
 
+    // Exposed Animation function
+    function triggerLineAnimation() {
+        accentLine.triggerAnimation()
+    }
+
     signal viewAllClicked()
 
     spacing: 8
@@ -143,14 +148,53 @@ ColumnLayout {
                 verticalAlignment: Text.AlignVCenter
             }
 
-            // Accent Underline under amount/date
-            Rectangle {
+            Canvas {
+                id: accentLine
                 Layout.fillWidth: true
                 Layout.preferredHeight: 3
-                radius: 1.5
-                color: root.accentLineColor
                 opacity: 0.8
+
+                property real progress: 0.0
+
+                onProgressChanged: requestPaint()
+
+                function triggerAnimation() {
+                    fillAnimation.stop();
+                    progress = 0.0;
+                    fillAnimation.start();
+                }
+
+                NumberAnimation {
+                    id: fillAnimation
+                    target: accentLine
+                    property: "progress"
+                    from: 0.0
+                    to: 1.0
+                    duration: 800
+                    easing.type: Easing.OutCubic
+                    running: true
+                }
+
+                onPaint: {
+                    var ctx = getContext("2d");
+                    ctx.reset();
+
+                    var currentWidth = width * progress;
+                    if (currentWidth <= 0) return;
+
+                    var r = 1.5; // Original radius
+                    var h = height;
+
+                    ctx.fillStyle = root.accentLineColor;
+                    ctx.beginPath();
+
+                    ctx.roundedRect(0, 0, currentWidth, h, r, r);
+
+                    ctx.fill();
+                }
             }
         }
     }
+
+
 }

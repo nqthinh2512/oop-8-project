@@ -130,7 +130,7 @@ Rectangle {
                 ColumnLayout {
                     Text {
                         // anchors.topMargin: 0
-
+                        color: AppTheme.textMain
                         text: settingsController.fullName
 
                         font.family: "Inter"
@@ -139,6 +139,7 @@ Rectangle {
                     }
 
                     Text {
+                        color: AppTheme.textSub
                         text: settingsController.email
 
                         font.family: "Inter"

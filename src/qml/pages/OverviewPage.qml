@@ -66,6 +66,7 @@ Rectangle {
                 spacing: 20
 
                 OverviewKpiCard {
+                    id: overviewCard1
                     Layout.fillWidth: true
                     Layout.preferredWidth: 0
                     cardTitle: "Net Balance"
@@ -77,6 +78,7 @@ Rectangle {
                 }
 
                 OverviewKpiCard {
+                    id: overviewCard2
                     Layout.fillWidth: true
                     Layout.preferredWidth: 0
                     cardTitle: "Total Income"
@@ -89,6 +91,7 @@ Rectangle {
                 }
 
                 OverviewKpiCard {
+                    id: overviewCard3
                     Layout.fillWidth: true
                     Layout.preferredWidth: 0
                     cardTitle: "Total Expense"
@@ -98,6 +101,15 @@ Rectangle {
                     showTrend: false
                     accentLineColor: AppTheme.danger
                     onViewAllClicked: overviewPage.navigateTo(1)
+                }
+
+                Connections {
+                    target: overviewController
+                    function onDataChanged() {
+                        overviewCard1.triggerLineAnimation()
+                        overviewCard2.triggerLineAnimation()
+                        overviewCard3.triggerLineAnimation()
+                    }
                 }
             }
 

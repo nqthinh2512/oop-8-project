@@ -1,7 +1,8 @@
-type,id,title,amount,dateTime,method,categoryId
-Income,1,Monthly Salary,15000000.00,2026-07-19T22:21:52,Bank Transfer,1
-Income,2,Freelance Web Design,3500000.00,2026-07-29T01:57:27,Bank Transfer,2
-Expense,3,Monthly Apartment Rent,3500000.00,2026-07-24T01:57:27,Cash,6
-Expense,4,Weekly Grocery & Dining,850000.00,2026-07-31T01:57:27,Cash,5
-Expense,5,Fiber Internet Service,250000.00,2026-08-01T01:57:27,Credit Card,8
-Expense,6,Fuel & Transportation,200000.00,2026-08-02T01:57:27,Cash,7
+type,id,title,amount,dateTime,method,categoryId,linkedBillId,linkedSavingId
+Income,1,Monthly Salary,15000000.00,2026-07-19T22:21:52,Bank Transfer,1,-1,-1
+Income,2,Freelance Web Design,3500000.00,2026-07-29T01:57:27,Bank Transfer,2,-1,-1
+Expense,3,Monthly Apartment Rent,3500000.00,2026-07-24T01:57:27,Cash,6,-1,-1
+Expense,4,Weekly Grocery & Dining,850000.00,2026-07-31T01:57:27,Cash,5,-1,-1
+Expense,5,Fiber Internet Service,250000.00,2026-08-01T01:57:27,Credit Card,8,-1,-1
+Expense,6,Fuel & Transportation,200000.00,2026-08-02T01:57:27,Cash,7,-1,-1
+Expense,7,Deposit to New Years Fund,10000000.00,2026-08-08T15:32:22,Saving Transfer,18,-1,5

@@ -56,9 +56,25 @@ Item {
         anchors.bottom: underline.top
         spacing: 12
 
+        Rectangle {
+            anchors.fill: parent
+
+            color: hoverHandler.hovered ? AppTheme.bgHover : AppTheme.bgCard
+            Behavior on color {
+                ColorAnimation { duration: 150 }
+            }
+
+            HoverHandler {
+                id: hoverHandler
+                // cursorShape: Qt.PointingHandCursor
+            }
+
+            z: -1
+        }
+
         // Optional Icon
         ColorImage {
-        color: AppTheme.textMain
+            color: AppTheme.textMain
             visible: root.showIcon && root.iconSource.toString() !== ""
             source: root.iconSource
             Layout.preferredWidth: 36
