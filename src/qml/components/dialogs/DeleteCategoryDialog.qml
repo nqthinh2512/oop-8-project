@@ -23,13 +23,13 @@ Item {
         deletingCategoryId = catId
         label.text = "Choose category to move items from \"" + catName + "\" to:"
 
-        var names = ["Uncategorized (Default)"]
-        var ids = [0]
+        var names = []
+        var ids = []
         var targetParentId = 0
 
         // Fetch candidate categories from controller belonging to the SAME main parent category group
-        if (typeof categoriesController !== "undefined" && categoriesController.categoriesList) {
-            var list = categoriesController.categoriesList
+        if (typeof categoriesController !== "undefined") {
+            var list = categoriesController.categoriesForParent(0, 0)
             for (var j = 0; j < list.length; j++) {
                 if (list[j].id === catId) {
                     targetParentId = list[j].parentId
@@ -37,13 +37,19 @@ Item {
                 }
             }
 
-            for (var i = 0; i < list.length; i++) {
-                var cat = list[i]
-                if (cat.id !== catId && (targetParentId === 0 || cat.parentId === targetParentId)) {
+            var candidates = categoriesController.categoriesForParent(targetParentId, 0)
+            for (var i = 0; i < candidates.length; i++) {
+                var cat = candidates[i]
+                if (cat.id !== catId) {
                     names.push(cat.name)
                     ids.push(cat.id)
                 }
             }
+        }
+
+        if (names.length === 0) {
+            names = ["None (Keep Unassigned)"]
+            ids = [0]
         }
 
         targetCategoryIds = ids
@@ -53,8 +59,10 @@ Item {
         visible = true
     }
 
-    function open() { visible = true }
-    function close() { visible = false }
+    function close() {
+        if (typeof dropdown_1 !== "undefined" && dropdown_1) dropdown_1.menuOpen = false;
+        visible = false;
+    }
 
     // Dimmed background overlay
     Rectangle {

@@ -27,10 +27,10 @@ Item {
         dialogTitleText.text = "Add Category"
         textField.text = ""
         trySave = false
+        pageDropdown.menuOpen = false
+        statusDropdown.menuOpen = false
         pageDropdown.selectedIndex = 0
-        pageDropdown.selectedText = "Income"
         statusDropdown.selectedIndex = 0
-        statusDropdown.selectedText = "Active"
         visible = true
     }
 
@@ -40,20 +40,22 @@ Item {
         dialogTitleText.text = "Edit Category"
         textField.text = currentTitle
         trySave = false
+        pageDropdown.menuOpen = false
+        statusDropdown.menuOpen = false
 
-        var parentNames = ["Income", "Expense", "Bill", "Budget", "Saving"]
         var pIdx = (currentParentId >= 1 && currentParentId <= 5) ? (currentParentId - 1) : 0
         pageDropdown.selectedIndex = pIdx
-        pageDropdown.selectedText = parentNames[pIdx]
-
         statusDropdown.selectedIndex = currentActive ? 0 : 1
-        statusDropdown.selectedText = currentActive ? "Active" : "Inactive"
 
         visible = true
     }
 
     function open() { openAdd() }
-    function close() { visible = false }
+    function close() {
+        pageDropdown.menuOpen = false
+        statusDropdown.menuOpen = false
+        visible = false
+    }
 
     // Dimmed background overlay
     Rectangle {

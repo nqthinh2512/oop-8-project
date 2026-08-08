@@ -29,8 +29,7 @@ Item {
     }
 
     function setCategoryName(catName) {
-        var allCats = categoriesController.categoriesList;
-        var list = allCats.filter(function(c) { return c.parentId === 3; });
+        var list = categoriesController.categoriesForParent(3, billCategoryId);
         for (var i = 0; i < list.length; i++) {
             if (list[i].name === catName) {
                 dropdown_2.selectedIndex = i;
@@ -54,7 +53,10 @@ Item {
     }
 
     function open() { visible = true }
-    function close() { visible = false }
+    function close() {
+        if (typeof dropdown_2 !== "undefined" && dropdown_2) dropdown_2.menuOpen = false;
+        visible = false;
+    }
 
     function reset() {
         isEditMode = false;
@@ -67,8 +69,7 @@ Item {
         if (typeof titleField !== "undefined" && titleField) titleField.text = "";
         if (typeof amountField !== "undefined" && amountField) amountField.text = "";
 
-        var allCats = categoriesController.categoriesList;
-        var list = allCats.filter(function(c) { return c.parentId === 3; });
+        var list = categoriesController.categoriesForParent(3, 0);
         if (list.length > 0) {
             dropdown_2.selectedIndex = 0;
             dropdown_2.selectedText = list[0].name;
@@ -314,8 +315,7 @@ Item {
                     _state: Dropdown_1.State_1.State_1_default
                     clip: true
                     
-                    property var allCats: categoriesController.categoriesList
-                    property var catList: allCats.filter(function(c) { return c.parentId === 3; })
+                    property var catList: categoriesController.categoriesForParent(3, root.billCategoryId)
                     model: catList.map(function(c) { return c.name; })
                     selectedText: catList.length > 0 ? catList[0].name : "Select Category"
                     

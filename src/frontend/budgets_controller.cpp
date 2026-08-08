@@ -74,13 +74,12 @@ QVariantList BudgetsController::categoryOptions() const
     QVariantList list;
     const auto &allCategories = DatabaseManager::instance().categoryDAO()->getAll();
     for (const auto &c : allCategories) {
-        // SỬA: chỉ lấy danh mục con thuộc gốc "Expense" (parentId = 2) vì Ngân sách dùng để quản lý Chi tiêu
-        if (c.getParentId() != 2) continue; 
-
-        QVariantMap m;
-        m["id"] = c.getId();
-        m["name"] = c.getName();
-        list.append(m);
+        if ((c.getParentId() == 4 || c.getParentId() == 2) && c.isActive()) {
+            QVariantMap m;
+            m["id"] = c.getId();
+            m["name"] = c.getName();
+            list.append(m);
+        }
     }
     return list;
 }

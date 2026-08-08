@@ -41,9 +41,8 @@ Item {
     }
 
     function setCategoryName(catName) {
-        var allCats = categoriesController.categoriesList;
         var targetParent = root.transactionTypeIndex + 1; // 1 for Income, 2 for Expense
-        var list = allCats.filter(function(c) { return c.parentId === targetParent; });
+        var list = categoriesController.categoriesForParent(targetParent, root.transactionCategoryId);
         for (var i = 0; i < list.length; i++) {
             if (list[i].name === catName) {
                 dropdown_3.selectedIndex = i;
@@ -83,7 +82,14 @@ Item {
         }
         visible = true 
     }
-    function close() { visible = false }
+    function close() {
+        if (typeof dropdown_1 !== "undefined" && dropdown_1) dropdown_1.menuOpen = false;
+        if (typeof dropdown_3 !== "undefined" && dropdown_3) dropdown_3.menuOpen = false;
+        if (typeof dropdown_method !== "undefined" && dropdown_method) dropdown_method.menuOpen = false;
+        if (typeof dropdown_target_module !== "undefined" && dropdown_target_module) dropdown_target_module.menuOpen = false;
+        if (typeof dropdown_target_item !== "undefined" && dropdown_target_item) dropdown_target_item.menuOpen = false;
+        visible = false;
+    }
 
     function reset() {
         isEditMode = false;
@@ -329,11 +335,10 @@ Item {
                     enabled: root.transactionTypeIndex !== -1
                     opacity: enabled ? 1.0 : 0.5
                     
-                    property var allCats: categoriesController.categoriesList
                     property var catList: {
                         if (root.transactionTypeIndex === -1) return [];
                         var targetParent = root.transactionTypeIndex + 1; // 1 for Income, 2 for Expense
-                        return allCats.filter(function(c) { return c.parentId === targetParent; })
+                        return categoriesController.categoriesForParent(targetParent, root.transactionCategoryId);
                     }
                     model: catList.map(function(c) { return c.name; })
                     

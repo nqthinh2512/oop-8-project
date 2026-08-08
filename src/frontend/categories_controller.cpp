@@ -1,5 +1,6 @@
 #include "categories_controller.h"
 #include "../backend/models/transaction.h"
+#include "../backend/models/transaction_factory.h"
 #include <QLocale>
 #include <algorithm>
 
@@ -48,6 +49,25 @@ static QString formatVND(double amount) {
     return locale.toString(static_cast<qlonglong>(qAbs(amount))) + " VND";
 }
 
+QVariantList CategoriesController::categoriesForParent(int parentId, int includeCategoryId) const {
+    QVariantList list;
+    const QVector<Category>& categories = DatabaseManager::instance().categoryDAO()->getAll();
+    for (const auto &cat : categories) {
+        if (cat.getParentId() == parentId) {
+            if (cat.isActive() || cat.getId() == includeCategoryId) {
+                QVariantMap item;
+                item["id"] = cat.getId();
+                item["name"] = cat.getName();
+                item["parentId"] = cat.getParentId();
+                item["parentName"] = getParentCategoryName(cat.getParentId());
+                item["active"] = cat.isActive();
+                list.append(item);
+            }
+        }
+    }
+    return list;
+}
+
 QVariantList CategoriesController::categoriesList() const {
     const QVector<Category>& categories = DatabaseManager::instance().categoryDAO()->getAll();
     const auto& transactions = DatabaseManager::instance().transactionDAO()->getAll();
@@ -57,16 +77,39 @@ QVariantList CategoriesController::categoriesList() const {
 
     QMap<int, double> categorySums;
     for (const auto* t : transactions) {
-        if (t) categorySums[t->getCategoryId()] += t->getAmount();
+        if (t) {
+            int parentId = (t->getSignedAmount() > 0) ? 1 : 2;
+            for (const auto& cat : categories) {
+                if (cat.getId() == t->getCategoryId() && cat.getParentId() == parentId) {
+                    categorySums[cat.getId()] += t->getAmount();
+                    break;
+                }
+            }
+        }
     }
     for (const auto& b : bills) {
-        categorySums[b.getCategoryId()] += b.getAmount();
+        for (const auto& cat : categories) {
+            if (cat.getId() == b.getCategoryId() && cat.getParentId() == 3) {
+                categorySums[cat.getId()] += b.getAmount();
+                break;
+            }
+        }
     }
     for (const auto& b : budgets) {
-        categorySums[b.getCategoryId()] += b.getLimit();
+        for (const auto& cat : categories) {
+            if (cat.getId() == b.getCategoryId() && cat.getParentId() == 4) {
+                categorySums[cat.getId()] += b.getLimit();
+                break;
+            }
+        }
     }
     for (const auto& s : savings) {
-        categorySums[s.getCategoryId()] += s.getTarget();
+        for (const auto& cat : categories) {
+            if (cat.getId() == s.getCategoryId() && cat.getParentId() == 5) {
+                categorySums[cat.getId()] += s.getTarget();
+                break;
+            }
+        }
     }
 
     QVector<QVariantMap> items;
@@ -152,8 +195,9 @@ bool CategoriesController::updateCategory(int id, const QString &name, int newPa
     if (name.trimmed().isEmpty()) return false;
     for (const Category& existing : DatabaseManager::instance().categoryDAO()->getAll()) {
         if (existing.getId() == id) {
-            if (isCategoryNameExists(name, existing.getParentId(), id)) return false;
-            Category cat(id, existing.getParentId(), name.trimmed());
+            int targetParentId = (newParentId >= 1 && newParentId <= 5) ? newParentId : existing.getParentId();
+            if (isCategoryNameExists(name, targetParentId, id)) return false;
+            Category cat(id, targetParentId, name.trimmed());
             cat.setActive(active);
             DatabaseManager::instance().categoryDAO()->update(id, cat);
             emit categoriesChanged();
@@ -183,10 +227,15 @@ bool CategoriesController::removeCategory(int id) {
 }
 
 bool CategoriesController::migrateAndRemoveCategory(int sourceId, int targetId) {
-    for (const Transaction* t : DatabaseManager::instance().transactionDAO()->getAll()) {
-        if (t->getCategoryId() == sourceId) {
-            Transaction* updatedT = const_cast<Transaction*>(t);
-            updatedT->setCategoryId(targetId);
+    auto allTx = DatabaseManager::instance().transactionDAO()->getAll();
+    for (const Transaction* t : allTx) {
+        if (t && t->getCategoryId() == sourceId) {
+            int typeIndex = (t->getSignedAmount() > 0) ? 0 : 1;
+            Transaction* updatedT = TransactionFactory::createTransaction(
+                typeIndex, t->getId(), t->getTitle(), t->getAmount(),
+                t->getDateTime(), t->getMethod(), targetId,
+                t->getLinkedBillId(), t->getLinkedSavingId(), t->getLinkedBudgetId()
+            );
             DatabaseManager::instance().transactionDAO()->update(t->getId(), updatedT);
         }
     }
@@ -236,4 +285,4 @@ void CategoriesController::refresh() {
 
 bool CategoriesController::exportToCSV(const QString &filePath) {
     return DatabaseManager::instance().categoryDAO()->exportToCSV(filePath);
-}
+}

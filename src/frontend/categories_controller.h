@@ -34,6 +34,7 @@ public:
     int statusFilter() const { return m_statusFilter; }
     void setStatusFilter(int filter);
 
+    Q_INVOKABLE QVariantList categoriesForParent(int parentId, int includeCategoryId = 0) const;
     Q_INVOKABLE bool isCategoryNameExists(const QString &name, int parentId, int excludeId = 0) const;
     Q_INVOKABLE bool addCategory(const QString &name, int parentId, bool active = true);
     Q_INVOKABLE bool updateCategory(int id, const QString &name, int newParentId, bool active);

@@ -68,7 +68,6 @@ Rectangle {
                 hoverEnabled: true
                 cursorShape: Qt.PointingHandCursor
                 onClicked: {
-                    dropdownDialogBox.selectedIndex = index
                     dropdownDialogBox.itemSelected(index, modelData)
                 }
             }

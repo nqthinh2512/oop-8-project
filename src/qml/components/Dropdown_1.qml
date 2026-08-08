@@ -16,6 +16,18 @@ Rectangle {
     property alias dropdownBorderWidth: dropdown.border.width
     property bool menuOpen: false
 
+    onSelectedIndexChanged: {
+        if (model && selectedIndex >= 0 && selectedIndex < model.length) {
+            selectedText = model[selectedIndex]
+        }
+    }
+
+    onModelChanged: {
+        if (model && selectedIndex >= 0 && selectedIndex < model.length) {
+            selectedText = model[selectedIndex]
+        }
+    }
+
     // ===== Signals =====
     signal selected(int index, string value)
     signal clicked()

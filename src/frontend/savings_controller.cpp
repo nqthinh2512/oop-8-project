@@ -130,7 +130,7 @@ QVariantList SavingsController::categoryOptions() const
         // Trước đây có thêm "|| c.getId() == Saving::parentCategory" khiến
         // category nào có ID trùng số 5 (vd "Food & Dining", con của Expense)
         // cũng bị lọt vào danh sách category của Savings do trùng số ngẫu nhiên.
-        if (c.getParentId() == Saving::parentCategory) {
+        if (c.getParentId() == Saving::parentCategory && c.isActive()) {
             QVariantMap m;
             m["id"] = c.getId();
             m["name"] = c.getName();

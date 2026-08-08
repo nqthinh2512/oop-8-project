@@ -21,7 +21,13 @@ Item {
 
     // --- Các hàm API công khai ---
     function open() { visible = true }
-    function close() { visible = false; errorMessage = "" }
+    function close() {
+        if (typeof dropdown_1 !== "undefined" && dropdown_1) dropdown_1.menuOpen = false;
+        if (typeof dropdown_3 !== "undefined" && dropdown_3) dropdown_3.menuOpen = false;
+        if (typeof dropdown_7 !== "undefined" && dropdown_7) dropdown_7.menuOpen = false;
+        visible = false;
+        errorMessage = "";
+    }
 
     function openForAdd() {
         isEditMode = false
