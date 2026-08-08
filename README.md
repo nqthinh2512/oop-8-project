@@ -51,17 +51,6 @@ The backend architecture applies 5 core Software Design Patterns and OOP princip
 
 ---
 
-## 👥 Team Member Roles & Contributions
-
-| Member | Feature Demo & CRUD Operations (Part 1) | UML Architecture & Design Pattern Rationale (Part 2) |
-| :--- | :--- | :--- |
-| **Member 4** | **Introduction** + **Categories Page** (Create & Delete/Migrate) + **Reports Page** | 3-Tier Architecture, **Singleton & Facade Patterns** (`DatabaseManager`), **`Category.png`** UML (Data Integrity) |
-| **Member 1** | **Overview Page** (Read/View real-time aggregated data from 5 DAOs) | Project Wrap-Up & Conclusion |
-| **Member 2** | **Transactions & Bills Pages** (Search, filter & list navigation) | **DAO Pattern** (`IBaseDAO<T>`), **Polymorphism** (`Transaction` $\rightarrow$ `Income`/`Expense`) & **Factory Pattern** |
-| **Member 3** | **Savings & Budgets Pages** (Savings goal contributions & budget risk status) | Business logic encapsulation & model state calculations (`Budget` & `Saving`) |
-
----
-
 ## 📁 Directory Structure (`src/`)
 
 ```text
