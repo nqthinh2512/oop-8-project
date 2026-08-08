@@ -197,7 +197,7 @@ void TransactionsController::addTransaction(int typeIndex, const QString& title,
 
     QString cleanMethod = method.isEmpty() ? "Cash/Bank" : method;
     QString cleanTitle = title.isEmpty() ? "Transaction" : title;
-    Transaction* newTx = TransactionFactory::createTransaction(typeIndex, id, cleanTitle, amount, dt, cleanMethod, categoryId, linkedBillId, linkedSavingId);
+    Transaction* newTx = TransactionFactory::createTransaction(typeIndex, id, cleanTitle, amount, dt, cleanMethod, categoryId, linkedBillId, linkedSavingId, linkedBudgetId);
 
     DatabaseManager::instance().transactionDAO()->add(newTx);
     
@@ -216,7 +216,7 @@ void TransactionsController::addTransaction(int typeIndex, const QString& title,
                 break;
             }
         }
-    } else if (typeIndex == 1) { // 1 = Expense default category sync
+    } else if (typeIndex == 1) { // Default category auto-sync for expenses
         DatabaseManager::instance().budgetDAO()->addExpenseToBudget(categoryId, amount);
     }
     
@@ -256,33 +256,78 @@ void TransactionsController::updateTransaction(int id, int typeIndex, const QStr
     QString cleanMethod = method.isEmpty() ? "Cash/Bank" : method;
     QString cleanTitle = title.isEmpty() ? "Transaction" : title;
     
-    // Auto-sync Budget: Remove old amount, add new amount
+    // Retrieve old transaction details to revert prior impacts
     int oldCategoryId = 0;
     double oldAmount = 0;
     int oldTypeIndex = 0;
+    int oldLinkedBillId = -1;
+    int oldLinkedSavingId = -1;
+    int oldLinkedBudgetId = -1;
+
     for (const Transaction* t : DatabaseManager::instance().transactionDAO()->getAll()) {
         if (t->getId() == id) {
             oldCategoryId = t->getCategoryId();
             oldAmount = t->getAmount();
             oldTypeIndex = (dynamic_cast<const Income*>(t) != nullptr) ? 0 : 1;
+            oldLinkedBillId = t->getLinkedBillId();
+            oldLinkedSavingId = t->getLinkedSavingId();
+            oldLinkedBudgetId = t->getLinkedBudgetId();
             break;
         }
     }
 
-    if (oldTypeIndex == 1) {
+    // 1. Revert Old Budget Impact
+    if (oldLinkedBudgetId != -1) {
+        for (const Budget& b : DatabaseManager::instance().budgetDAO()->getAll()) {
+            if (b.getId() == oldLinkedBudgetId) {
+                Budget updatedBudget = b;
+                double revertAmount = (oldTypeIndex == 1) ? -oldAmount : oldAmount;
+                double newSpent = std::max(0.0, b.getSpent() + revertAmount);
+                updatedBudget.setSpent(newSpent);
+                DatabaseManager::instance().budgetDAO()->update(oldLinkedBudgetId, updatedBudget);
+                break;
+            }
+        }
+    } else if (oldTypeIndex == 1) {
         DatabaseManager::instance().budgetDAO()->addExpenseToBudget(oldCategoryId, -oldAmount);
     }
-    
-    Transaction* newTx = TransactionFactory::createTransaction(typeIndex, id, cleanTitle, amount, dt, cleanMethod, categoryId, linkedBillId, linkedSavingId);
 
+    // 2. Revert Old Saving Impact
+    if (oldLinkedSavingId != -1) {
+        for (const Saving& s : DatabaseManager::instance().savingDAO()->getAll()) {
+            if (s.getId() == oldLinkedSavingId) {
+                double newCurrent = std::max(0.0, s.getCurrent() - oldAmount);
+                Saving updatedSaving(s.getId(), s.getName(), s.getPriority(), s.getDueDate(), s.getTarget(), newCurrent, s.getCategoryId());
+                DatabaseManager::instance().savingDAO()->update(oldLinkedSavingId, updatedSaving);
+                break;
+            }
+        }
+    }
+
+    // 2.5 Revert Old Bill Link if changed or unlinked
+    if (oldLinkedBillId != -1 && oldLinkedBillId != linkedBillId) {
+        for (const Bill& b : DatabaseManager::instance().billDAO()->getAll()) {
+            if (b.getId() == oldLinkedBillId) {
+                Bill updatedBill(b.getId(), b.getName(), b.getAmount(), b.getDueDate(), b.getCategoryId(), false);
+                DatabaseManager::instance().billDAO()->update(oldLinkedBillId, updatedBill);
+                break;
+            }
+        }
+    }
+    
+    Transaction* newTx = TransactionFactory::createTransaction(typeIndex, id, cleanTitle, amount, dt, cleanMethod, categoryId, linkedBillId, linkedSavingId, linkedBudgetId);
     DatabaseManager::instance().transactionDAO()->update(id, newTx);
     
+    // 3. Apply New Budget Impact
     if (linkedBudgetId != -1) {
         for (const Budget& b : DatabaseManager::instance().budgetDAO()->getAll()) {
             if (b.getId() == linkedBudgetId) {
                 Budget updatedBudget = b;
                 if (typeIndex == 1) {
                     updatedBudget.addExpense(amount);
+                } else {
+                    double newSpent = std::max(0.0, b.getSpent() - amount);
+                    updatedBudget.setSpent(newSpent);
                 }
                 DatabaseManager::instance().budgetDAO()->update(linkedBudgetId, updatedBudget);
                 break;
@@ -292,12 +337,24 @@ void TransactionsController::updateTransaction(int id, int typeIndex, const QStr
         DatabaseManager::instance().budgetDAO()->addExpenseToBudget(categoryId, amount);
     }
     
-    // Hub Architecture: Sync updated amount back to Bill if linked
+    // 4. Apply New Bill Impact
     if (linkedBillId != -1) {
         for (const Bill& b : DatabaseManager::instance().billDAO()->getAll()) {
             if (b.getId() == linkedBillId) {
                 Bill updatedBill(b.getId(), b.getName(), amount, b.getDueDate(), b.getCategoryId(), true);
                 DatabaseManager::instance().billDAO()->update(linkedBillId, updatedBill);
+                break;
+            }
+        }
+    }
+
+    // 5. Apply New Saving Impact
+    if (linkedSavingId != -1) {
+        for (const Saving& s : DatabaseManager::instance().savingDAO()->getAll()) {
+            if (s.getId() == linkedSavingId) {
+                double newCurrent = s.getCurrent() + amount;
+                Saving updatedSaving(s.getId(), s.getName(), s.getPriority(), s.getDueDate(), s.getTarget(), newCurrent, s.getCategoryId());
+                DatabaseManager::instance().savingDAO()->update(linkedSavingId, updatedSaving);
                 break;
             }
         }
@@ -309,12 +366,13 @@ void TransactionsController::updateTransaction(int id, int typeIndex, const QStr
 
 void TransactionsController::deleteTransaction(int id)
 {
-    // Lấy thông tin giao dịch để trừ lại khỏi budget
     int categoryId = 0;
     double amount = 0;
     int typeIndex = 0;
     int linkedBillId = -1;
     int linkedSavingId = -1;
+    int linkedBudgetId = -1;
+
     for (const Transaction* t : DatabaseManager::instance().transactionDAO()->getAll()) {
         if (t->getId() == id) {
             categoryId = t->getCategoryId();
@@ -322,15 +380,28 @@ void TransactionsController::deleteTransaction(int id)
             typeIndex = (dynamic_cast<const Income*>(t) != nullptr) ? 0 : 1;
             linkedBillId = t->getLinkedBillId();
             linkedSavingId = t->getLinkedSavingId();
+            linkedBudgetId = t->getLinkedBudgetId();
             break;
         }
     }
 
-    if (typeIndex == 1) {
+    // Revert Budget Impact
+    if (linkedBudgetId != -1) {
+        for (const Budget& b : DatabaseManager::instance().budgetDAO()->getAll()) {
+            if (b.getId() == linkedBudgetId) {
+                Budget updatedBudget = b;
+                double revertAmount = (typeIndex == 1) ? -amount : amount;
+                double newSpent = std::max(0.0, b.getSpent() + revertAmount);
+                updatedBudget.setSpent(newSpent);
+                DatabaseManager::instance().budgetDAO()->update(linkedBudgetId, updatedBudget);
+                break;
+            }
+        }
+    } else if (typeIndex == 1) {
         DatabaseManager::instance().budgetDAO()->addExpenseToBudget(categoryId, -amount);
     }
     
-    // Hub Architecture: Revert Bill to Unpaid if deleted
+    // Revert Bill to Unpaid if deleted
     if (linkedBillId != -1) {
         for (const Bill& b : DatabaseManager::instance().billDAO()->getAll()) {
             if (b.getId() == linkedBillId) {
@@ -341,12 +412,11 @@ void TransactionsController::deleteTransaction(int id)
         }
     }
     
-    // Revert saving
+    // Revert Saving Goal Impact
     if (linkedSavingId != -1) {
         for (const Saving& s : DatabaseManager::instance().savingDAO()->getAll()) {
             if (s.getId() == linkedSavingId) {
-                double newCurrent = s.getCurrent() - (typeIndex == 1 ? amount : -amount);
-                if (newCurrent < 0) newCurrent = 0;
+                double newCurrent = std::max(0.0, s.getCurrent() - amount);
                 Saving updatedSaving(s.getId(), s.getName(), s.getPriority(), s.getDueDate(), s.getTarget(), newCurrent, s.getCategoryId());
                 DatabaseManager::instance().savingDAO()->update(linkedSavingId, updatedSaving);
                 break;

@@ -101,32 +101,23 @@ void TransactionDAO::loadFromCSV() {
                 
                 int linkedBillId = -1;
                 int linkedSavingId = -1;
+                int linkedBudgetId = -1;
                 if (fields.size() >= 9) {
                     linkedBillId = fields[7].toInt();
                     linkedSavingId = fields[8].toInt();
                 }
+                if (fields.size() >= 10) {
+                    linkedBudgetId = fields[9].toInt();
+                }
 
                 if (type == "Income") {
-                    m_transactions.append(new Income(id, title, amount, dt, method, catId, linkedBillId, linkedSavingId));
+                    m_transactions.append(new Income(id, title, amount, dt, method, catId, linkedBillId, linkedSavingId, linkedBudgetId));
                 } else {
-                    m_transactions.append(new Expense(id, title, amount, dt, method, catId, linkedBillId, linkedSavingId));
+                    m_transactions.append(new Expense(id, title, amount, dt, method, catId, linkedBillId, linkedSavingId, linkedBudgetId));
                 }
             }
         }
         file.close();
-    }
-
-    if (m_transactions.isEmpty()) {
-        qDebug() << "Khởi tạo dữ liệu giao dịch mẫu ban đầu...";
-        int id = 1;
-        QDateTime now = QDateTime::currentDateTime();
-        m_transactions.append(new Income(id++, "Monthly Salary", 15000000.0, now.addDays(-15), "Bank Transfer", 1));
-        m_transactions.append(new Income(id++, "Freelance Web Design", 3500000.0, now.addDays(-5), "Bank Transfer", 2));
-        m_transactions.append(new Expense(id++, "Monthly Apartment Rent", 3500000.0, now.addDays(-10), "Cash", 6));
-        m_transactions.append(new Expense(id++, "Weekly Grocery & Dining", 850000.0, now.addDays(-3), "Cash", 5));
-        m_transactions.append(new Expense(id++, "Fiber Internet Service", 250000.0, now.addDays(-2), "Credit Card", 8));
-        m_transactions.append(new Expense(id++, "Fuel & Transportation", 200000.0, now.addDays(-1), "Cash", 7));
-        saveToCSV();
     }
 }
 
@@ -144,7 +135,7 @@ void TransactionDAO::saveToCSV() const {
     }
 
     QTextStream out(&file);
-    out << "type,id,title,amount,dateTime,method,categoryId,linkedBillId,linkedSavingId\n";
+    out << "type,id,title,amount,dateTime,method,categoryId,linkedBillId,linkedSavingId,linkedBudgetId\n";
 
     for (const Transaction* t : m_transactions) {
         if (!t) continue;
@@ -157,7 +148,8 @@ void TransactionDAO::saveToCSV() const {
             << t->getMethod() << ","
             << t->getCategoryId() << ","
             << t->getLinkedBillId() << ","
-            << t->getLinkedSavingId() << "\n";
+            << t->getLinkedSavingId() << ","
+            << t->getLinkedBudgetId() << "\n";
     }
     file.close();
 }

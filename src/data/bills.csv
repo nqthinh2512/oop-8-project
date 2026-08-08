@@ -1,9 +1,8 @@
 id,name,amount,dueDate,categoryId,isPaid
-1,Electricity Bill,650000.00,2026-08-13,0,0
-2,Water Supply Bill,180000.00,2026-08-08,0,0
-3,High-Speed Internet,250000.00,2026-08-01,0,1
-4,Netflix Subscription,250000.00,2026-07-19,0,1
-5,Credit Card Bill,1250000.00,2026-07-29,0,0
-6,Gym Membership,500000.00,2026-08-01,0,0
-7,Car Insurance,850000.00,2026-07-24,0,0
-8,Phone Bill,150000.00,2026-08-02,0,0
+1,"Apartment Rent Bill",3500000.00,2026-08-05,15,1
+2,"High-Speed Fiber Internet",250000.00,2026-08-10,13,1
+3,"Monthly Electricity Bill",680000.00,2026-08-02,11,0
+4,"Clean Water Supply Bill",120000.00,2026-08-04,12,0
+5,"Gym & Fitness Pass",450000.00,2026-08-20,17,1
+6,"Netflix & Spotify Subscriptions",260000.00,2026-08-25,16,0
+7,"Credit Card Settlement",1250000.00,2026-08-28,14,0
