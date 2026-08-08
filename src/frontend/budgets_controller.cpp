@@ -11,6 +11,7 @@ QString formatVnd(double amount) {
 BudgetsController::BudgetsController(QObject *parent) : QObject(parent) {
     connect(&DatabaseManager::instance(), &DatabaseManager::dataChanged, this, [this]() {
         m_listDirty = true;
+        emit categoriesChanged();
         emit budgetsListChanged();
     });
 }

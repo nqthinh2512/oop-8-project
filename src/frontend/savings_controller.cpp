@@ -24,6 +24,7 @@ QDate parseDateStr(const QString &str) {
 SavingsController::SavingsController(QObject *parent) : QObject(parent) {
     connect(&DatabaseManager::instance(), &DatabaseManager::dataChanged, this, [this]() {
         m_listDirty = true;
+        emit categoriesChanged();
         emit savingsListChanged();
     });
 }

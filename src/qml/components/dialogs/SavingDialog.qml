@@ -9,7 +9,7 @@ Item {
     z: 999
 
     // --- Properties & Signals ---
-    property var categoryList: []
+    property var categoryList: savingsController.categoryOptions
     // SỬA: luôn tự lọc bỏ mục "All Main Categories" (id === 0) ngay trong dialog,
     // không phụ thuộc vào việc component cha (SavingsPage.qml) có lọc đúng hay chưa.
     // Dialog Add/Edit không nên cho chọn "Tất cả danh mục" vì phải gán đúng 1 category cụ thể.

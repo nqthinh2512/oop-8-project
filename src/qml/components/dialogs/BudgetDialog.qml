@@ -11,7 +11,7 @@ Item {
     z: 999
 
     // --- Properties & Signals kết nối với BudgetsPage ---
-    property var categoryList: []
+    property var categoryList: budgetsController.categoryOptions
     property bool isEditMode: false
     property int currentBudgetId: -1
     property string errorMessage: ""

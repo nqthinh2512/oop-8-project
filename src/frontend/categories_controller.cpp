@@ -187,6 +187,7 @@ bool CategoriesController::addCategory(const QString &name, int parentId, bool a
     Category cat(0, parentId, name.trimmed());
     cat.setActive(active);
     DatabaseManager::instance().categoryDAO()->add(cat);
+    DatabaseManager::instance().triggerDataChanged();
     emit categoriesChanged();
     return true;
 }
@@ -200,6 +201,7 @@ bool CategoriesController::updateCategory(int id, const QString &name, int newPa
             Category cat(id, targetParentId, name.trimmed());
             cat.setActive(active);
             DatabaseManager::instance().categoryDAO()->update(id, cat);
+            DatabaseManager::instance().triggerDataChanged();
             emit categoriesChanged();
             return true;
         }
@@ -216,12 +218,14 @@ bool CategoriesController::updateCategoryParent(int id, int newParentId) {
             break;
         }
     }
+    DatabaseManager::instance().triggerDataChanged();
     emit categoriesChanged();
     return true;
 }
 
 bool CategoriesController::removeCategory(int id) {
     DatabaseManager::instance().categoryDAO()->remove(id);
+    DatabaseManager::instance().triggerDataChanged();
     emit categoriesChanged();
     return true;
 }
@@ -261,12 +265,14 @@ bool CategoriesController::migrateAndRemoveCategory(int sourceId, int targetId) 
         }
     }
     DatabaseManager::instance().categoryDAO()->remove(sourceId);
+    DatabaseManager::instance().triggerDataChanged();
     emit categoriesChanged();
     return true;
 }
 
 bool CategoriesController::deactivateCategory(int id) {
     DatabaseManager::instance().categoryDAO()->deactivate(id);
+    DatabaseManager::instance().triggerDataChanged();
     emit categoriesChanged();
     return true;
 }

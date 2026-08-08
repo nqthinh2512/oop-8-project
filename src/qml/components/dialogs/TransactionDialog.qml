@@ -335,7 +335,9 @@ Item {
                     enabled: root.transactionTypeIndex !== -1
                     opacity: enabled ? 1.0 : 0.5
                     
+                    property var dummyCats: categoriesController.categoriesList
                     property var catList: {
+                        var dep = dummyCats;
                         if (root.transactionTypeIndex === -1) return [];
                         var targetParent = root.transactionTypeIndex + 1; // 1 for Income, 2 for Expense
                         return categoriesController.categoriesForParent(targetParent, root.transactionCategoryId);

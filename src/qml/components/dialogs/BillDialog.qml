@@ -315,7 +315,11 @@ Item {
                     _state: Dropdown_1.State_1.State_1_default
                     clip: true
                     
-                    property var catList: categoriesController.categoriesForParent(3, root.billCategoryId)
+                    property var dummyCats: categoriesController.categoriesList
+                    property var catList: {
+                        var dep = dummyCats;
+                        return categoriesController.categoriesForParent(3, root.billCategoryId);
+                    }
                     model: catList.map(function(c) { return c.name; })
                     selectedText: catList.length > 0 ? catList[0].name : "Select Category"
                     
