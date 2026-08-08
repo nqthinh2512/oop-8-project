@@ -12,7 +12,7 @@ Rectangle {
 
     property string row2Label: "Overdue"
     property string row2Amount: "2,000,000 VND"
-    property string row2Color: "#000000"
+    property string row2Color: AppTheme.textMain
 
     property string row3Label: "Paid"
     property string row3Amount: "1,000 VND"
