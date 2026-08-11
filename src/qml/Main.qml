@@ -14,7 +14,19 @@ Window {
     width: 1920
     height: 1080
     visible: true
-    title: "Finance Dashboard App"
+
+    readonly property var pageTitles: [
+        "Overview",
+        "Transactions",
+        "Bills",
+        "Budgets",
+        "Savings",
+        "Categories",
+        "Reports",
+        "Settings"
+    ]
+
+    title: `${pageTitles[sidebarMenu.selectedIndex] || "Dashboard"} - FManagement`
 
     visibility: Window.Maximized
 
@@ -49,6 +61,4 @@ Window {
             SettingsPage { }      // Index 7
         }
     }
-
-
 }

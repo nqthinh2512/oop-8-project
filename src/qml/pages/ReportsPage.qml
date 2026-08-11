@@ -37,6 +37,10 @@ Rectangle {
         anchors.fill: parent
         clip: true
 
+        // flickDeceleration: 800
+        // maximumFlickVelocity: 2500
+        // boundsBehavior: Flickable.StopAtBounds
+
         Item {
             width: scrollView.availableWidth
             implicitHeight: mainLayout.implicitHeight + 48
@@ -143,6 +147,7 @@ Rectangle {
                         row1Amount: reportsController.billsSnapshot.dueFormatted || "0 VND"
                         row2Label: "Overdue"
                         row2Amount: reportsController.billsSnapshot.overdueFormatted || "0 VND"
+                        row2Color: "#ff0000"
                         row3Label: "Paid"
                         row3Amount: reportsController.billsSnapshot.paidFormatted || "0 VND"
                         Layout.fillWidth: true
@@ -236,10 +241,40 @@ Rectangle {
                                     anchors.fill: parent
                                     anchors.margins: 12
 
+                                    property real animProgress: 0.0
+
+                                    onAnimProgressChanged: requestPaint()
+
+                                    SequentialAnimation {
+                                        id: barAnimation
+                                        running: true
+
+                                        NumberAnimation{
+                                            target: rptBarCanvas
+                                            property: "animProgress"
+                                            from: 0.0
+                                            to: 0.0
+                                            duration: 0
+                                        }
+
+                                        PauseAnimation {
+                                            duration: 200
+                                        }
+
+                                        NumberAnimation {
+                                            target: rptBarCanvas
+                                            property: "animProgress"
+                                            from: 0.0
+                                            to: 1.0
+                                            duration: 800
+                                            easing.type: Easing.OutQuad
+                                        }
+                                    }
+
                                     Connections {
                                         target: reportsController
                                         function onReportChanged() {
-                                            rptBarCanvas.requestPaint()
+                                            barAnimation.restart()
                                         }
                                     }
                                     onPaint: {
@@ -288,8 +323,8 @@ Rectangle {
                                             var xInc = groupCenterX - barWidth - 1;
                                             var xExp = groupCenterX + 1;
 
-                                            var hInc = incomeRatios[b] * chartH;
-                                            var hExp = expenseRatios[b] * chartH;
+                                            var hInc = incomeRatios[b] * chartH * animProgress;
+                                            var hExp = expenseRatios[b] * chartH * animProgress;
 
                                             ctx.fillStyle = "#10b981";
                                             ctx.fillRect(xInc, padT + chartH - hInc, barWidth, hInc);
@@ -379,10 +414,42 @@ Rectangle {
                                     anchors.fill: parent
                                     anchors.margins: 12
 
+                                    property real animProgress: 0.0
+
+                                    onAnimProgressChanged: requestPaint()
+
+                                    SequentialAnimation {
+                                        id: lineChartAnim
+                                        running: true
+
+                                        NumberAnimation{
+                                            target: rptNwCanvas
+                                            property: "animProgress"
+                                            from: 0.0
+                                            to: 0.0
+                                            duration: 0
+                                        }
+
+                                        PauseAnimation {
+                                            duration: 200
+                                        }
+
+                                        NumberAnimation {
+                                            target: rptNwCanvas
+                                            property: "animProgress"
+                                            from: 0.0
+                                            to: 1.0
+                                            duration: 2000
+                                            easing.type: Easing.OutQuint
+                                        }
+                                    }
+
+                                    Component.onCompleted: lineChartAnim.start()
+
                                     Connections {
                                         target: reportsController
                                         function onReportChanged() {
-                                            rptNwCanvas.requestPaint()
+                                            lineChartAnim.restart()
                                         }
                                     }
                                     onPaint: {
@@ -425,7 +492,7 @@ Rectangle {
                                         ctx.moveTo(padL, padT + chartH);
                                         for (var p = 0; p < count; p++) {
                                             var px = padL + p * step;
-                                            var py = padT + chartH - (nwRatios[p] * chartH);
+                                            var py = padT + chartH - (nwRatios[p] * chartH * animProgress);
                                             ctx.lineTo(px, py);
                                         }
                                         ctx.lineTo(padL + (count - 1) * step, padT + chartH);
@@ -443,7 +510,7 @@ Rectangle {
                                         ctx.lineWidth = 2.5;
                                         for (var l = 0; l < count; l++) {
                                             var lx = padL + l * step;
-                                            var ly = padT + chartH - (nwRatios[l] * chartH);
+                                            var ly = padT + chartH - (nwRatios[l] * chartH * animProgress);
                                             if (l === 0) ctx.moveTo(lx, ly);
                                             else ctx.lineTo(lx, ly);
                                         }
@@ -454,7 +521,7 @@ Rectangle {
                                         ctx.textBaseline = "top";
                                         for (var d = 0; d < count; d++) {
                                             var dx = padL + d * step;
-                                            var dy = padT + chartH - (nwRatios[d] * chartH);
+                                            var dy = padT + chartH - (nwRatios[d] * chartH * animProgress);
 
                                             ctx.fillStyle = "#6366f1";
                                             ctx.beginPath();
@@ -542,10 +609,40 @@ Rectangle {
                                         anchors.margins: 12
                                         property var chartData: reportsController.categoryExpenseReport
 
+                                        property real animProgress: 0.0
+
+                                        onAnimProgressChanged: requestPaint()
+
+                                        SequentialAnimation {
+                                            id: chartAnim
+                                            running: true
+
+                                            NumberAnimation {
+                                                target: expenseCanvas
+                                                property: "animProgress"
+                                                from: 0.0
+                                                to: 0.0
+                                                duration: 0
+                                            }
+
+                                            PauseAnimation {
+                                                duration: 500
+                                            }
+
+                                            NumberAnimation {
+                                                target: expenseCanvas
+                                                property: "animProgress"
+                                                from: 0.0
+                                                to: 1.0
+                                                duration: 800
+                                                easing.type: Easing.OutCubic
+                                            }
+                                        }
+
                                         Connections {
                                             target: reportsController
                                             function onReportChanged() {
-                                                expenseCanvas.requestPaint()
+                                                chartAnim.restart()
                                             }
                                         }
 
@@ -568,15 +665,22 @@ Rectangle {
                                             }
 
                                             var startAngle = -Math.PI / 2;
+                                            var maxAngle = -Math.PI / 2 + (2 * Math.PI * animProgress);
                                             for (var i = 0; i < chartData.length; i++) {
                                                 var item = chartData[i];
                                                 var sliceAngle = (item.percentage / 100.0) * (2 * Math.PI);
                                                 var endAngle = startAngle + sliceAngle;
 
+                                                if (startAngle >= maxAngle) {
+                                                    break;
+                                                }
+
+                                                var drawEndAngle = Math.min(endAngle, maxAngle);
+
                                                 ctx.fillStyle = item.color;
                                                 ctx.beginPath();
-                                                ctx.arc(centerX, centerY, outerRadius, startAngle, endAngle);
-                                                ctx.arc(centerX, centerY, innerRadius, endAngle, startAngle, true);
+                                                ctx.arc(centerX, centerY, outerRadius, startAngle, drawEndAngle);
+                                                ctx.arc(centerX, centerY, innerRadius, drawEndAngle, startAngle, true);
                                                 ctx.closePath();
                                                 ctx.fill();
 
@@ -669,10 +773,40 @@ Rectangle {
                                         anchors.margins: 12
                                         property var chartData: reportsController.categoryIncomeReport
 
+                                        property real animProgress: 0.0
+
+                                        onAnimProgressChanged: requestPaint()
+
+                                        SequentialAnimation {
+                                            id: chartAnim2
+                                            running: true
+
+                                            NumberAnimation {
+                                                target: incomeCanvas
+                                                property: "animProgress"
+                                                from: 0.0
+                                                to: 0.0
+                                                duration: 0
+                                            }
+
+                                            PauseAnimation {
+                                                duration: 500
+                                            }
+
+                                            NumberAnimation {
+                                                target: incomeCanvas
+                                                property: "animProgress"
+                                                from: 0.0
+                                                to: 1.0
+                                                duration: 800
+                                                easing.type: Easing.OutCubic
+                                            }
+                                        }
+
                                         Connections {
                                             target: reportsController
                                             function onReportChanged() {
-                                                incomeCanvas.requestPaint()
+                                                chartAnim2.restart()
                                             }
                                         }
 
@@ -695,15 +829,23 @@ Rectangle {
                                             }
 
                                             var startAngle = -Math.PI / 2;
+                                            var maxAngle = -Math.PI / 2 + (2 * Math.PI * animProgress);
+
                                             for (var i = 0; i < chartData.length; i++) {
                                                 var item = chartData[i];
                                                 var sliceAngle = (item.percentage / 100.0) * (2 * Math.PI);
                                                 var endAngle = startAngle + sliceAngle;
 
+                                                if (startAngle >= maxAngle) {
+                                                    break;
+                                                }
+
+                                                var drawEndAngle = Math.min(endAngle, maxAngle);
+
                                                 ctx.fillStyle = item.color;
                                                 ctx.beginPath();
-                                                ctx.arc(centerX, centerY, outerRadius, startAngle, endAngle);
-                                                ctx.arc(centerX, centerY, innerRadius, endAngle, startAngle, true);
+                                                ctx.arc(centerX, centerY, outerRadius, startAngle, drawEndAngle);
+                                                ctx.arc(centerX, centerY, innerRadius, drawEndAngle, startAngle, true);
                                                 ctx.closePath();
                                                 ctx.fill();
 

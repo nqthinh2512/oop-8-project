@@ -66,6 +66,7 @@ Rectangle {
                 spacing: 20
 
                 OverviewKpiCard {
+                    id: overviewCard1
                     Layout.fillWidth: true
                     Layout.preferredWidth: 0
                     cardTitle: "Net Balance"
@@ -77,6 +78,7 @@ Rectangle {
                 }
 
                 OverviewKpiCard {
+                    id: overviewCard2
                     Layout.fillWidth: true
                     Layout.preferredWidth: 0
                     cardTitle: "Total Income"
@@ -89,6 +91,7 @@ Rectangle {
                 }
 
                 OverviewKpiCard {
+                    id: overviewCard3
                     Layout.fillWidth: true
                     Layout.preferredWidth: 0
                     cardTitle: "Total Expense"
@@ -98,6 +101,15 @@ Rectangle {
                     showTrend: false
                     accentLineColor: AppTheme.danger
                     onViewAllClicked: overviewPage.navigateTo(1)
+                }
+
+                Connections {
+                    target: overviewController
+                    function onDataChanged() {
+                        overviewCard1.triggerLineAnimation()
+                        overviewCard2.triggerLineAnimation()
+                        overviewCard3.triggerLineAnimation()
+                    }
                 }
             }
 
@@ -238,10 +250,40 @@ Rectangle {
                                     anchors.fill: parent
                                     anchors.margins: 12
 
+                                    property real animProgress: 0.0
+
+                                    onAnimProgressChanged: requestPaint()
+
+                                    SequentialAnimation {
+                                        id: barAnimation
+                                        running: true
+
+                                        NumberAnimation {
+                                            target: overviewCanvas
+                                            property: "animProgress"
+                                            from: 0.0
+                                            to: 0.0
+                                            duration: 0.0
+                                        }
+
+                                        PauseAnimation {
+                                            duration: 200
+                                        }
+
+                                        NumberAnimation {
+                                            target: overviewCanvas
+                                            property: "animProgress"
+                                            from: 0.0
+                                            to: 1.0
+                                            duration: 800
+                                            easing.type: Easing.OutQuad
+                                        }
+                                    }
+
                                     Connections {
                                         target: overviewController
                                         function onDataChanged() {
-                                            overviewCanvas.requestPaint()
+                                            barAnimation.restart()
                                         }
                                     }
                                     onPaint: {
@@ -297,8 +339,8 @@ Rectangle {
                                             var xInc = groupCenterX - barWidth - 1;
                                             var xExp = groupCenterX + 1;
 
-                                            var hInc = incomeRatios[b] * chartH;
-                                            var hExp = expenseRatios[b] * chartH;
+                                            var hInc = incomeRatios[b] * chartH * animProgress;
+                                            var hExp = expenseRatios[b] * chartH * animProgress;
 
                                             var yInc = padT + chartH - hInc;
                                             var yExp = padT + chartH - hExp;
@@ -346,11 +388,14 @@ Rectangle {
             RowLayout {
                 id: bottom_content
                 Layout.fillWidth: true
+                // Layout.maximumWidth: 300
                 spacing: 20
 
                 // A. Recent Transactions
                 ColumnLayout {
+                    Layout.preferredWidth: 150
                     Layout.fillWidth: true
+                    width: 1200
                     spacing: 10
 
                     RowLayout {
@@ -483,11 +528,15 @@ Rectangle {
                                     currentLabel: Math.round((overviewController.topSaving.progress || 0)) + "%"
                                     minLabel: "0%"
                                     maxLabel: "100%"
-                                    Layout.preferredWidth: 130
-                                    Layout.maximumWidth: 140
-                                    Layout.minimumWidth: 80
-                                    Layout.preferredHeight: 85
-                                    Layout.alignment: Qt.AlignRight | Qt.AlignVCenter
+                                    Layout.preferredWidth: 140
+                                    Layout.preferredHeight: 90
+
+                                    Component.onCompleted: gaugeAnim.start()
+                                    // Layout.preferredWidth: 130
+                                    // Layout.maximumWidth: 140
+                                    // Layout.minimumWidth: 80
+                                    // Layout.preferredHeight: 85
+                                    // Layout.alignment: Qt.AlignRight | Qt.AlignVCenter
                                 }
                             }
                         }

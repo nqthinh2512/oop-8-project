@@ -21,6 +21,36 @@ Item {
         anchors.fill: parent
         antialiasing: true
 
+        property real animProgress: 0.0
+
+        onAnimProgressChanged: requestPaint()
+
+        SequentialAnimation {
+            id: gaugeAnim
+            running: true
+
+            NumberAnimation {
+                target: canvas
+                property: "animProgress"
+                from: 0.0
+                to: 0.0
+                duration: 0.0
+            }
+
+            PauseAnimation {
+                duration: 400
+            }
+
+            NumberAnimation {
+                target: canvas
+                property: "animProgress"
+                from: 0.0
+                to: 1.0
+                duration: 800
+                easing.type: Easing.OutQuad
+            }
+        }
+
         onPaint: {
             var ctx = getContext("2d");
             ctx.reset();
@@ -47,9 +77,11 @@ Item {
 
             // Progress Arc
             var fraction = Math.min(Math.max(root.currentValue / (root.maxValue || 1), 0), 1);
-            if (fraction > 0) {
+            var currentFraction = fraction * canvas.animProgress;
+
+            if (currentFraction > 0) {
                 ctx.beginPath();
-                ctx.arc(centerX, centerY, radius, Math.PI, Math.PI + fraction * Math.PI, false);
+                ctx.arc(centerX, centerY, radius, Math.PI, Math.PI + currentFraction * Math.PI, false);
                 ctx.lineWidth = lineWidth;
                 ctx.strokeStyle = root.progressColor;
                 ctx.lineCap = "round";
@@ -94,8 +126,9 @@ Item {
 
     Connections {
         target: root
-        function onCurrentValueChanged() { canvas.requestPaint(); }
-        function onMaxValueChanged() { canvas.requestPaint(); }
-        function onProgressColorChanged() { canvas.requestPaint(); }
+        function onCurrentValueChanged() { gaugeAnim.restart(); }
+        function onMaxValueChanged() { gaugeAnim.restart(); }
+        function onProgressColorChanged() { gaugeAnim.restart(); }
+        function onVisibleChanged() { gaugeAnim.restart(); }
     }
 }
